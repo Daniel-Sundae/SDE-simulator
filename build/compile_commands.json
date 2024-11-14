@@ -1,0 +1,14 @@
+[
+{
+  "directory": "C:/Projects/StochasticProcesses/build",
+  "command": "C:\\ProgramData\\mingw64\\mingw64\\bin\\g++.exe  @CMakeFiles/StochasticSim.dir/includes_CXX.rsp -g -std=c++20 -o CMakeFiles\\StochasticSim.dir\\src\\Process.cpp.obj -c C:\\Projects\\StochasticProcesses\\src\\Process.cpp",
+  "file": "C:/Projects/StochasticProcesses/src/Process.cpp",
+  "output": "CMakeFiles/StochasticSim.dir/src/Process.cpp.obj"
+},
+{
+  "directory": "C:/Projects/StochasticProcesses/build",
+  "command": "C:\\ProgramData\\mingw64\\mingw64\\bin\\g++.exe  @CMakeFiles/StochasticSim.dir/includes_CXX.rsp -g -std=c++20 -o CMakeFiles\\StochasticSim.dir\\src\\main.cpp.obj -c C:\\Projects\\StochasticProcesses\\src\\main.cpp",
+  "file": "C:/Projects/StochasticProcesses/src/main.cpp",
+  "output": "CMakeFiles/StochasticSim.dir/src/main.cpp.obj"
+}
+]
