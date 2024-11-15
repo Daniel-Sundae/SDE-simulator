@@ -10,7 +10,6 @@ set(DOCUMENTATION_TEXT
   ]]
 )
 
-
 cmake_minimum_required(VERSION 3.15)
 project(StochasticSim VERSION 1.0.0 LANGUAGES CXX)
 
@@ -28,9 +27,19 @@ if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
 endif()
 
+# Find Qt packages
+set(CMAKE_PREFIX_PATH "C:/Qt/6.8.0/mingw_64/lib/cmake")
+find_package(Qt6 COMPONENTS Core Widgets Charts REQUIRED)
+
 # Add executable
 file(GLOB SOURCES "src/*.cpp")
 add_executable(StochasticSim ${SOURCES})
+
+# Link Qt libraries
+target_link_libraries(StochasticSim PRIVATE Qt6::Core Qt6::Widgets Qt6::Charts)
+
+# Enable Qt MOC and UI processing (if needed)
+set_target_properties(StochasticSim PROPERTIES AUTOMOC ON AUTOUIC ON)
 
 # Set output directories based on build type
 set_target_properties(StochasticSim PROPERTIES

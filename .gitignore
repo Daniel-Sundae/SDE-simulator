@@ -1,0 +1,19 @@
+# Ignore build artifacts and directories
+/build/
+
+# Ignore IDE settings directories
+.vscode/
+
+# Ignore executables and object files
+*.exe
+*.obj
+*.o
+
+# Ignore CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# Ignore Qt-specific build directories (if applicable)
+.qt/
