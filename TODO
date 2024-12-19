@@ -1,0 +1,2 @@
+- Implement such that I can see which weights f(t,w) are being used at each time step, and each outcome, when plotting f(t,w)Bs
+- Implement example 3.1.1. Can I see that using left edge Bt as weight gives 0 on average while right edge gives T?

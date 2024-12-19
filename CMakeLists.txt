@@ -1,15 +1,3 @@
-# COMMENT ON HOW TO BUILD RELEASE AND DEBUG
-# HAVE TO BE IN BUILD DIRECTORY 
-set(DOCUMENTATION_TEXT
-  [[
-    cmake -DCMAKE_BUILD_TYPE=Release ..
-    cmake --build . --config Release
-
-    cmake -DCMAKE_BUILD_TYPE=Debug ..
-    cmake --build . --config Debug
-  ]]
-)
-
 cmake_minimum_required(VERSION 3.15)
 project(StochasticSim VERSION 1.0.0 LANGUAGES CXX)
 
@@ -18,22 +6,35 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Include directories
-include_directories(${PROJECT_SOURCE_DIR}/include)
-
-# Define build types
+# Define build types if not already defined
 if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
 endif()
+
+# Set compiler flags based on the build type
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-g -O2")
+set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os")
+
+# Add compiler warnings
+add_compile_options(-Wall -Wextra -Wpedantic)
+
+# Include directories
+include_directories(${PROJECT_SOURCE_DIR}/include)
 
 # Find Qt packages
 set(CMAKE_PREFIX_PATH "C:/Qt/6.8.0/mingw_64/lib/cmake")
 find_package(Qt6 COMPONENTS Core Widgets Charts REQUIRED)
 
 # Add executable
-file(GLOB SOURCES "src/*.cpp")
-add_executable(StochasticSim ${SOURCES})
+add_executable(StochasticSim
+    src/main.cpp
+    src/SDE.cpp
+    # Add other source files here
+)
+
 
 # Link Qt libraries
 target_link_libraries(StochasticSim PRIVATE Qt6::Core Qt6::Widgets Qt6::Charts)

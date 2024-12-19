@@ -1,0 +1,26 @@
+{
+    "version": 3,
+    "configurePresets": [
+      {
+        "name": "debug",
+        "displayName": "Debug",
+        "description": "Build configuration for Debug",
+        "generator": "MinGW Makefiles",
+        "binaryDir": "${sourceDir}/build/Debug",
+        "cacheVariables": {
+          "CMAKE_BUILD_TYPE": "Debug"
+        }
+      },
+      {
+        "name": "release",
+        "displayName": "Release",
+        "description": "Build configuration for Release",
+        "generator": "MinGW Makefiles",
+        "binaryDir": "${sourceDir}/build/Release",
+        "cacheVariables": {
+          "CMAKE_BUILD_TYPE": "Release"
+        }
+      }
+    ]
+  }
+  
