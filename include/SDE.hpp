@@ -2,20 +2,18 @@
 
 #include <functional>
 #include <vector>
-
-using time = double;
-using state = double;
+#include "types.hpp"
 
 class SDE{
 public:
-    SDE(std::function<double(time, state)>drift, std::function<double(time, state)>diffusion);
+    SDE(std::function<double(TIME, STATE)>drift, std::function<double(TIME, STATE)>diffusion);
     auto SamplePath(int points, double dt, double startPos = 0) const -> const std::vector<double>;
-    auto Drift() const -> std::function<double(time, state)>;
-    auto Diffusion() const -> std::function<double(time, state)>;
+    auto Drift() const -> std::function<double(TIME, STATE)>;
+    auto Diffusion() const -> std::function<double(TIME, STATE)>;
 
 private:
-    auto Increment(double time, double state, double dt) const -> double;
+    auto Increment(double TIME, double STATE, double dt) const -> double;
 
-    const std::function<double(time, state)> m_drift;
-    const std::function<double(time, state)> m_diffusion;
+    const std::function<double(TIME, STATE)> m_drift;
+    const std::function<double(TIME, STATE)> m_diffusion;
 };

@@ -24,10 +24,6 @@ add_compile_options(-Wall -Wextra -Wpedantic)
 # Include directories
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
-# Find Qt packages
-set(CMAKE_PREFIX_PATH "C:/Qt/6.8.0/mingw_64/lib/cmake")
-find_package(Qt6 COMPONENTS Core Widgets Charts REQUIRED)
-
 # Add executable
 add_executable(StochasticSim
     src/main.cpp
@@ -35,7 +31,9 @@ add_executable(StochasticSim
     # Add other source files here
 )
 
-
+# Find Qt packages
+set(CMAKE_PREFIX_PATH "C:/Qt/6.8.0/mingw_64/lib/cmake")
+find_package(Qt6 COMPONENTS Core Widgets Charts REQUIRED)
 # Link Qt libraries
 target_link_libraries(StochasticSim PRIVATE Qt6::Core Qt6::Widgets Qt6::Charts)
 
