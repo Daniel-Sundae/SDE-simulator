@@ -24,6 +24,21 @@ add_compile_options(-Wall -Wextra -Wpedantic)
 # Include directories
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
+# Set automoc, autorcc, and autouic
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+
+# Find Qt packages
+if(WIN32)
+    set(CMAKE_PREFIX_PATH "C:/Qt/6.8.0/mingw_64/lib/cmake")
+else()
+    set(CMAKE_PREFIX_PATH "/opt/homebrew/opt/qt@6")
+endif()
+
+# Find required Qt components
+find_package(Qt6 COMPONENTS Core Widgets Charts REQUIRED)
+
 # Add executable
 add_executable(StochasticSim
     src/main.cpp
@@ -31,14 +46,21 @@ add_executable(StochasticSim
     # Add other source files here
 )
 
-# Find Qt packages
-set(CMAKE_PREFIX_PATH "C:/Qt/6.8.0/mingw_64/lib/cmake")
-find_package(Qt6 COMPONENTS Core Widgets Charts REQUIRED)
 # Link Qt libraries
-target_link_libraries(StochasticSim PRIVATE Qt6::Core Qt6::Widgets Qt6::Charts)
+target_link_libraries(StochasticSim PRIVATE 
+    Qt6::Core 
+    Qt6::Widgets 
+    Qt6::Charts
+)
 
-# Enable Qt MOC and UI processing (if needed)
-set_target_properties(StochasticSim PROPERTIES AUTOMOC ON AUTOUIC ON)
+# Set macOS bundle properties
+if(APPLE)
+    set_target_properties(StochasticSim PROPERTIES
+        MACOSX_BUNDLE TRUE
+        MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourorg.stochasticsim"
+        MACOSX_BUNDLE_BUNDLE_NAME "StochasticSim"
+    )
+endif()
 
 # Set output directories based on build type
 set_target_properties(StochasticSim PROPERTIES
