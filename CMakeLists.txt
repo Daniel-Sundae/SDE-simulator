@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 project(StochasticSim VERSION 1.0.0 LANGUAGES CXX)
 
 # Set C++ standard to C++20
@@ -43,7 +44,7 @@ find_package(Qt6 COMPONENTS Core Widgets Charts REQUIRED)
 add_executable(StochasticSim
     src/main.cpp
     src/SDE.cpp
-    # Add other source files here
+    src/RunApplication.cpp
 )
 
 # Link Qt libraries
@@ -53,17 +54,25 @@ target_link_libraries(StochasticSim PRIVATE
     Qt6::Charts
 )
 
-# Set macOS bundle properties
+# Set bundle properties for macOS or properties for other platforms (e.g., Windows)
 if(APPLE)
     set_target_properties(StochasticSim PROPERTIES
         MACOSX_BUNDLE TRUE
         MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourorg.stochasticsim"
-        MACOSX_BUNDLE_BUNDLE_NAME "StochasticSim"
+        OUTPUT_NAME_DEBUG "StochasticSim_Debug"
+        OUTPUT_NAME_RELEASE "StochasticSim_Release"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}"
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}"
+    )
+else()
+    # Windows-specific properties
+    set_target_properties(StochasticSim PROPERTIES
+        WIN32_EXECUTABLE TRUE  # Indicates a Windows GUI application
+        OUTPUT_NAME_DEBUG "StochasticSim_Debug.exe"
+        OUTPUT_NAME_RELEASE "StochasticSim_Release.exe"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/bin/Debug"
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/bin/Release"
     )
 endif()
-
-# Set output directories based on build type
-set_target_properties(StochasticSim PROPERTIES
-  OUTPUT_NAME_DEBUG StochasticSim_Debug
-  OUTPUT_NAME_RELEASE StochasticSim_Release
-)

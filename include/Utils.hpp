@@ -1,7 +1,8 @@
 #pragma once
 #include <random>
 #include <cmath>
-#include "types.hpp"
+#include <QLineSeries>
+#include "Types.hpp"
 #include "SDE.hpp"
 
 namespace Utils
@@ -22,5 +23,14 @@ namespace Utils
         auto drift = [](TIME, STATE){ return 0; };
         auto diffusion = [](TIME, STATE){ return 1; };
         return SDE(drift, diffusion);
+    }
+
+    inline auto LineSeries(const std::vector<double>& data) -> std::unique_ptr<QLineSeries>
+    {
+        auto series = std::make_unique<QLineSeries>();
+        for (size_t i = 0; i < data.size(); ++i) {
+            series->append(static_cast<qreal>(i), static_cast<qreal>(data[i]));
+        }
+        return series;
     }
 }

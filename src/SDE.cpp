@@ -10,7 +10,7 @@ m_drift(std::move(drift)),
 m_diffusion(std::move(diffusion))
 {}
 //---------------------------------------------------------------------------//
-auto SDE::SamplePath(int points, double dt, double startPos) const -> const std::vector<double>
+auto SDE::Sample(int points, double dt, double startPos) const -> const std::vector<double>
 {
     std::vector<double> path;
     path.reserve(points);

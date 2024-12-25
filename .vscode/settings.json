@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "qapplication": "cpp",
+        "iostream": "cpp",
+        "qmessagebox": "cpp",
+        "cmath": "cpp"
+    },
+    "cSpell.words": [
+        "Ebutton",
+        "qreal",
+        "stdev"
+    ]
+}
