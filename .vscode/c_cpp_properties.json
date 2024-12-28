@@ -15,7 +15,40 @@
             "compilerArgs": [
                 "-isystem",
                 "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1"
-            ]
+            ],
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/**"
+                ],
+                "limitSymbolsToIncludedHeaders": true
+            }
+        },
+        {
+            "name": "Windows",
+            "compileCommands": "${workspaceFolder}/build/Debug/compile_commands.json",
+            "defines": [],
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/include",
+                "C:/Qt/6.8.0/mingw_64/include/**",
+                "C:/Qt/6.8.0/mingw_64/include/QtCore",
+                "C:/Qt/6.8.0/mingw_64/include/QtWidgets",
+                "C:/Qt/6.8.0/mingw_64/include/QtCharts"
+            ],
+            "compilerPath": "C:/Qt/Tools/mingw1310_64/bin/g++.exe", // Path to your MinGW g++ compiler
+            "cStandard": "c17",
+            "cppStandard": "c++20",
+            "intelliSenseMode": "windows-gcc-x64",
+            "compilerArgs": [
+                "-IC:/Qt/Tools/mingw1310_64/include" // Adjust if necessary
+            ],
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/**",
+                    "C:/Qt/Tools/mingw1310_64/include/**" // Ensure IntelliSense can browse MinGW headers
+                ],
+                "limitSymbolsToIncludedHeaders": true
+            }
         }
     ]
 }

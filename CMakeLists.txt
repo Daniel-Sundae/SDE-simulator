@@ -7,6 +7,14 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Additional settings
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_DEBUG_POSTFIX "d")
+
+if(WIN32)
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+endif()
+
 # Define build types if not already defined
 if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
@@ -22,8 +30,6 @@ set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os")
 # Add compiler warnings
 add_compile_options(-Wall -Wextra -Wpedantic)
 
-# Include directories
-include_directories(${PROJECT_SOURCE_DIR}/include)
 
 # Set automoc, autorcc, and autouic
 set(CMAKE_AUTOMOC ON)
@@ -44,7 +50,16 @@ find_package(Qt6 COMPONENTS Core Widgets Charts REQUIRED)
 add_executable(StochasticSim
     src/main.cpp
     src/SDE.cpp
-    src/RunApplication.cpp
+    src/MainWindow.cpp
+    src/ChartWidget.cpp
+    src/ButtonWidget.cpp
+)
+
+target_include_directories(StochasticSim PRIVATE
+    ${PROJECT_SOURCE_DIR}/include
+    ${Qt6Core_INCLUDE_DIRS}
+    ${Qt6Widgets_INCLUDE_DIRS}
+    ${Qt6Charts_INCLUDE_DIRS}
 )
 
 # Link Qt libraries
@@ -69,10 +84,10 @@ else()
     # Windows-specific properties
     set_target_properties(StochasticSim PROPERTIES
         WIN32_EXECUTABLE TRUE  # Indicates a Windows GUI application
-        OUTPUT_NAME_DEBUG "StochasticSim_Debug.exe"
-        OUTPUT_NAME_RELEASE "StochasticSim_Release.exe"
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/bin/Debug"
-        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/bin/Release"
+        OUTPUT_NAME_DEBUG "StochasticSim_Debug"
+        OUTPUT_NAME_RELEASE "StochasticSim_Release"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}"
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}"
     )
 endif()

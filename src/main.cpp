@@ -1,5 +1,5 @@
 
-#include "RunApplication.hpp"
+#include "MainWindow.hpp"
 // #include "Utils.hpp"
 // #include "SDE.hpp"
 // #include <iostream>
@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 {
 
     QApplication app(argc, argv);
-    RunApplication r{};
+    MainWindow r{};
     // // Use smart pointers for better memory management
     // auto series = std::make_unique<QLineSeries>();
     
