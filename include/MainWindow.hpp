@@ -7,12 +7,12 @@
 
 class MainWindow : public QMainWindow{
 public:
-    MainWindow();    
+    MainWindow();
     
 private:
     void InitializeMainWindow();
 
-    QVBoxLayout* m_mainWindowLayout;
+    QHBoxLayout* m_mainWindowLayout;
     ChartWidget* m_chartWidget;
     ButtonWidget* m_buttonWidget;
 };
