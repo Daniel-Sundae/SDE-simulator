@@ -6,11 +6,13 @@
 
 class ButtonWidget : public QWidget
 {
+    Q_OBJECT
+
 public:
     explicit ButtonWidget(QWidget* parent = nullptr);
 
 signals:
-    void newDataGenerated(std::vector<double> data);
+    void SampleData(std::vector<double> data);
 
 private:
     auto CreateButtons() -> void;

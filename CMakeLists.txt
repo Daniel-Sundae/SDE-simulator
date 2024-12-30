@@ -46,13 +46,27 @@ endif()
 # Find required Qt components
 find_package(Qt6 COMPONENTS Core Widgets Charts REQUIRED)
 
-# Add executable
-add_executable(StochasticSim
+set(SOURCES
     src/main.cpp
     src/SDE.cpp
     src/MainWindow.cpp
     src/ChartWidget.cpp
     src/ButtonWidget.cpp
+    src/SDEChart.cpp
+)
+
+set(HEADERS
+    include/MainWindow.hpp
+    include/ChartWidget.hpp
+    include/ButtonWidget.hpp
+    include/SDE.hpp
+    include/Utils.hpp
+    include/SDEChart.hpp
+)
+
+add_executable(StochasticSim
+    ${SOURCES}
+    ${HEADERS}
 )
 
 target_include_directories(StochasticSim PRIVATE

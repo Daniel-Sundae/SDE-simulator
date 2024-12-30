@@ -10,7 +10,11 @@ MainWindow::MainWindow() : QMainWindow(),
     QWidget* centralWidget = new QWidget(this);
     setCentralWidget(centralWidget);
     centralWidget->setLayout(m_mainWindowLayout);
-    
+    connect(
+        m_buttonWidget,
+        &ButtonWidget::SampleData, 
+        m_chartWidget,
+        &ChartWidget::PlotChart);
     InitializeMainWindow();
 }
 
