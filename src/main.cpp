@@ -6,10 +6,8 @@
 // #include <memory>
 #include <QtWidgets/QApplication>
 
-
 int main(int argc, char *argv[])
 {
-
     QApplication app(argc, argv);
     MainWindow r{};
     // // Use smart pointers for better memory management

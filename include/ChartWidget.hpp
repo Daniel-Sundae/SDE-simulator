@@ -11,7 +11,9 @@ class ChartWidget : public QWidget{
 
 public:
     explicit ChartWidget(QWidget* parent = nullptr);
-    auto PlotChart(const std::vector<double>& sampleData) -> void;
+
+public slots:
+    auto OnButtonClickSignal(const std::vector<double>& sampleData, const QString& title) -> void;
 
 private:
     QVBoxLayout* m_layout;

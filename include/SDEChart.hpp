@@ -8,9 +8,12 @@ class SDEChart : public QChart{
 
 public:
     explicit SDEChart();
-    auto PlotChart(const std::vector<double>& sampleData) -> void;
+    auto OnButtonClickSignal(
+        const std::vector<double>& sampleData,
+        const QString& title) -> void;
 
 private:
+    auto PlotChart(const std::vector<double>& sampleData) -> void;
     auto UpdateRangesIfNeeded(double maxX, double minY, double maxY) -> void;
     auto InitializeSDEChart() -> void;
 };

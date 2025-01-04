@@ -2,6 +2,7 @@
 #include <QtWidgets/qwidget.h>
 #include <QtWidgets/qboxlayout.h>
 #include <QtWidgets/qpushbutton.h>
+#include <QtWidgets/qspinbox.h>
 
 
 class ButtonWidget : public QWidget
@@ -12,13 +13,23 @@ public:
     explicit ButtonWidget(QWidget* parent = nullptr);
 
 signals:
-    void SampleData(std::vector<double> data);
+    void ChartUpdate(
+        std::vector<double> data,
+        const QString& label);
 
 private:
+    auto InitializeLayout() -> void;
+    auto InitializeParameterLayout() -> void;
+    auto ButtonLayout() const -> QGridLayout*;
+    auto GetMueValue() const -> double;
+    auto GetSigmaValue() const -> double;
     auto CreateButtons() -> void;
+    auto CreateButton(
+        const QString &label,
+        std::function<std::vector<double>()> sample,
+        const QString &toolTip = "") -> void;
 
-    auto CreateButton(const QString &label, std::function<std::vector<double>()> sample) -> void;
+    QGridLayout* const m_buttonLayout;
 
-    QVBoxLayout* m_layout;
-    QPushButton* m_plotButton;
 };
+

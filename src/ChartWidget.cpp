@@ -12,7 +12,7 @@ ChartWidget::ChartWidget(QWidget *parent) :
     setLayout(m_layout);
 }
 
-auto ChartWidget::PlotChart(const std::vector<double>& sampleData) -> void
+auto ChartWidget::OnButtonClickSignal(const std::vector<double>& sampleData, const QString& title) -> void
 {
-    m_chart->PlotChart(sampleData);
+    m_chart->OnButtonClickSignal(sampleData, title);
 }

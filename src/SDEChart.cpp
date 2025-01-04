@@ -7,6 +7,12 @@ SDEChart::SDEChart() : QChart()
     InitializeSDEChart();
 }
 
+auto SDEChart::OnButtonClickSignal(const std::vector<double>& sampleData, const QString& title) -> void
+{
+    setTitle(title);
+    PlotChart(sampleData);
+}
+
 auto SDEChart::PlotChart(const std::vector<double>& sampleData) -> void
 {
     if (sampleData.empty()) return;
@@ -94,6 +100,7 @@ auto SDEChart::InitializeSDEChart() -> void
 {
     setTheme(QChart::ChartThemeBlueNcs);
     setTitle("Testtitle for SDEChart");
+    legend()->setVisible(false);
     QValueAxis* xAxis = new QValueAxis(this);
     QValueAxis* yAxis = new QValueAxis(this);
     addAxis(xAxis, Qt::AlignBottom);

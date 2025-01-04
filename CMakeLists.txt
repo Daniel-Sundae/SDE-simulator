@@ -55,13 +55,11 @@ set(SOURCES
     src/SDEChart.cpp
 )
 
+file(GLOB_RECURSE CORE_HEADERS "${PROJECT_SOURCE_DIR}/include/*.hpp")
+file(GLOB_RECURSE UTILS_HEADERS "${PROJECT_SOURCE_DIR}/include/Utils/*.hpp")
 set(HEADERS
-    include/MainWindow.hpp
-    include/ChartWidget.hpp
-    include/ButtonWidget.hpp
-    include/SDE.hpp
-    include/Utils.hpp
-    include/SDEChart.hpp
+    ${CORE_HEADERS}
+    ${UTILS_HEADERS}
 )
 
 add_executable(StochasticSim
@@ -71,6 +69,7 @@ add_executable(StochasticSim
 
 target_include_directories(StochasticSim PRIVATE
     ${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_SOURCE_DIR}/include/Utils
     ${Qt6Core_INCLUDE_DIRS}
     ${Qt6Widgets_INCLUDE_DIRS}
     ${Qt6Charts_INCLUDE_DIRS}

@@ -12,7 +12,9 @@ public:
     MainWindow();
     
 private:
-    void InitializeMainWindow();
+    auto InitializeMainWindow() -> void;
+
+    auto ConnectButtons() const -> void;
 
     QHBoxLayout* m_mainWindowLayout;
     ChartWidget* m_chartWidget;
