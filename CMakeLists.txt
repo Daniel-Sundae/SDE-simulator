@@ -46,21 +46,18 @@ endif()
 # Find required Qt components
 find_package(Qt6 COMPONENTS Core Widgets Charts REQUIRED)
 
+file(GLOB_RECURSE SRC_IMPL "${PROJECT_SOURCE_DIR}/src/*.cpp")
 set(SOURCES
-    src/main.cpp
-    src/SDE.cpp
-    src/MainWindow.cpp
-    src/ChartWidget.cpp
-    src/ButtonWidget.cpp
-    src/SDEChart.cpp
+    ${SRC_IMPL}
 )
 
 file(GLOB_RECURSE CORE_HEADERS "${PROJECT_SOURCE_DIR}/include/*.hpp")
-file(GLOB_RECURSE UTILS_HEADERS "${PROJECT_SOURCE_DIR}/include/Utils/*.hpp")
+file(GLOB_RECURSE SRC_HEADERS "${PROJECT_SOURCE_DIR}/src/*.hpp")
 set(HEADERS
     ${CORE_HEADERS}
-    ${UTILS_HEADERS}
+    ${SRC_HEADERS}
 )
+message("Found header files: ${SRC_HEADERS}")
 
 add_executable(StochasticSim
     ${SOURCES}
@@ -70,6 +67,8 @@ add_executable(StochasticSim
 target_include_directories(StochasticSim PRIVATE
     ${PROJECT_SOURCE_DIR}/include
     ${PROJECT_SOURCE_DIR}/include/Utils
+    ${PROJECT_SOURCE_DIR}/src
+    ${PROJECT_SOURCE_DIR}/src/GUI
     ${Qt6Core_INCLUDE_DIRS}
     ${Qt6Widgets_INCLUDE_DIRS}
     ${Qt6Charts_INCLUDE_DIRS}

@@ -3,3 +3,4 @@
 
 - Setaxis checkbox for x and y axis
 - sample many times without removing plots.
+- Make plot redraw when incrementing a parameter (probably performance hit?)

@@ -1,7 +1,7 @@
 #pragma once
 #include <random>
 #include <cmath>
-#include <QtCharts/QLineSeries>
+#include <QtCharts/qlineseries.h>
 #include "SDE.hpp"
 
 namespace Utils
@@ -17,7 +17,7 @@ namespace Utils
         return d(generator);
     }
 
-    inline auto LineSeries(const std::vector<double>& data) -> std::unique_ptr<QLineSeries>
+/*     inline auto LineSeries(const std::vector<double>& data) -> std::unique_ptr<QLineSeries>
     {
         auto series = std::make_unique<QLineSeries>();
         for (size_t i = 0; i < data.size(); ++i) {
@@ -25,4 +25,5 @@ namespace Utils
         }
         return series;
     }
+*/
 }

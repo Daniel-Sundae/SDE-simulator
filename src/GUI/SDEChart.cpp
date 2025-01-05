@@ -99,7 +99,6 @@ auto SDEChart::UpdateRangesIfNeeded(double sampleMaxX, double sampleMinY, double
 auto SDEChart::InitializeSDEChart() -> void
 {
     setTheme(QChart::ChartThemeBlueNcs);
-    setTitle("Testtitle for SDEChart");
     legend()->setVisible(false);
     QValueAxis* xAxis = new QValueAxis(this);
     QValueAxis* yAxis = new QValueAxis(this);
