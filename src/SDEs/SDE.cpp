@@ -3,8 +3,8 @@
 #include "Utils.hpp"
 
 SDE::SDE(
-    const std::function<double(TIME, STATE)> drift,
-    const std::function<double(TIME, STATE)> diffusion,
+    const std::function<double(Time, State)> drift,
+    const std::function<double(Time, State)> diffusion,
     const double startPos
 ):
 m_drift(std::move(drift)),
@@ -12,9 +12,9 @@ m_diffusion(std::move(diffusion)),
 m_startPos(startPos)
 {}
 //---------------------------------------------------------------------------//
-auto SDE::Sample(int points, double dt) const -> const std::vector<double>
+auto SDE::Sample(int points, double dt) const -> Path
 {
-    std::vector<double> path;
+    std::vector<double> path = {};
     path.reserve(points);
     if(points <= 0) return path;
     path.push_back(StartPos());
@@ -25,12 +25,12 @@ auto SDE::Sample(int points, double dt) const -> const std::vector<double>
     return path;
 }
 //---------------------------------------------------------------------------//
-auto SDE::Drift() const -> std::function<double(TIME, STATE)>
+auto SDE::Drift() const -> std::function<double(Time, State)>
 {
     return m_drift;
 }
 //---------------------------------------------------------------------------//
-auto SDE::Diffusion() const -> std::function<double(TIME, STATE)>
+auto SDE::Diffusion() const -> std::function<double(Time, State)>
 {
     return m_diffusion;
 }

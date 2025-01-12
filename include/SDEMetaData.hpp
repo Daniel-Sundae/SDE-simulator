@@ -8,16 +8,15 @@ struct SDEMetaData{
     const QString acronym;
     const QString description;
     const QString definition;
-    // Constructor to ensure all fields are initialized
     SDEMetaData(
-        QString name,
-        QString acronym,
-        QString description,
-        QString definition)
-        : name(std::move(name)),
-        acronym(std::move(acronym)),
-        description(std::move(description)),
-        definition(std::move(definition))
+        QString in_name,
+        QString in_acronym,
+        QString in_description,
+        QString in_definition)
+        : name(std::move(in_name)),
+        acronym(std::move(in_acronym)),
+        description(std::move(in_description)),
+        definition(std::move(in_definition))
     {}
     
     static inline auto Create(SDEType type) -> SDEMetaData{

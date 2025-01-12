@@ -5,7 +5,7 @@
 MainWindow::MainWindow() : QMainWindow(),
     m_mainWindowLayout(new QHBoxLayout),
     m_chartWidget(new ChartWidget(this)),
-    m_buttonWidget(new ButtonWidget(this))
+    m_buttonWidget(new ButtonWidgetManager(this))
 {
     QWidget* centralWidget = new QWidget(this);
     setCentralWidget(centralWidget);
@@ -25,7 +25,7 @@ auto MainWindow::InitializeMainWindow() -> void{
 auto MainWindow::ConnectButtons() const -> void{
     connect(
         m_buttonWidget,
-        &ButtonWidget::ChartUpdate, 
+        &ButtonWidgetManager::ChartUpdate, 
         m_chartWidget,
         &ChartWidget::OnButtonClickSignal
         );

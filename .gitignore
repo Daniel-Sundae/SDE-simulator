@@ -2,7 +2,8 @@
 /build/
 
 # Ignore IDE settings directories
-#.vscode/
+.vscode/
+.vs/
 
 # Ignore executables and object files
 *.exe

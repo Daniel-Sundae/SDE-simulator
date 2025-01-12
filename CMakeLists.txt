@@ -7,6 +7,31 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Add strict compiler options based on compiler type
+if(MSVC)
+    add_compile_options(
+        /W4     # Warning level 4
+        /WX     # Treat warnings as errors
+        /permissive- # Strict standards conformance
+        /analyze # Enable code analysis
+        /sdl    # Enable additional security checks
+        /Zi     # Generate debug info
+        /guard:cf # Control Flow Guard
+        /MP     # Multi-processor compilation
+    )
+else()
+    add_compile_options(
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Werror     # Treat warnings as errors
+        -Wconversion # Warn about implicit conversions
+        -Wshadow    # Warn about shadowed variables
+        -Wnon-virtual-dtor # Warn about non-virtual destructors
+        -pedantic-errors  # Strict ISO C++ compliance
+    )
+endif()
+
 # Additional settings
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_DEBUG_POSTFIX "d")
@@ -22,14 +47,12 @@ if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
 endif()
 
 # Set compiler flags based on the build type
-set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-g -O2")
-set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os")
-
-# Add compiler warnings
-add_compile_options(-Wall -Wextra -Wpedantic)
-
+if(NOT MSVC)
+    set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-g -O2")
+    set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os")
+endif()
 
 # Set automoc, autorcc, and autouic
 set(CMAKE_AUTOMOC ON)
@@ -38,6 +61,7 @@ set(CMAKE_AUTOUIC ON)
 
 # Find Qt packages
 if(WIN32)
+#    set(CMAKE_PREFIX_PATH "C:/Qt/6.8.0/mingw_64/lib/cmake")
     set(CMAKE_PREFIX_PATH "C:/Qt/6.8.0/mingw_64/lib/cmake")
 else()
     set(CMAKE_PREFIX_PATH "/opt/homebrew/opt/qt@6")
@@ -57,7 +81,6 @@ set(HEADERS
     ${CORE_HEADERS}
     ${SRC_HEADERS}
 )
-message("Found header files: ${SRC_HEADERS}")
 
 add_executable(StochasticSim
     ${SOURCES}
@@ -69,6 +92,8 @@ target_include_directories(StochasticSim PRIVATE
     ${PROJECT_SOURCE_DIR}/include/Utils
     ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/src/GUI
+    ${PROJECT_SOURCE_DIR}/src/GUI/Buttons
+    ${PROJECT_SOURCE_DIR}/src/SDEs
     ${Qt6Core_INCLUDE_DIRS}
     ${Qt6Widgets_INCLUDE_DIRS}
     ${Qt6Charts_INCLUDE_DIRS}

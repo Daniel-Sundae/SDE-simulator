@@ -1,7 +1,9 @@
 #pragma once
+#include <vector>
 
-using TIME = double;
-using STATE = double;
+using Time = double;
+using State = double;
+using Path = std::vector<double>;
 enum class SDEType{
     BM = 0,
     GBM,

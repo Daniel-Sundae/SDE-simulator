@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ChartWidget.hpp"
-#include "ButtonWidget.hpp"
+#include "ButtonWidgetManager.hpp"
 #include <QtWidgets/qmainwindow.h>
 #include <QVBoxLayout>
 
@@ -18,6 +18,6 @@ private:
 
     QHBoxLayout* m_mainWindowLayout;
     ChartWidget* m_chartWidget;
-    ButtonWidget* m_buttonWidget;
+    ButtonWidgetManager* m_buttonWidget;
 };
 
