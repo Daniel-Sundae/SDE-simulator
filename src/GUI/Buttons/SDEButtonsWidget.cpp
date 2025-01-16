@@ -5,46 +5,53 @@
 SDEButtonsWidget::SDEButtonsWidget(ButtonWidgetManager* parent):
     QWidget(parent)
 {
-    InitializeSDEButtonsWidget();
+    CreateSDEButtons();
+    InitializeSDEButtonsWidgetLayout();
 }
+
+
 
 auto SDEButtonsWidget::InitializeSDEButtonsWidget() -> void
 {
     auto* buttonLayout = new QGridLayout(this);
 
-    buttonLayout->addWidget(CreateSDEButton(
-        SDEMetaData::Create(SDEType::BM),
-        [this] {
-            return CreateSDE::BrownianMotion(GetStartValue()).Sample(1000, 0.1);
-        }
-    ));
+    buttonLayout->addWidget();
 
     buttonLayout->addWidget(CreateSDEButton(
         SDEMetaData::Create(SDEType::GBM),
         [this] {
-            return CreateSDE::GeometricBrownianMotion(GetMueValue(), GetSigmaValue(), GetStartValue()).Sample(1000, 0.01);
+            return CreateSDE::GeometricBrownianMotion(GetMuValue(), GetSigmaValue(), GetStartValue()).Sample(1000, 0.01);
         }
     ));
     setLayout(buttonLayout);
 }
-//---------------------------------------------------------------------------//
+auto SDEButtonsWidget::CreateSDEButtons() -> void
+{
+    CreateSDEButton(
+        SDEMetaData::Create(SDEType::BM),
+        [this] {
+            return SDE<SDEType::BM>::Create(GetStartValue()).Sample(1000, 0.1);
+        }
+    )
+}
+
 auto SDEButtonsWidget::CreateSDEButton(
     const SDEMetaData& metaData,
-    std::function<std::vector<double>()> sample) -> QPushButton*
+    std::function<Path()> sample) -> QPushButton*
 {
     auto* button = new QPushButton(this);
     button->setText(metaData.acronym);
     button->setToolTip(metaData.description);
     QString chartTitle = metaData.name + ": " + metaData.definition;
-    // Button sends clicked signal to buttonwidget which emits sample data to ChartWidget::OnButtonClickSignal
+    // Button sends clicked signal to SDEButtonsWidget (this) which emits sample data to ChartWidget::OnButtonClickSignal
     connect(
         button,
         &QPushButton::clicked,
         this,
         [this, sample, chartTitle]() {
-            emit ChartUpdate(sample(), chartTitle);
+            emit RequestUpdatePathChart(sample(), chartTitle);
         });
     return button;
 }
-//---------------------------------------------------------------------------//
+
 

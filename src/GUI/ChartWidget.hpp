@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SDEChart.hpp"
+#include "PathChart.hpp"
 #include <QtWidgets/qwidget.h>
 #include <QtWidgets/qboxlayout.h>
 #include <QtCharts/qchartview.h>
@@ -13,10 +13,10 @@ public:
     explicit ChartWidget(QWidget* parent = nullptr);
 
 public slots:
-    auto OnButtonClickSignal(const std::vector<double>& sampleData, const QString& title) -> void;
+    auto SDEButtonClicked(const std::vector<double>& sampleData, const QString& title) -> void;
 
 private:
     QVBoxLayout* m_layout;
-    SDEChart* m_chart;
+    PathChart* m_chart;
     QChartView* m_chartView;
 };

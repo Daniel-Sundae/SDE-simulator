@@ -16,13 +16,14 @@ public:
     explicit ButtonWidgetManager(QWidget* parent = nullptr);
 
 signals:
-    void ButtonWidgetPathSignal(
+    void ForwardRequestUpdatePathChart(
         const Path& data,
         const QString& label);
 
 private:
     auto InitializeLayout() -> void;
-    auto ConnectSignals() -> void;
+    auto SetupConnections() -> void;
+
 private:
     ParametersWidget* m_parametersWidget;
     SDEButtonsWidget* m_SDEButtonsWidget;

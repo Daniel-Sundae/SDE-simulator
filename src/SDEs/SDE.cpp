@@ -11,7 +11,7 @@ m_drift(std::move(drift)),
 m_diffusion(std::move(diffusion)),
 m_startPos(startPos)
 {}
-//---------------------------------------------------------------------------//
+
 auto SDE::Sample(int points, double dt) const -> Path
 {
     std::vector<double> path = {};
@@ -24,25 +24,25 @@ auto SDE::Sample(int points, double dt) const -> Path
     }
     return path;
 }
-//---------------------------------------------------------------------------//
+
 auto SDE::Drift() const -> std::function<double(Time, State)>
 {
     return m_drift;
 }
-//---------------------------------------------------------------------------//
+
 auto SDE::Diffusion() const -> std::function<double(Time, State)>
 {
     return m_diffusion;
 }
-//---------------------------------------------------------------------------//
+
 auto SDE::StartPos() const -> double
 {
     return m_startPos;
 }
-//---------------------------------------------------------------------------//
+
 auto SDE::Increment(double TIME, double STATE, double dt) const -> double
 {
     return Drift()(TIME, STATE) * dt + Diffusion()(TIME, STATE) * Utils::db(dt);
 }
-//---------------------------------------------------------------------------//
+
 

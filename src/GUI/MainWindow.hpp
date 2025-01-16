@@ -14,7 +14,7 @@ public:
 private:
     auto InitializeMainWindow() -> void;
 
-    auto ConnectButtons() const -> void;
+    auto SetupConnections() const -> void;
 
     QHBoxLayout* m_mainWindowLayout;
     ChartWidget* m_chartWidget;

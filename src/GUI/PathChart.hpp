@@ -2,13 +2,13 @@
 
 #include <QtCharts/qchart.h>
 
-class SDEChart : public QChart{
+class PathChart : public QChart{
 
     Q_OBJECT
 
 public:
-    explicit SDEChart();
-    auto OnButtonClickSignal(
+    explicit PathChart();
+    auto UpdatePathChart(
         const std::vector<double>& sampleData,
         const QString& title) -> void;
 

@@ -9,7 +9,7 @@ class ParametersWidget : public QWidget
 public:
 	explicit ParametersWidget(ButtonWidgetManager* parent);
 protected:
-	auto GetMueValue() const -> double;
+	auto GetMuValue() const -> double;
 	auto GetSigmaValue() const -> double;
 	auto GetStartValue() const -> double;
 private:

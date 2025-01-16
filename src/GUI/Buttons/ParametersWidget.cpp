@@ -6,17 +6,17 @@ ParametersWidget::ParametersWidget(ButtonWidgetManager* parent):
 {
 	InitializeParametersWidget();
 }
-//---------------------------------------------------------------------------//
+
 auto ParametersWidget::InitializeParametersWidget() -> void
 {
     auto* layout = new QHBoxLayout(this);
-    auto* mueInput = new QDoubleSpinBox(this);
-    mueInput->setObjectName("mueValue");
-    mueInput->setRange(-10.0, 10.0);
-    mueInput->setValue(0.2);
-    mueInput->setSingleStep(0.1);
+    auto* muInput = new QDoubleSpinBox(this);
+    muInput->setObjectName("muValue");
+    muInput->setRange(-10.0, 10.0);
+    muInput->setValue(0.2);
+    muInput->setSingleStep(0.1);
     layout->addWidget(new QLabel("Drift (μ):"));
-    layout->addWidget(mueInput);
+    layout->addWidget(muInput);
 
     auto* sigmaInput = new QDoubleSpinBox(this);
     sigmaInput->setObjectName("sigmaValue");
@@ -35,19 +35,19 @@ auto ParametersWidget::InitializeParametersWidget() -> void
     layout->addWidget(startValueInput);
     setLayout(layout);
 }
-//---------------------------------------------------------------------------//
-auto ParametersWidget::GetMueValue() const -> double
+
+auto ParametersWidget::GetMuValue() const -> double
 {
-    auto* mueInput = findChild<QDoubleSpinBox*>("mueValue");
-    return mueInput->value();
+    auto* muInput = findChild<QDoubleSpinBox*>("muValue");
+    return muInput->value();
 }
-//---------------------------------------------------------------------------//
+
 auto ParametersWidget::GetSigmaValue() const -> double
 {
     auto* sigmaInput = findChild<QDoubleSpinBox*>("sigmaValue");
     return sigmaInput->value();
 }
-//---------------------------------------------------------------------------//
+
 auto ParametersWidget::GetStartValue() const -> double
 {
     auto* startValueInput = findChild<QDoubleSpinBox*>("startValue");

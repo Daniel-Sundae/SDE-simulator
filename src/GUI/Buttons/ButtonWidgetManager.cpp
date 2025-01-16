@@ -9,9 +9,9 @@ ButtonWidgetManager::ButtonWidgetManager(QWidget* parent):
     m_SDEButtonsWidget(new SDEButtonsWidget(this))
 {
     InitializeLayout();
-    ConnectSignals();
+    SetupConnections();
 }
-//---------------------------------------------------------------------------//
+
 auto ButtonWidgetManager::InitializeLayout() -> void
 {
     auto* mainLayout = new QVBoxLayout(this);
@@ -21,8 +21,21 @@ auto ButtonWidgetManager::InitializeLayout() -> void
     mainLayout->setSpacing(0);
     setLayout(mainLayout);
 }
-//---------------------------------------------------------------------------//
-auto ButtonWidgetManager::ConnectSignals() -> void
-{
 
+auto ButtonWidgetManager::SetupConnections() -> void
+{
+    connect(
+        m_SDEButtonsWidget,
+        &SDEButtonsWidget::RequestUpdatePathChart,
+        this,
+        &ButtonWidgetManager::ForwardRequestUpdatePathChart
+    );
+
+    connect(
+        m_parametersWidget,
+        &ParametersWidget::DriftSignal,
+        m_SDEButtonsWidget,
+        &SDEButtonsWidget::ForwardRequestUpdatePathChart
+    );
 }
+

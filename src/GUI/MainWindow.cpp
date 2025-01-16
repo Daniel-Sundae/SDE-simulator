@@ -11,9 +11,9 @@ MainWindow::MainWindow() : QMainWindow(),
     setCentralWidget(centralWidget);
     centralWidget->setLayout(m_mainWindowLayout);
     InitializeMainWindow();
-    ConnectButtons();
+    SetupConnections();
 }
-//---------------------------------------------------------------------------//
+
 auto MainWindow::InitializeMainWindow() -> void{
     m_mainWindowLayout->addWidget(m_chartWidget, 8);
     m_mainWindowLayout->addWidget(m_buttonWidget, 2);
@@ -21,13 +21,24 @@ auto MainWindow::InitializeMainWindow() -> void{
     resize(1300, 600);
     show();
 }
-//---------------------------------------------------------------------------//
-auto MainWindow::ConnectButtons() const -> void{
+
+auto MainWindow::SetupConnections() const -> void{
     connect(
         m_buttonWidget,
-        &ButtonWidgetManager::ChartUpdate, 
+        &ButtonWidgetManager::ForwardRequestUpdatePathChart, 
         m_chartWidget,
-        &ChartWidget::OnButtonClickSignal
-        );
-    
+        &ChartWidget::SDEButtonClicked
+    );
 }
+
+//connect(
+//    sender,            // m_buttonWidget (the object that sends the signal)
+//    signalFunc,            // &ButtonWidgetManager::ChartUpdate (the signal to listen for) (signal is sent when "emit ChartUpdate()" line is run)
+//    receiver,          // m_chartWidget (the object that receives the signal)
+//    slotFunc              // &ChartWidget::OnButtonClickSignal (the slot to be called)
+//);
+
+/*
+To emit a function, the function must be under signal.
+The receiver object must have the slotFunc under slots (perhaps private slots if only itra object transmission)
+*/

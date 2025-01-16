@@ -1,19 +1,19 @@
-#include "SDEChart.hpp"
+#include "PathChart.hpp"
 #include "QtCharts/qlineseries.h"
 #include "QtCharts/qvalueaxis.h"
 
-SDEChart::SDEChart() : QChart()
+PathChart::PathChart() : QChart()
 {
     InitializeSDEChart();
 }
 
-auto SDEChart::OnButtonClickSignal(const std::vector<double>& sampleData, const QString& title) -> void
+auto PathChart::UpdatePathChart(const std::vector<double>& sampleData, const QString& title) -> void
 {
     setTitle(title);
     PlotChart(sampleData);
 }
 
-auto SDEChart::PlotChart(const std::vector<double>& sampleData) -> void
+auto PathChart::PlotChart(const std::vector<double>& sampleData) -> void
 {
     if (sampleData.empty()) return;
     removeAllSeries();
@@ -33,7 +33,7 @@ auto SDEChart::PlotChart(const std::vector<double>& sampleData) -> void
     UpdateRangesIfNeeded(sampleData.size(), *min_it, *max_it);
 }
 
-auto SDEChart::UpdateRangesIfNeeded(double sampleMaxX, double sampleMinY, double sampleMaxY) -> void
+auto PathChart::UpdateRangesIfNeeded(double sampleMaxX, double sampleMinY, double sampleMaxY) -> void
 {
     auto xAxis = qobject_cast<QValueAxis*>(axes(Qt::Horizontal).first());
     auto yAxis = qobject_cast<QValueAxis*>(axes(Qt::Vertical).first());
@@ -96,7 +96,7 @@ auto SDEChart::UpdateRangesIfNeeded(double sampleMaxX, double sampleMinY, double
     }
 }
 
-auto SDEChart::InitializeSDEChart() -> void
+auto PathChart::InitializeSDEChart() -> void
 {
     setTheme(QChart::ChartThemeBlueNcs);
     legend()->setVisible(false);

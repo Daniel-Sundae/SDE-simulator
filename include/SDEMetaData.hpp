@@ -3,7 +3,7 @@
 #include <QtCore/qstring.h>
 #include <stdexcept>
 
-struct SDEMetaData{
+struct SDEMetaData {
     const QString name;
     const QString acronym;
     const QString description;
@@ -18,7 +18,7 @@ struct SDEMetaData{
         description(std::move(in_description)),
         definition(std::move(in_definition))
     {}
-    
+
     static inline auto Create(SDEType type) -> SDEMetaData{
         switch(type){
             case SDEType::BM:

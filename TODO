@@ -4,3 +4,4 @@
 - sample many times without removing plots.
 - Make plot redraw when incrementing a parameter (probably performance hit?). Send signal from parameterwidget to chart.
 - Don't hardcode which buttons to draw
+- Delete old SDE when pressing button again

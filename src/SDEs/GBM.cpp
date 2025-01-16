@@ -8,7 +8,7 @@ GBM::GBM(
 	const double startPos)
 : BaseClass(std::move(drift), std::move(diffusion), startPos)
 {}
-//---------------------------------------------------------------------------//
+
 auto GBM::Sample(int points, double dt) const -> Path
 {
 	if (StartPos() == 0){
