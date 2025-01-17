@@ -10,6 +10,7 @@ ParametersWidget::ParametersWidget(ButtonWidgetManager* parent):
 auto ParametersWidget::InitializeParametersWidget() -> void
 {
     auto* layout = new QHBoxLayout(this);
+
     auto* muInput = new QDoubleSpinBox(this);
     muInput->setObjectName("muValue");
     muInput->setRange(-10.0, 10.0);
@@ -52,4 +53,13 @@ auto ParametersWidget::GetStartValue() const -> double
 {
     auto* startValueInput = findChild<QDoubleSpinBox*>("startValue");
     return startValueInput->value();
+}
+
+auto ParametersWidget::RequestParameters() -> void
+{
+    SDEDefinition def;
+    def.mu = GetMuValue();
+    def.sigma = GetSigmaValue();
+    def.startValue = GetStartValue();
+    emit EmitParameters(def);
 }

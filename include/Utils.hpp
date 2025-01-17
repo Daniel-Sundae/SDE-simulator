@@ -17,13 +17,4 @@ namespace Utils
         return d(generator);
     }
 
-/*     inline auto LineSeries(const std::vector<double>& data) -> std::unique_ptr<QLineSeries>
-    {
-        auto series = std::make_unique<QLineSeries>();
-        for (size_t i = 0; i < data.size(); ++i) {
-            series->append(static_cast<qreal>(i), static_cast<qreal>(data[i]));
-        }
-        return series;
-    }
-*/
 }

@@ -12,7 +12,7 @@ GBM::GBM(
 auto GBM::Sample(int points, double dt) const -> Path
 {
 	if (StartPos() == 0){
-		return std::vector<double>(points, 0);
+		return Path(points, 0);
 	}
 	else if (StartPos() < 0){
 		std::stringstream ss;

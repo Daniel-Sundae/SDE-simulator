@@ -13,7 +13,7 @@ public:
     explicit ChartWidget(QWidget* parent = nullptr);
 
 public slots:
-    auto SDEButtonClicked(const std::vector<double>& sampleData, const QString& title) -> void;
+    auto SDEButtonClicked(const Path& sampleData, const SDEType type) -> void;
 
 private:
     QVBoxLayout* m_layout;

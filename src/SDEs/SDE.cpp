@@ -14,7 +14,7 @@ m_startPos(startPos)
 
 auto SDE::Sample(int points, double dt) const -> Path
 {
-    std::vector<double> path = {};
+    Path path = {};
     path.reserve(points);
     if(points <= 0) return path;
     path.push_back(StartPos());

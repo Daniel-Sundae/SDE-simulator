@@ -10,3 +10,8 @@ enum class SDEType{
     Levy,
     OU
 };
+struct SDEDefinition {
+    double mu = 0;
+    double sigma = 0;
+    double startValue = 0;
+};

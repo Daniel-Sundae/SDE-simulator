@@ -6,7 +6,7 @@
 #include <QtWidgets/qspinbox.h>
 
 class ParametersWidget;
-class SDEButtonsWidget;
+class SDEButtonsManager;
 
 class ButtonWidgetManager : public QWidget
 {
@@ -18,7 +18,7 @@ public:
 signals:
     void ForwardRequestUpdatePathChart(
         const Path& data,
-        const QString& label);
+        const SDEType type);
 
 private:
     auto InitializeLayout() -> void;
@@ -26,6 +26,6 @@ private:
 
 private:
     ParametersWidget* m_parametersWidget;
-    SDEButtonsWidget* m_SDEButtonsWidget;
+    SDEButtonsManager* m_SDEButtonsManager;
 };
 

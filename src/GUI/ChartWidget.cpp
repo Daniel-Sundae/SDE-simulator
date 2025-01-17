@@ -12,7 +12,7 @@ ChartWidget::ChartWidget(QWidget *parent) :
     setLayout(m_layout);
 }
 
-auto ChartWidget::SDEButtonClicked(const std::vector<double>& sampleData, const QString& title) -> void
+auto ChartWidget::SDEButtonClicked(const Path& sampleData, const SDEType type) -> void
 {
-    m_chart->UpdatePathChart(sampleData, title);
+    m_chart->UpdatePathChart(sampleData, type);
 }

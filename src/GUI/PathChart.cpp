@@ -1,4 +1,6 @@
 #include "PathChart.hpp"
+#include "SDEMetaData.hpp"
+#include "Types.hpp"
 #include "QtCharts/qlineseries.h"
 #include "QtCharts/qvalueaxis.h"
 
@@ -7,19 +9,21 @@ PathChart::PathChart() : QChart()
     InitializeSDEChart();
 }
 
-auto PathChart::UpdatePathChart(const std::vector<double>& sampleData, const QString& title) -> void
+auto PathChart::UpdatePathChart(const Path& path, const SDEType type) -> void
 {
+    SDEMetaData metaData = SDEMetaData::Create(type);
+    QString title = metaData.name + ": " + metaData.definition;
     setTitle(title);
-    PlotChart(sampleData);
+    PlotChart(path);
 }
 
-auto PathChart::PlotChart(const std::vector<double>& sampleData) -> void
+auto PathChart::PlotChart(const Path& path) -> void
 {
-    if (sampleData.empty()) return;
+    if (path.empty()) return;
     removeAllSeries();
     QLineSeries* series = new QLineSeries();
-    for(size_t i = 0; i < sampleData.size(); ++i) {
-        series->append(static_cast<qreal>(i), static_cast<qreal>(sampleData[i]));
+    for(size_t i = 0; i < path.size(); ++i) {
+        series->append(static_cast<qreal>(i), static_cast<qreal>(path[i]));
     }
     addSeries(series);
 
@@ -29,8 +33,8 @@ auto PathChart::PlotChart(const std::vector<double>& sampleData) -> void
         series->attachAxis(xAxis);
         series->attachAxis(yAxis);
     }
-    auto [min_it, max_it] = std::minmax_element(sampleData.begin(), sampleData.end());
-    UpdateRangesIfNeeded(sampleData.size(), *min_it, *max_it);
+    auto [min_it, max_it] = std::minmax_element(path.begin(), path.end());
+    UpdateRangesIfNeeded(path.size(), *min_it, *max_it);
 }
 
 auto PathChart::UpdateRangesIfNeeded(double sampleMaxX, double sampleMinY, double sampleMaxY) -> void
