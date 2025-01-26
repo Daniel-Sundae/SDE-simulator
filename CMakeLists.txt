@@ -93,7 +93,7 @@ target_include_directories(StochasticSim PRIVATE
     ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/src/GUI
     ${PROJECT_SOURCE_DIR}/src/GUI/Buttons
-    ${PROJECT_SOURCE_DIR}/src/SDEs
+    ${PROJECT_SOURCE_DIR}/src/Processs
     ${Qt6Core_INCLUDE_DIRS}
     ${Qt6Widgets_INCLUDE_DIRS}
     ${Qt6Charts_INCLUDE_DIRS}

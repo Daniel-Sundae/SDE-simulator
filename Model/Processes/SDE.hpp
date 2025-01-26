@@ -4,11 +4,11 @@
 #include <vector>
 #include "Types.hpp"
 
-class SDE{
+class Process{
 public:
-    SDE() = delete;
-    explicit SDE(std::function<double(Time, State)>drift, std::function<double(Time, State)>diffusion, const double startPos);
-    virtual ~SDE() = default;
+    Process() = delete;
+    explicit Process(std::function<double(Time, State)>drift, std::function<double(Time, State)>diffusion, const double startPos);
+    virtual ~Process() = default;
 public:
     virtual auto Sample(int points, double dt) const -> Path = 0;
     auto Drift() const -> std::function<double(Time, State)>;

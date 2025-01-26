@@ -4,12 +4,12 @@
 #include "BM.hpp"
 #include "GBM.hpp"
 
-template<SDEType Type>
-struct SDE;
+template<ProcessType Type>
+struct Process;
 
 template<>
-struct SDE<SDEType::BM> {
-	static auto Create(const SDEDefinition& def) -> std::unique_ptr<BM>
+struct Process<ProcessType::BM> {
+	static auto Create(const ProcessDefinition& def) -> std::unique_ptr<BM>
 	{
 		auto drift = [](Time, State) { return 0.0; };
 		auto diffusion = [](Time, State) { return 1.0; };
@@ -18,8 +18,8 @@ struct SDE<SDEType::BM> {
 };
 
 template<>
-struct SDE<SDEType::GBM> {
-	static auto Create(const SDEDefinition& def) -> std::unique_ptr<GBM>
+struct Process<ProcessType::GBM> {
+	static auto Create(const ProcessDefinition& def) -> std::unique_ptr<GBM>
 	{
 		auto drift = [def](Time, State s) { return def.mu * s; };
 		auto diffusion = [def](Time, State s) { return def.sigma * s; };
@@ -27,11 +27,11 @@ struct SDE<SDEType::GBM> {
 	}
 };
 
-//template<SDEType Type>
-//struct SDE;
+//template<ProcessType Type>
+//struct Process;
 //
 //template<>
-//struct SDE<SDEType::BM> {
+//struct Process<ProcessType::BM> {
 //	static auto Create(const double startPos) -> std::unique_ptr<BM>
 //	{
 //		auto drift = [](Time, State) { return 0.0; };
@@ -41,7 +41,7 @@ struct SDE<SDEType::GBM> {
 //};
 //
 //template<>
-//struct SDE<SDEType::GBM> {
+//struct Process<ProcessType::GBM> {
 //	static auto Create(const double mu, const double sigma, const double startPos) -> std::unique_ptr<GBM>
 //	{
 //		auto drift = [mu](Time, State s) { return mu * s; };

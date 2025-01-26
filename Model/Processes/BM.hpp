@@ -1,8 +1,8 @@
 #pragma once
 #include "Types.hpp"
-#include "SDE.hpp"
-class BM : public SDE {
-	using BaseClass = SDE;
+#include "Process.hpp"
+class BM : public Process {
+	using BaseClass = Process;
 public:
 	explicit BM(std::function<double(Time, State)>drift, std::function<double(Time, State)>diffusion, const double startPos);
 public:

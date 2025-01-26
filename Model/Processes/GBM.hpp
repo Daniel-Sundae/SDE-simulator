@@ -1,7 +1,7 @@
 #pragma once
-#include "SDE.hpp"
-class GBM : public SDE {
-	using BaseClass = SDE;
+#include "Process.hpp"
+class GBM : public Process {
+	using BaseClass = Process;
 public:
 	explicit GBM(std::function<double(Time, State)>drift, std::function<double(Time, State)>diffusion, const double startPos);
 public:

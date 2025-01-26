@@ -11,6 +11,6 @@ signal:
 	auto Path(Path& path) -> void;
 
 slots:
-	auto RequestPath(SDEType type) -> void;
+	auto RequestPath(ProcessQuery type) -> void;
 
 }

@@ -3,12 +3,12 @@
 #include <QtCore/qstring.h>
 #include <stdexcept>
 
-struct SDEMetaData {
+struct ProcessMetaData {
     const QString name;
     const QString acronym;
     const QString description;
     const QString definition;
-    SDEMetaData(
+    ProcessMetaData(
         QString in_name,
         QString in_acronym,
         QString in_description,
@@ -19,22 +19,22 @@ struct SDEMetaData {
         definition(std::move(in_definition))
     {}
 
-    static inline auto Create(SDEType type) -> SDEMetaData{
+    static inline auto Create(ProcessType type) -> ProcessMetaData{
         switch(type){
-            case SDEType::BM:
-                return SDEMetaData(
+            case ProcessType::BM:
+                return ProcessMetaData(
                     QString("Brownian Motion"),
                     QString("BM"),
                     QString("Standard brownian motion. μ = 0, σ = 1"),
                     QString("dX = dB"));
-            case SDEType::GBM:
-                return SDEMetaData(
+            case ProcessType::GBM:
+                return ProcessMetaData(
                     QString("Geometric Brownian Motion"),
                     QString("GBM"),
                     QString("Geometric brownian motion."),
                     QString("dX = μXdt + σXdB"));
             default:
-                throw std::runtime_error("Unexpected SDE type");
+                throw std::runtime_error("Unexpected Process type");
         }   
     }
 };

@@ -1,8 +1,8 @@
 #include <vector>
-#include "SDE.hpp"
+#include "Process.hpp"
 #include "Utils.hpp"
 
-SDE::SDE(
+Process::Process(
     const std::function<double(Time, State)> drift,
     const std::function<double(Time, State)> diffusion,
     const double startPos
@@ -12,7 +12,7 @@ m_diffusion(std::move(diffusion)),
 m_startPos(startPos)
 {}
 
-auto SDE::Sample(int points, double dt) const -> Path
+auto Process::Sample(int points, double dt) const -> Path
 {
     Path path = {};
     path.reserve(points);
@@ -25,22 +25,22 @@ auto SDE::Sample(int points, double dt) const -> Path
     return path;
 }
 
-auto SDE::Drift() const -> std::function<double(Time, State)>
+auto Process::Drift() const -> std::function<double(Time, State)>
 {
     return m_drift;
 }
 
-auto SDE::Diffusion() const -> std::function<double(Time, State)>
+auto Process::Diffusion() const -> std::function<double(Time, State)>
 {
     return m_diffusion;
 }
 
-auto SDE::StartPos() const -> double
+auto Process::StartPos() const -> double
 {
     return m_startPos;
 }
 
-auto SDE::Increment(double TIME, double STATE, double dt) const -> double
+auto Process::Increment(double TIME, double STATE, double dt) const -> double
 {
     return Drift()(TIME, STATE) * dt + Diffusion()(TIME, STATE) * Utils::db(dt);
 }

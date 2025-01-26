@@ -2,7 +2,7 @@
 #include "ButtonWidgetManager.hpp"
 #include "Types.hpp"
 
-class SDEButtonsManager;
+class ProcessButtonsManager;
 
 class ParametersWidget : public QWidget
 {
@@ -10,7 +10,7 @@ class ParametersWidget : public QWidget
 public:
 	explicit ParametersWidget(ButtonWidgetManager* parent);
 signals:
-	auto EmitParameters(const SDEDefinition& def) -> void;
+	auto EmitParameters(const ProcesProcessfinition& def) -> void;
 public slots:
 	auto RequestParameters() -> void;
 protected:
@@ -19,5 +19,5 @@ protected:
 	auto GetStartValue() const -> double;
 private:
 	auto InitializeParametersWidget() -> void;
-	friend class SDEButtonsManager;
+	friend class ProcessButtonsManager;
 };

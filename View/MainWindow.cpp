@@ -27,7 +27,7 @@ auto MainWindow::SetupConnections() const -> void{
         m_buttonWidget,
         &ButtonWidgetManager::ForwardRequestUpdatePathChart, 
         m_chartWidget,
-        &ChartWidget::SDEButtonClicked
+        &ChartWidget::ProcessButtonClicked
     );
 }
 

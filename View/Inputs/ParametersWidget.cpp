@@ -57,7 +57,7 @@ auto ParametersWidget::GetStartValue() const -> double
 
 auto ParametersWidget::RequestParameters() -> void
 {
-    SDEDefinition def;
+    ProcesProcessfinition def;
     def.mu = GetMuValue();
     def.sigma = GetSigmaValue();
     def.startValue = GetStartValue();

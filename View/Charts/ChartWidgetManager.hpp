@@ -13,7 +13,7 @@ public:
     explicit ChartWidget(QWidget* parent = nullptr);
 
 public slots:
-    auto SDEButtonClicked(const Path& sampleData, const SDEType type) -> void;
+    auto ProcessButtonClicked(const Path& sampleData, const ProcessType type) -> void;
 
 private:
     QVBoxLayout* m_layout;

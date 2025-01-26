@@ -4,13 +4,13 @@
 using Time = double;
 using State = double;
 using Path = std::vector<double>;
-enum class SDEType{
+enum class ProcessType{
     BM = 0,
     GBM,
     Levy,
     OU
 };
-struct SDEDefinition {
+struct ProcessDefinition {
     double mu = 0;
     double sigma = 0;
     double startValue = 0;

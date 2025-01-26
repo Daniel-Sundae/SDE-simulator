@@ -1,12 +1,12 @@
 #pragma once
-#include "SDEMetaData.hpp"
+#include "ProcessMetaData.hpp"
 #include <QtWidgets/qwidget.h>
 #include <QtWidgets/qboxlayout.h>
 #include <QtWidgets/qpushbutton.h>
 #include <QtWidgets/qspinbox.h>
 
 class ParametersWidget;
-class SDEButtonsManager;
+class ProcessButtonsManager;
 
 class ButtonWidgetManager : public QWidget
 {
@@ -18,7 +18,7 @@ public:
 signals:
     void ForwardRequestUpdatePathChart(
         const Path& data,
-        const SDEType type);
+        const ProcessType type);
 
 private:
     auto InitializeLayout() -> void;
@@ -26,6 +26,6 @@ private:
 
 private:
     ParametersWidget* m_parametersWidget;
-    SDEButtonsManager* m_SDEButtonsManager;
+    ProcessButtonsManager* m_ProcessButtonsManager;
 };
 

@@ -4,4 +4,23 @@
 - sample many times without removing plots.
 - Make plot redraw when incrementing a parameter (probably performance hit?). Send signal from parameterwidget to chart.
 - Don't hardcode which buttons to draw
-- Delete old SDE when pressing button again
+- Delete old Process when pressing button again
+- Implement the model view presenter pattern. https://github.com/mantidproject/documents/blob/main/Presentations/DeveloperInduction/CppMvpPattern.md
+MODEL:
+stored data over the Process parameters, the seed (if any), the sampler parameters, the engine
+View:
+The gui layer. Very lightweight. Only send signals within itself for buttonpresses and send notification to presenter subscriber (derived from ISubscriber)
+Presenter:
+One presenter class for each widget.
+Contains slots for processing user inputs (signals from view classes).
+Send signals to model for storing and processing further
+
+How I will structure code:
+
+Data from view to model - Pull based
+when clicked signal happens, button sends signal to private slot that informs subscriber presenter (by using the link) that button was pressed.
+The button relays info to query class (an engine adapter) who start building a query.
+Mainpresenter asks each subscriber (e.g. sampler widgetsubscr and parameter widgetsubsc) to pull data. Can specify which data want to request since mainpresenter knows which query to build.
+
+Data from model to view - Push
+engine responds and enginesubscriber 

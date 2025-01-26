@@ -1,17 +1,17 @@
 #include "PathChart.hpp"
-#include "SDEMetaData.hpp"
+#include "ProcessMetaData.hpp"
 #include "Types.hpp"
 #include "QtCharts/qlineseries.h"
 #include "QtCharts/qvalueaxis.h"
 
 PathChart::PathChart() : QChart()
 {
-    InitializeSDEChart();
+    InitializeProcessChart();
 }
 
-auto PathChart::UpdatePathChart(const Path& path, const SDEType type) -> void
+auto PathChart::UpdatePathChart(const Path& path, const ProcessType type) -> void
 {
-    SDEMetaData metaData = SDEMetaData::Create(type);
+    ProcessMetaData metaData = ProcessMetaData::Create(type);
     QString title = metaData.name + ": " + metaData.definition;
     setTitle(title);
     PlotChart(path);
@@ -100,7 +100,7 @@ auto PathChart::UpdateRangesIfNeeded(double sampleMaxX, double sampleMinY, doubl
     }
 }
 
-auto PathChart::InitializeSDEChart() -> void
+auto PathChart::InitializeProcessChart() -> void
 {
     setTheme(QChart::ChartThemeBlueNcs);
     legend()->setVisible(false);

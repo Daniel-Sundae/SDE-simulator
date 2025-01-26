@@ -2,7 +2,7 @@
 #include <random>
 #include <cmath>
 #include <QtCharts/qlineseries.h>
-#include "SDE.hpp"
+#include "Process.hpp"
 
 namespace Utils
 {
