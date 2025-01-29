@@ -10,8 +10,7 @@ class ProcessButton : public QPushButton {
 public:
 	explicit ProcessButton(ProcessButtonsManager* parent, ProcessType type);
 
-private slots:
-	auto PlotPath() -> void;
 private:
+	auto RequestPlotPath() -> void;
 	const ProcessType m_ProcessType;
 };

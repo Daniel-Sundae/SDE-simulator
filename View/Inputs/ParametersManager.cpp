@@ -1,13 +1,14 @@
-﻿#include "ParametersWidget.hpp"
+﻿#include "ParametersManager.hpp"
 #include <QtWidgets/qlabel.h>
 
-ParametersWidget::ParametersWidget(ButtonWidgetManager* parent): 
-	QWidget(parent)
+ParametersManager::ParametersManager(InputManager* parent, std::shared_ptr<InputPresenter> parameterPresenter)
+    : QWidget(parent)
+    , m_parameterPresenter(std::move(parameterPresenter))
 {
-	InitializeParametersWidget();
+	InitializeParametersManager();
 }
 
-auto ParametersWidget::InitializeParametersWidget() -> void
+auto ParametersManager::InitializeParametersWidget() -> void
 {
     auto* layout = new QHBoxLayout(this);
 
@@ -37,29 +38,28 @@ auto ParametersWidget::InitializeParametersWidget() -> void
     setLayout(layout);
 }
 
-auto ParametersWidget::GetMuValue() const -> double
+auto ParametersManager::GetMuValue() const -> double
 {
     auto* muInput = findChild<QDoubleSpinBox*>("muValue");
     return muInput->value();
 }
 
-auto ParametersWidget::GetSigmaValue() const -> double
+auto ParametersManager::GetSigmaValue() const -> double
 {
     auto* sigmaInput = findChild<QDoubleSpinBox*>("sigmaValue");
     return sigmaInput->value();
 }
 
-auto ParametersWidget::GetStartValue() const -> double
+auto ParametersManager::GetStartValue() const -> double
 {
     auto* startValueInput = findChild<QDoubleSpinBox*>("startValue");
     return startValueInput->value();
 }
 
-auto ParametersWidget::RequestParameters() -> void
+auto ParametersManager::OnParametersChanged() -> void
 {
-    ProcesProcessfinition def;
-    def.mu = GetMuValue();
-    def.sigma = GetSigmaValue();
-    def.startValue = GetStartValue();
-    emit EmitParameters(def);
+    // def.mu = GetMuValue();
+    // def.sigma = GetSigmaValue();
+    // def.startValue = GetStartValue();
+    m_listener->OnParametersChanged(ProcessDefinition{GetMuValue(), GetSigmaValue(), GetStartValue()});
 }

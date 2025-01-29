@@ -5,7 +5,7 @@
 MainWindow::MainWindow() : QMainWindow(),
     m_mainWindowLayout(new QHBoxLayout),
     m_chartWidget(new ChartWidget(this)),
-    m_buttonWidget(new ButtonWidgetManager(this))
+    m_buttonWidget(new InputManager(this))
 {
     QWidget* centralWidget = new QWidget(this);
     setCentralWidget(centralWidget);
@@ -25,7 +25,7 @@ auto MainWindow::InitializeMainWindow() -> void{
 auto MainWindow::SetupConnections() const -> void{
     connect(
         m_buttonWidget,
-        &ButtonWidgetManager::ForwardRequestUpdatePathChart, 
+        &InputManager::ForwardRequestUpdatePathChart, 
         m_chartWidget,
         &ChartWidget::ProcessButtonClicked
     );
@@ -33,7 +33,7 @@ auto MainWindow::SetupConnections() const -> void{
 
 //connect(
 //    sender,            // m_buttonWidget (the object that sends the signal)
-//    signalFunc,            // &ButtonWidgetManager::ChartUpdate (the signal to listen for) (signal is sent when "emit ChartUpdate()" line is run)
+//    signalFunc,            // &InputManager::ChartUpdate (the signal to listen for) (signal is sent when "emit ChartUpdate()" line is run)
 //    receiver,          // m_chartWidget (the object that receives the signal)
 //    slotFunc              // &ChartWidget::OnButtonClickSignal (the slot to be called)
 //);

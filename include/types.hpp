@@ -5,7 +5,8 @@ using Time = double;
 using State = double;
 using Path = std::vector<double>;
 enum class ProcessType{
-    BM = 0,
+    NONE = 0,
+    BM,
     GBM,
     Levy,
     OU

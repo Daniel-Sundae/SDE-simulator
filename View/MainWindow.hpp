@@ -18,6 +18,6 @@ private:
 
     QHBoxLayout* m_mainWindowLayout;
     ChartWidget* m_chartWidget;
-    ButtonWidgetManager* m_buttonWidget;
+    InputManager* m_buttonWidget;
 };
 

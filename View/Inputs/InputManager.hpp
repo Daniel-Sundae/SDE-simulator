@@ -5,19 +5,18 @@
 #include <QtWidgets/qpushbutton.h>
 #include <QtWidgets/qspinbox.h>
 
-class ParametersWidget;
+class ParametersManager;
 class ProcessButtonsManager;
 
-class ButtonWidgetManager : public QWidget
+class InputManager : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit ButtonWidgetManager(QWidget* parent = nullptr);
+    explicit InputManager(QWidget* parent = nullptr);
 
-signals:
+slots:
     void ForwardRequestUpdatePathChart(
-        const Path& data,
         const ProcessType type);
 
 private:
@@ -25,7 +24,7 @@ private:
     auto SetupConnections() -> void;
 
 private:
-    ParametersWidget* m_parametersWidget;
+    ParametersManager* m_parametersWidget;
     ProcessButtonsManager* m_ProcessButtonsManager;
 };
 

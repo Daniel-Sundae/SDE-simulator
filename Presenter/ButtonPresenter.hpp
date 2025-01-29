@@ -6,5 +6,5 @@ public:
 	explicit ButtonPresenter();
 	auto OnButtonPressed(ProcessType type) -> void;
 private:
-	auto BuildPathEngineQuery() -> PathEngineQuery;
+	auto BuildPathEngineQuery();
 };

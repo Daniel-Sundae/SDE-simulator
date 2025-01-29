@@ -1,67 +1,28 @@
 #include "ProcessButtonsManager.hpp"
-#include "CreateProcess.hpp"
 #include "Types.hpp"
+#include "ButtonPresenter.hpp"
 
-ProcessButtonsManager::ProcessButtonsManager(ButtonWidgetManager* parent) :
-    QWidget(parent), m_activeButton(nullptr)
+ProcessButtonsManager::ProcessButtonsManager(InputManager* parent, std::shared_pointer<InputPresenter> listener) :
+    QWidget(parent), m_listener(std::move(listener))
 {
     CreateProcessButtons();
     InitializeProcessButtonsManager();
-    SetupConnections();
 }
 
 auto ProcessButtonsManager::InitializeProcessButtonsManager() -> void
 {
     auto* buttonLayout = new QGridLayout(this);
+    m_buttons[ProcessType::BM] = std::make_unique<ProcessButton>(this, ProcessType::BM);
     buttonLayout->addWidget(m_buttons[ProcessType::BM]);
+    m_buttons[ProcessType::GBM] = std::make_unique<ProcessButton>(this, ProcessType::GBM);
     buttonLayout->addWidget(m_buttons[ProcessType::GBM]);
     setLayout(buttonLayout);
 }
 
-auto ProcessButtonsManager::CreateProcessButtons() -> void
+auto ProcessButtonsManager::OnButtonPressed(ProcessType type) -> void
 {
-    m_buttons[ProcessType::BM] = std::make_unique<ProcessButton>(this, ProcessType::BM);
-    m_buttons[ProcessType::GBM] = std::make_unique<ProcessButton>(this, ProcessType::GBM);
+    m_listener->OnProcessButtonPressed(type);
 }
 
-
-auto ProcessButtonsManager::SetupConnections() -> void
-{
-    
-    for (const auto& [_, button] : m_buttons) {
-        // Allow all buttons to signal chart
-        connect(
-            button,
-            &ProcessButton::RequestUpdatePathChart,
-            this,
-            &ProcessButtonsManager::ForwardRequestUpdatePathChart
-        );
-        connect(
-            button,
-            &ProcessButton::SetActive,
-            this,
-            &ProcessButtonsManager::SetActive(button)
-        );
-
-    }
-}
-
-auto ProcessButtonsManager::OnParametersReceived(const ProcesProcessfinition& def) -> void
-{
-    if (m_activeButton)
-    {
-        m_activeButton->OnParametersReceived(def);
-    }
-}
-
-auto ProcessButtonsManager::SetActive(ProcessButton* button) -> void
-{
-    m_activeButton = button;
-}
-
-auto ProcessButtonsManager::ClearActive() -> void
-{
-    m_activeButton = nullptr;
-}
 
 

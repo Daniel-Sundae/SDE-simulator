@@ -13,31 +13,11 @@ ProcessButton::ProcessButton(ProcessButtonsManager *parent, const ProcessType ty
         this,
         &QPushButton::clicked,
         this,
-        &ProcessButton::PlotPath
+        &ProcessButton::RequestPlotPath
     );
 }
 
-auto ProcessButton::PlotPath() -> void
+auto ProcessButton::RequestPlotPath() -> void
 {
-    assert(bpLink->ProcessButton() == this);
-    bpLink->ButtonPresenter()->ButtonPressed(type);
+    parent->ButtonPressed(m_processType)
 }
-
-
-// auto ProcessButton::OnParametersReceived(const ProcesProcessfinition& def) -> void
-// {
-//     Path path;
-//     switch(m_ProcessType){
-//         case ProcessType::BM:
-//             path = Process<ProcessType::BM>::Create(def)->Sample(1000, 0.1);
-//             break;
-//         case ProcessType::GBM:
-//             path = Process<ProcessType::GBM>::Create(def)->Sample(1000, 0.1);
-//             break;
-//         default:
-//             throw std::runtime_error("Unexpected Process type");
-//     }
-//     emit RequestUpdatePathChart(path, m_ProcessType);
-//     emit SetActive(this);
-// }
-
