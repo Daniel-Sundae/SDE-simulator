@@ -1,26 +1,9 @@
 - Implement such that I can see which weights f(t,w) are being used at each time step, and each outcome, when plotting f(t,w)Bs
-- Implement example 3.1.1. Can I see that using left edge Bt as weight gives 0 on average while right edge gives T?
+- Implement example 3.1.1. Can I see that using left edge Bt as weight gives 0 on average while right edge gives T? (Stratonovic vs ito)
 
-- sample many times without removing plots.
-- Make plot redraw when incrementing a parameter (probably performance hit?). Send signal from parameterwidget to chart.
-- Don't hardcode which buttons to draw
-- Delete old Process when pressing button again
-- Implement the model view presenter pattern. https://github.com/mantidproject/documents/blob/main/Presentations/DeveloperInduction/CppMvpPattern.md
-MODEL:
-stored data over the Process parameters, the seed (if any), the sampler parameters, the engine
-View:
-The gui layer. Very lightweight. Only send signals within itself for buttonpresses and send notification to presenter subscriber (derived from ISubscriber)
-Presenter:
-One presenter class for each widget.
-Contains slots for processing user inputs (signals from view classes).
-Send signals to model for storing and processing further
-
-How I will structure code:
-
-Data from view to model - Pull based
-when clicked signal happens, button sends signal to private slot that informs subscriber presenter (by using the link) that button was pressed.
-The button relays info to query class (an engine adapter) who start building a query.
-Mainpresenter asks each subscriber (e.g. sampler widgetsubscr and parameter widgetsubsc) to pull data. Can specify which data want to request since mainpresenter knows which query to build.
-
-Data from model to view - Push
-engine responds and enginesubscriber 
+- sample many times without removing plots. Clear button
+- use async. Transmit loading signal to chartmanager
+- use threads for many paths.
+- Maybe use more than one thread per path (for simple paths like BM). Could write function sampleRange() andattach offset to each range, where offset is previous range's last value.
+- Use threadpool to avoid spinning up threads
+- Make sure old data deleted after presented when pressing button again.

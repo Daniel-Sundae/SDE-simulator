@@ -3,6 +3,7 @@
 InputHandler::InputHandler()
 	: m_processType(NONE)
 	, m_def({})
+	, m_simulationParameters({10, 1000})
 {}
 
 auto InputHandler::OnProcessButtonPressed(ProcessType processType) -> void
@@ -11,9 +12,17 @@ auto InputHandler::OnProcessButtonPressed(ProcessType processType) -> void
 	SamplePath();
 }
 
-auto InputHandler::OnParametersChanged(ProcessDefinition& def) -> void
+auto InputHandler::OnProcessParametersChanged(ProcessParameters& params) -> void
 {
-	m_def = def;
+	m_params = params;
+	if (m_processType) {
+		SamplePath();
+	}
+}
+
+auto InputHandler::OnSimulationParametersChanged(SimulationParameters& simParams) -> void
+{
+	m_simParams = simParams;
 }
 
 auto InputHandler::SamplePath() -> void

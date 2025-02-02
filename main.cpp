@@ -1,11 +1,12 @@
 
-#include "MainWindow.hpp"
+#include "AppInitializer.hpp"
 #include <QtWidgets/qapplication.h>
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    MainWindow r{};
+    AppInitializer a{};
+    a.Run();
     return app.exec();
 }
 

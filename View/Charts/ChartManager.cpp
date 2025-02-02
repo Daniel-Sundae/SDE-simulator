@@ -2,7 +2,7 @@
 #include "PathChart.hpp"
 
 
-ChartWidget::ChartWidget(QWidget *parent) :
+ChartManager::ChartManager(QWidget *parent) :
     QWidget(parent),
     m_layout(new QVBoxLayout(this)),
     m_chart(new PathChart()),
@@ -12,7 +12,7 @@ ChartWidget::ChartWidget(QWidget *parent) :
     setLayout(m_layout);
 }
 
-auto ChartWidget::ProcessButtonClicked(const Path& sampleData, const ProcessType type) -> void
+auto ChartManager::ProcessButtonClicked(const Path& sampleData, const ProcessType type) -> void
 {
     m_chart->UpdatePathChart(sampleData, type);
 }

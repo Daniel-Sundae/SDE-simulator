@@ -9,15 +9,16 @@ class MainWindow : public QMainWindow{
     Q_OBJECT
 
 public:
-    MainWindow();
+    explicit MainWindow();
+    auto SetChartManager(ChartManager* chartManager) -> void;
+    auto SetInputManager(InputManager* inputManager) -> void;
+    auto AddWidgets() -> void;
     
 private:
-    auto InitializeMainWindow() -> void;
-
-    auto SetupConnections() const -> void;
 
     QHBoxLayout* m_mainWindowLayout;
-    ChartWidget* m_chartWidget;
-    InputManager* m_buttonWidget;
+    ChartManager* m_chartManager;
+    InputManager* m_inputManager;
+    bool m_widgetsAdded;
 };
 

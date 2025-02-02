@@ -6,11 +6,11 @@
 #include <QtCharts/qchartview.h>
 #include <QtCharts/qchart.h>
 
-class ChartWidget : public QWidget{
+class ChartManager : public QWidget{
     Q_OBJECT
 
 public:
-    explicit ChartWidget(QWidget* parent = nullptr);
+    explicit ChartManager(QWidget* parent = nullptr);
 
 public slots:
     auto ProcessButtonClicked(const Path& sampleData, const ProcessType type) -> void;

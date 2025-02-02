@@ -1,44 +1,48 @@
-#include "Utils.hpp"
 #include "MainWindow.hpp"
+#include <stdexcept>
 
 
 MainWindow::MainWindow() : QMainWindow(),
     m_mainWindowLayout(new QHBoxLayout),
-    m_chartWidget(new ChartWidget(this)),
-    m_buttonWidget(new InputManager(this))
+    m_chartManager(new ChartManager(this)),
+    m_inputManager(new InputManager(this)),
+    m_widgetsAdded(0)
 {
     QWidget* centralWidget = new QWidget(this);
     setCentralWidget(centralWidget);
     centralWidget->setLayout(m_mainWindowLayout);
-    InitializeMainWindow();
-    SetupConnections();
-}
-
-auto MainWindow::InitializeMainWindow() -> void{
-    m_mainWindowLayout->addWidget(m_chartWidget, 8);
-    m_mainWindowLayout->addWidget(m_buttonWidget, 2);
     setWindowTitle("Qt6 Window with Button");
     resize(1300, 600);
     show();
 }
 
-auto MainWindow::SetupConnections() const -> void{
-    connect(
-        m_buttonWidget,
-        &InputManager::ForwardRequestUpdatePathChart, 
-        m_chartWidget,
-        &ChartWidget::ProcessButtonClicked
-    );
+auto MainWindow::SetChartManager(ChartManager* chartManager) -> void
+{
+    m_chartManager = chartManager;
 }
 
-//connect(
-//    sender,            // m_buttonWidget (the object that sends the signal)
-//    signalFunc,            // &InputManager::ChartUpdate (the signal to listen for) (signal is sent when "emit ChartUpdate()" line is run)
-//    receiver,          // m_chartWidget (the object that receives the signal)
-//    slotFunc              // &ChartWidget::OnButtonClickSignal (the slot to be called)
-//);
+auto MainWindow::SetInputManager(InputManager* inputManager) -> void
+{
+    m_inputManager = inputManager;
+}
 
-/*
-To emit a function, the function must be under signal.
-The receiver object must have the slotFunc under slots (perhaps private slots if only itra object transmission)
-*/
+auto MainWindow::AddWidgets() -> void
+{
+    // DSTODO: what are these numbers   
+    if (m_widgetsAdded){
+        throw std::runtime_error("Error: Already added widgets")
+    }
+    if (!m_chartManager || !m_inputManager) {
+        throw std::logic_error("Error: Managers not set")
+    }
+    m_mainWindowLayout->addWidget(m_chartManager, 8);
+    m_mainWindowLayout->addWidget(m_inputManager, 2);
+}
+
+auto MainWindow::Healthy()
+{
+    if (!m_widgetsAdded) return 0;
+    if (!m_chartManager) return 0;
+    if (!m_inputManager) return 0;
+    return 1;
+}
