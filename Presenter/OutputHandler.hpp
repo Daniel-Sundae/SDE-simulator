@@ -1,9 +1,8 @@
 #include "ChartManager.cpp"
 #include <memory>
 
-class OutputHandler {
+class OutputHandler final : public IPresenterComponent<ChartManager> {
 public:
-	explicit OutputHandler(std::shared_ptr<ChartManager> chartManager)
-private:
-	std::shared_ptr<ChartManager> m_chartManager;
+	explicit OutputHandler(std::shared_ptr<ChartManager> chartManager);
+	auto OnPathReceived(Path& path) -> void;
 };

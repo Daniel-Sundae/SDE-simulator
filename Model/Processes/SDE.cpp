@@ -3,7 +3,7 @@
 #include "Utils.hpp"
 
 Process::Process(
-    const std::function<double(Time, State)> drift,
+    const Drift drift,
     const std::function<double(Time, State)> diffusion,
     const double startPos
 ):

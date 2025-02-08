@@ -1,9 +1,19 @@
+
+MATH TODO:
 - Implement such that I can see which weights f(t,w) are being used at each time step, and each outcome, when plotting f(t,w)Bs
 - Implement example 3.1.1. Can I see that using left edge Bt as weight gives 0 on average while right edge gives T? (Stratonovic vs ito)
+- Add solver types
 
-- sample many times without removing plots. Clear button
+
+FUNCTIONALITY TODO:
+- sample many times without removing plots + Clear button
+
+CODE DESIGN TODO:
+- remove "listener" term. Nothing is actually listening. Only change after done with architecture so that i can insert object and stuff.
+
+TECH DETAILS TODO:
+- Make sure old data is not leaking. Either outputmanager deletes or data saved to disc
 - use async. Transmit loading signal to chartmanager
 - use threads for many paths.
-- Maybe use more than one thread per path (for simple paths like BM). Could write function sampleRange() andattach offset to each range, where offset is previous range's last value.
 - Use threadpool to avoid spinning up threads
-- Make sure old data deleted after presented when pressing button again.
+- Maybe use more than one thread per path (for simple paths like BM). Could write function sampleRange() andattach offset to each range, where offset is previous range's last value.

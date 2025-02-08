@@ -1,12 +1,11 @@
 #pragma once
 #include "ProcessMetaData.hpp"
 #include <QtWidgets/qwidget.h>
-#include <QtWidgets/qboxlayout.h>
-#include <QtWidgets/qpushbutton.h>
-#include <QtWidgets/qspinbox.h>
+
 
 class ParametersManager;
 class ProcessButtonsManager;
+class InputHandler;
 
 class InputManager : public QWidget
 {
@@ -14,6 +13,7 @@ class InputManager : public QWidget
 
 public:
     explicit InputManager(QWidget* parent = nullptr);
+    auto SetListener(const InputHandler* inputHandler) -> void;
 
 slots:
     void ForwardRequestUpdatePathChart(
@@ -21,10 +21,10 @@ slots:
 
 private:
     auto InitializeLayout() -> void;
-    auto SetupConnections() -> void;
 
 private:
     ParametersManager* m_parametersWidget;
     ProcessButtonsManager* m_ProcessButtonsManager;
+    const InputHandler* m_listener;
 };
 

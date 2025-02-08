@@ -1,7 +1,11 @@
 #pragma once
 #include "Types.hpp"
-class PathEngine(){
+class PathEngine final : public IModelComponent {
 public:
-	explicit Engine();
+	explicit PathEngine();
+	Path SamplePath(void* requester, Query q);
+	std::vector<Path> SamplePaths(void* requester, Query q);
+private:
+
 
 }

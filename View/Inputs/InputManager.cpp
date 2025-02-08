@@ -2,16 +2,15 @@
 #include "ParametersWidget.hpp"
 #include "ProcessButtonsManager.hpp"
 #include <QtWidgets/qlabel.h>
+#include <QtWidgets/qboxlayout.h>
 
 InputManager::InputManager(QWidget* parent)
     : QWidget(parent)
 {
-    auto inputPresenter = std::make_shared<InputPresenter>();
     auto m_parametersWidget = new ParametersManager(this, inputPresenter);
     auto m_ProcessButtonsManager = new ProcessButtonsManager(this, inputPresenter);
 
     InitializeLayout();
-    SetupConnections();
 }
 
 auto InputManager::InitializeLayout() -> void
@@ -24,33 +23,8 @@ auto InputManager::InitializeLayout() -> void
     setLayout(mainLayout);
 }
 
-
-
-
-// auto InputManager::SetupConnections() -> void
-// {
-//     // Button signals chart to redraw
-//     connect(
-//         m_ProcessButtonsManager,
-//         &ProcessButtonsManager::ForwardRequestUpdatePathChart,
-//         this,
-//         &InputManager::ForwardRequestUpdatePathChart
-//     );
-
-//     // Process parameters sent to button
-//     connect(
-//         m_parametersWidget,
-//         &ParametersManager::EmitParameters,
-//         m_ProcessButtonsManager,
-//         &ProcessButtonsManager::OnParametersReceived
-//     );
-
-//     // Button asks for new parameters
-//     connect(
-//         m_ProcessButtonsManager,
-//         &ProcessButtonsManager::RequestParameters,
-//         m_parametersWidget,
-//         &ParametersManager::RequestParameters
-//     );
-// }
+auto InputManager::SetListener(const InputHandler* inputHandler) -> void
+{
+    m_inputHandler = inputHandler;
+}
 
