@@ -9,7 +9,7 @@ struct Process;
 
 template<>
 struct Process<ProcessType::BM> {
-	static auto Create(const ProcessParameters& def) -> std::unique_ptr<BM>
+	static auto Create(const ProcessDefinition& def) -> std::unique_ptr<BM>
 	{
 		auto drift = [](Time, State) { return 0.0; };
 		auto diffusion = [](Time, State) { return 1.0; };
@@ -19,7 +19,7 @@ struct Process<ProcessType::BM> {
 
 template<>
 struct Process<ProcessType::GBM> {
-	static auto Create(const ProcessParameters& def) -> std::unique_ptr<GBM>
+	static auto Create(const ProcessDefinition& def) -> std::unique_ptr<GBM>
 	{
 		auto drift = [def](Time, State s) { return def.mu * s; };
 		auto diffusion = [def](Time, State s) { return def.sigma * s; };

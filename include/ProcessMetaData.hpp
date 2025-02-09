@@ -1,46 +1,6 @@
 #pragma once
 #include "Types.hpp"
-#include <QtCore/qstring.h>
 #include <stdexcept>
-
-//struct ProcessMetaData {
-//private:
-//    ProcessMetaData(
-//        QString in_name,
-//        QString in_acronym,
-//        QString in_description,
-//        QString in_definition)
-//        : name(std::move(in_name)),
-//        acronym(std::move(in_acronym)),
-//        description(std::move(in_description)),
-//        definition(std::move(in_definition))
-//    {}
-//public:
-//    const QString name;
-//    const QString acronym;
-//    const QString description;
-//    const QString definition;
-//
-//    static inline auto Create(ProcessType type) -> ProcessMetaData{
-//        switch(type){
-//            case ProcessType::BM:
-//                return ProcessMetaData(
-//                    QString("Brownian Motion"),
-//                    QString("BM"),
-//                    QString("Standard brownian motion. μ = 0, σ = 1"),
-//                    QString("dX = dB"));
-//            case ProcessType::GBM:
-//                return ProcessMetaData(
-//                    QString("Geometric Brownian Motion"),
-//                    QString("GBM"),
-//                    QString("Geometric brownian motion."),
-//                    QString("dX = μXdt + σXdB"));
-//            default:
-//                throw std::runtime_error("Unexpected Process type");
-//        }   
-//    }
-//};
-
 
 class ProcessData {
 public:
@@ -68,10 +28,10 @@ public:
     };
 
     struct GBM{
-        static auto Drift(double mu) -> Drift {
+        static auto Drift(const double mu) -> Drift {
             return [mu](Time, State s) { return mu * s; };
         }
-        static auto Diffusion(double sigma) -> Drift {
+        static auto Diffusion(const double sigma) -> Drift {
             return [sigma](Time, State s) { return sigma * s; };
         }
 

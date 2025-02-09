@@ -13,16 +13,22 @@ class InputHandler final : public IPresenterComponent<MainPresenter> {
 public:
     explicit InputHandler();
     auto OnProcessButtonPressed(ProcessType processType) -> void;
-    auto OnProcessParametersModified(ModifiedParam param, double value) -> void;
+    auto OnProcessDefinitionModified(ModifiedParam param, double userValue) -> void;
     auto OnSimulationParametersModified(SimulationParameters& simParams) -> void;
-    //auto SetListener(const MainPresenter* mainPresenter) -> void;
 
 private:
+    auto ProcessDefinition() -> ProcessDefinition;
     auto SamplePath() -> void;
 
 private:
+    struct ProcessDefinitionInputs {
+        double mu;
+        double sigma;
+        double startValue;
+    };
     ProcessType m_processType;
-    std::unique_ptr<ProcessParameters> m_params;
+    std::unique_ptr<ProcessDefinitionInputs> m_processDefinitionInputs;
     std::unique_ptr<SimulationParameters> m_simParams;
-    const MainPresenter* m_listener;
+    std::function<Drift(double)> m_driftGenerator;
+    std::function<Diffusion(double)> m_diffusionGenerator;
 }

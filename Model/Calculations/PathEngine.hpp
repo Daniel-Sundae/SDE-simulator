@@ -3,8 +3,8 @@
 class PathEngine final : public IModelComponent {
 public:
 	explicit PathEngine();
-	Path SamplePath(void* requester, Query q);
-	std::vector<Path> SamplePaths(void* requester, Query q);
+	auto SamplePath(const PathQuery& pathQuery) const -> Path;
+	auto SamplePaths(const PathQuery& pathQuery, std::size_t samples) const -> std::vector<Path>;
 private:
 
 

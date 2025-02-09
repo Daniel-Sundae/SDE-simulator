@@ -3,7 +3,5 @@
 
 class MainPresenter final : public IPresenterComponent<OutputHandler> {
 public:
-	explicit MainPresenter();
-
-
+	auto SamplePath(PathQuery pathQuery) -> void;
 }

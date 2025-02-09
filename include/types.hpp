@@ -6,8 +6,9 @@
 using Time = double;
 using State = double;
 using Path = std::vector<double>;
-using Drift = std::function<State(Time, State)>;
-using Diffusion = std::function<State(Time, State)>;
+using StateDot = double; // dX/dt
+using Drift = std::function<StateDot(Time, State)>;
+using Diffusion = std::function<StateDot(Time, State)>;
 enum class ProcessType{
     NONE = 0,
     CUSTOM,
@@ -18,8 +19,8 @@ enum class ProcessType{
 };
 
 struct ProcessDefinition {
-    Drift mu = 0;
-    Diffusion sigma = 0;
+    Drift drift = [](Time t, State s) -> State { return 0.0; };
+    Diffusion diffusion = [](Time t, State s) -> State { return 0.0; };
     State startValue = 0;
 };
 
@@ -39,8 +40,8 @@ struct SimulationParameters {
     std::size_t points;
 };
 
-struct PathEngineQuery {
-    ProcessType processType;
-    ProcessDefinition processDefinition;
-    SimulationParameters simulationParameters;
+struct PathQuery {
+    const ProcessType processType;
+    const ProcessDefinition& processDefinition;
+    const SimulationParameters& simulationParameters;
 };

@@ -7,9 +7,14 @@ MATH TODO:
 
 FUNCTIONALITY TODO:
 - sample many times without removing plots + Clear button
+- loading symbol for simulation taking time
+- add dashed red driftline. Should be present immediately.
+- Add dot showing the final result of sim in chart graph.
 
 CODE DESIGN TODO:
 - remove "listener" term. Nothing is actually listening. Only change after done with architecture so that i can insert object and stuff.
+- send activetype from mainpresenter immediately to outputhandler. Outputhandler generates loadingsymbol while waiting for path(s)
+- Check if possible to trigger all eventr in inputmanager so that the information can be sent to inputhandler to "reset" or initialize it, in case the state is broken somehow.
 
 TECH DETAILS TODO:
 - Make sure old data is not leaking. Either outputmanager deletes or data saved to disc
