@@ -10,7 +10,7 @@ InputHandler::InputHandler()
 	, m_diffusionGenerator(nullptr))
 {}
 
-auto InputHandler::OnProcessButtonPressed(ProcessType processType) -> void
+auto InputHandler::OnProcessButtonPressed(const ProcessType processType) -> void
 {
     m_processType = processType;
     switch (processType){
@@ -73,7 +73,7 @@ auto InputHandler::SamplePath() -> void
 	static_assert(m_processType != NONE);
 	static_assert(m_processDefinitionInputs);
 	static_assert(m_simParams);
-	Listener()->SamplePath(m_processType, ProcessDefinition(), m_simParams);
+	Listener()->SamplePath({ m_processType, ProcessDefinition(), m_simParams });
 }
 
 auto InputHandler::CreateQuery()

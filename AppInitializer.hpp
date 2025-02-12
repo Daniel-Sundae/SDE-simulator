@@ -1,9 +1,7 @@
 #pragma once
 #include <memory>
 #include <vector>
-#include "IViewComponent.hpp"
 #include "IPresenterComponent.hpp"
-#include "IModelComponent.hpp"
 class AppInitializer {
 public:
 	explicit AppInitializer();

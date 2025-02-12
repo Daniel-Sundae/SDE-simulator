@@ -4,5 +4,5 @@
 auto MainPresenter::SamplePath(const PathQuery& pathQuery) const -> void
 {
 	PathEngine engine{};
-	Listener()->ShowPath(engine.SamplePath(pathQuery));
+	Listener()->OnPathReceived(engine.SamplePath(pathQuery));
 }

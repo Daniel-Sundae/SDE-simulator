@@ -1,15 +1,18 @@
 #pragma once
-#include "ButtonWidgetManager.hpp"
+#include "Types.hpp"
 #include <unordered_map>
 #include <memory>
+#include <QtWidgets/qwidget.h>
+
 
 class ProcessButton;
+class InputManager;
 
 class ProcessButtonsManager : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit ProcessButtonsManager(InputManager* parent, std::shared_pointer<InputPresenter> listener));
+	explicit ProcessButtonsManager(InputManager* parent);
 	auto OnButtonPressed(ProcessType type) -> void;
 
 private:
@@ -17,5 +20,4 @@ private:
 
 private:
 	std::unordered_map<ProcessType, ProcessButton*> m_buttons;
-	std::shared_pointer<InputPresenter> m_listener;
 };

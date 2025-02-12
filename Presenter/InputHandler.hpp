@@ -12,7 +12,7 @@ enum class ModifiedParam {
 class InputHandler final : public IPresenterComponent<MainPresenter> {
 public:
     explicit InputHandler();
-    auto OnProcessButtonPressed(ProcessType processType) -> void;
+    auto OnProcessButtonPressed(const ProcessType processType) -> void;
     auto OnProcessDefinitionModified(ModifiedParam param, double userValue) -> void;
     auto OnSimulationParametersModified(SimulationParameters& simParams) -> void;
 

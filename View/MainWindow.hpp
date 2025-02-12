@@ -2,8 +2,8 @@
 
 #include "ChartManager.hpp"
 #include "InputManager.hpp"
-#include "QtWidgets\qmainwindow.h"
-#include "QtWidgets\qboxlayout.h>
+#include <QtWidgets\qmainwindow.h>
+#include <QtWidgets\qboxlayout.h>
 
 class MainWindow final : public QMainWindow{
     Q_OBJECT

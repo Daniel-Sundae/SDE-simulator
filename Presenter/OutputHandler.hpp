@@ -3,6 +3,6 @@
 
 class OutputHandler final : public IPresenterComponent<ChartManager> {
 public:
-	explicit OutputHandler(std::shared_ptr<ChartManager> chartManager);
+	explicit OutputHandler();
 	auto OnPathReceived(Path& path) -> void;
 };

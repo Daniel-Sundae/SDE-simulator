@@ -1,5 +1,5 @@
-#include "ChartWidget.hpp"
 #include "PathChart.hpp"
+#include "ChartManager.hpp"
 
 
 ChartManager::ChartManager(QWidget *parent) :
@@ -12,7 +12,7 @@ ChartManager::ChartManager(QWidget *parent) :
     setLayout(m_layout);
 }
 
-auto ChartManager::ProcessButtonClicked(const Path& sampleData, const ProcessType type) -> void
+auto ChartManager::OnPathReceived(const Path& sampleData) const -> void
 {
-    m_chart->UpdatePathChart(sampleData, type);
+    m_chart->UpdatePathChart(sampleData, ProcessType::BM);
 }

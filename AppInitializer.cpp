@@ -12,11 +12,10 @@ AppInitializer::AppInitializer()
 	InitializeComponents();
 }
 
-auto AppInitializer::InitializeComponents -> void
+auto AppInitializer::InitializeComponents() -> void
 {
 	// View components
-	auto mainWindow = std::make_unique<MainWindow>();
-	m_viewComponents.push_back(std::move(mainWindow));
+	auto m_view = std::make_unique<MainWindow>();
 
 	// Presenter components
 	auto inputHandler = std::make_unique<InputHandler>();
@@ -39,9 +38,4 @@ auto AppInitializer::InitializeComponents -> void
 	// Connect view and presenter
 	mainWindow->InputManager()->SetListener(inputHandler.get());
 	outputHandler->SetListener(mainWindow->ChartManager());
-
-
-	// Connect presenter and model
-	mainPresenterPtr->SetEngine(enginePtr);
-	enginePtr->SetListener(mainPresenterPtr);
 }

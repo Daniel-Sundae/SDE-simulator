@@ -1,23 +1,24 @@
 #include "ProcessButton.hpp"
-#include "CreateProcess.hpp"
+#include "ProcessData.hpp"
+#include "ProcessButtonsManager.hpp"
 #include "Types.hpp"
 
 ProcessButton::ProcessButton(ProcessButtonsManager *parent, const ProcessType type)
-    : QPushButton(parent), m_ProcessType(type)
+    : QPushButton(parent)
+    , m_processType(type)
 {
-    auto metaData = ProcessMetaData::Create(m_ProcessType);
-    setText(metaData.acronym);
-    setToolTip(metaData.description);
+    setText(ProcessData::Acronym(type));
+    setToolTip("testdescr");
     
     connect(
         this,
         &QPushButton::clicked,
         this,
-        &ProcessButton::RequestPlotPath
+        &ProcessButton::PlotPath
     );
 }
 
-auto ProcessButton::RequestPlotPath() -> void
+auto ProcessButton::PlotPath() const -> void
 {
-    parent->ButtonPressed(m_processType)
+    static_cast<ProcessButtonsManager*>(parent())->OnButtonPressed(m_processType);
 }

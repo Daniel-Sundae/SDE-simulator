@@ -1,5 +1,5 @@
 #include "PathChart.hpp"
-#include "ProcessMetaData.hpp"
+#include "ProcessData.hpp"
 #include "Types.hpp"
 #include "QtCharts/qlineseries.h"
 #include "QtCharts/qvalueaxis.h"
@@ -11,7 +11,7 @@ PathChart::PathChart() : QChart()
 
 auto PathChart::UpdatePathChart(const Path& path, const ProcessType type) -> void
 {
-    ProcessMetaData metaData = ProcessMetaData::Create(type);
+    ProcessMetaData metaData = ProcessData::Create(type);
     QString title = metaData.name + ": " + metaData.definition;
     setTitle(title);
     PlotChart(path);

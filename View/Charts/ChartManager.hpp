@@ -1,10 +1,12 @@
 #pragma once
 
 #include "PathChart.hpp"
+#include "Types.hpp"
 #include <QtWidgets/qwidget.h>
 #include <QtWidgets/qboxlayout.h>
 #include <QtCharts/qchartview.h>
 #include <QtCharts/qchart.h>
+
 
 class ChartManager : public QWidget{
     Q_OBJECT
@@ -12,8 +14,7 @@ class ChartManager : public QWidget{
 public:
     explicit ChartManager(QWidget* parent = nullptr);
 
-public slots:
-    auto ProcessButtonClicked(const Path& sampleData, const ProcessType type) -> void;
+    auto OnPathReceived(const Path& sampleData) const -> void;
 
 private:
     QVBoxLayout* m_layout;

@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <stdexcept>
+#include <functional>
 #include <cstddef>
 
 using Time = double;
@@ -19,14 +20,14 @@ enum class ProcessType{
 };
 
 struct ProcessDefinition {
-    Drift drift = [](Time t, State s) -> State { return 0.0; };
-    Diffusion diffusion = [](Time t, State s) -> State { return 0.0; };
+    Drift drift = [](Time, State) -> State { return 0.0; };
+    Diffusion diffusion = [](Time, State) -> State { return 0.0; };
     State startValue = 0;
 };
 
 struct SimulationParameters {
-    explicit SimulationParameters(Time time, std::size_t points)
-        : time(time), points(points)
+    explicit SimulationParameters(Time in_time, std::size_t in_points)
+        : time(in_time), points(in_points)
     {
         if (points == 0 || time <= 0) {
             throw std::invalid_argument("Time and points must be greater than 0");
@@ -34,10 +35,11 @@ struct SimulationParameters {
     }
     auto dt() const -> Time
     {
-        return time / points;
+        return time / static_cast<Time>(points);
     }
     Time time = 0;
     std::size_t points;
+    // TODO add nr samples here?
 };
 
 struct PathQuery {

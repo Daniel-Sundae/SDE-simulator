@@ -1,27 +1,27 @@
 #include "ProcessButtonsManager.hpp"
-#include "Types.hpp"
-#include "ButtonPresenter.hpp"
+#include "InputManager.hpp"
+#include "ProcessButton.hpp"
+#include <QtWidgets/qgridlayout.h>
 
-ProcessButtonsManager::ProcessButtonsManager(InputManager* parent, std::shared_pointer<InputPresenter> listener) :
-    QWidget(parent), m_listener(std::move(listener))
+ProcessButtonsManager::ProcessButtonsManager(InputManager* parent) :
+    QWidget(parent)
 {
-    CreateProcessButtons();
     InitializeProcessButtonsManager();
 }
 
 auto ProcessButtonsManager::InitializeProcessButtonsManager() -> void
 {
     auto* buttonLayout = new QGridLayout(this);
-    m_buttons[ProcessType::BM] = std::make_unique<ProcessButton>(this, ProcessType::BM);
+    m_buttons[ProcessType::BM] = new ProcessButton(this, ProcessType::BM);
     buttonLayout->addWidget(m_buttons[ProcessType::BM]);
-    m_buttons[ProcessType::GBM] = std::make_unique<ProcessButton>(this, ProcessType::GBM);
+    m_buttons[ProcessType::GBM] = new ProcessButton(this, ProcessType::GBM);
     buttonLayout->addWidget(m_buttons[ProcessType::GBM]);
     setLayout(buttonLayout);
 }
 
 auto ProcessButtonsManager::OnButtonPressed(ProcessType type) -> void
 {
-    m_listener->OnProcessButtonPressed(type);
+    static_cast<InputManager*>(parent())->OnProcessButtonPressed(type);
 }
 
 

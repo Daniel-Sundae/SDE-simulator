@@ -1,5 +1,5 @@
 #pragma once
-#include "ProcessMetaData.hpp"
+#include "ProcessData.hpp"
 #include <QtWidgets/qwidget.h>
 
 
@@ -7,17 +7,22 @@ class ParametersManager;
 class ProcessButtonsManager;
 class InputHandler;
 
+struct InputParameters {
+    double mu;
+    double sigma;
+    double startValue;
+};
+
 class InputManager : public QWidget
 {
     Q_OBJECT
 
 public:
     explicit InputManager(QWidget* parent = nullptr);
-    auto SetListener(const InputHandler* inputHandler) -> void;
-
-slots:
-    void ForwardRequestUpdatePathChart(
-        const ProcessType type);
+    auto SetListener(InputHandler* inputHandler) -> void;
+    auto OnProcessButtonPressed(const ProcessType type) const -> void;
+    auto OnParametersChanged(const InputParameters& type) const -> void;
+    
 
 private:
     auto InitializeLayout() -> void;
@@ -25,6 +30,6 @@ private:
 private:
     ParametersManager* m_parametersWidget;
     ProcessButtonsManager* m_ProcessButtonsManager;
-    const InputHandler* m_listener;
+    InputHandler* m_inputHandler;
 };
 

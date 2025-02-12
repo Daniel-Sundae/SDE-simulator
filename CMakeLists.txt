@@ -76,7 +76,6 @@ set(SOURCES
 
 file(GLOB_RECURSE SRC_HEADERS "${PROJECT_SOURCE_DIR}/*.hpp")
 set(HEADERS
-    ${CORE_HEADERS}
     ${SRC_HEADERS}
 )
 
@@ -88,7 +87,11 @@ add_executable(StochasticSim
 target_include_directories(StochasticSim PRIVATE
     ${PROJECT_SOURCE_DIR}/include
     ${PROJECT_SOURCE_DIR}/Model
+    ${PROJECT_SOURCE_DIR}/Model/Calculations
+    ${PROJECT_SOURCE_DIR}/Model/Processes
     ${PROJECT_SOURCE_DIR}/View
+    ${PROJECT_SOURCE_DIR}/View/Charts
+    ${PROJECT_SOURCE_DIR}/View/Inputs
     ${PROJECT_SOURCE_DIR}/Presenter
     ${Qt6Core_INCLUDE_DIRS}
     ${Qt6Widgets_INCLUDE_DIRS}

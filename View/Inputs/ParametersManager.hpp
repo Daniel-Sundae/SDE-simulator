@@ -1,19 +1,30 @@
 #pragma once
-#include "InputPresenter.hpp"
-#include "Types.hpp"
 
-class ProcessButtonsManager;
+#include "Types.hpp"
+#include <unordered_map>
+#include <QWidget>
+
+class InputManager;
 
 class ParametersManager : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit ParametersManager(InputManager* parent, std::shared_ptr<InputPresenter> parameterPresenter);
-protected:
+	explicit ParametersManager(InputManager* parent);
+private:
 	auto GetMuValue() const -> double;
 	auto GetSigmaValue() const -> double;
 	auto GetStartValue() const -> double;
-private:
-	std::shared_ptr<InputPresenter> m_parameterPresenter;
-	auto InitializeParametersWidget() -> void;
+	auto InitializeParametersManager() -> void;
+	auto Parent() const -> InputManager*;
+	enum class InputType {
+		MU = 0,
+		SIGMA,
+		STARTVALUE
+	};
+	std::unordered_map<InputType, QWidget*> m_inputs;
+
+private slots:
+	auto OnParametersChanged() const -> void;
 };
+

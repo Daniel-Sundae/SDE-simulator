@@ -10,6 +10,7 @@ FUNCTIONALITY TODO:
 - loading symbol for simulation taking time
 - add dashed red driftline. Should be present immediately.
 - Add dot showing the final result of sim in chart graph.
+- Better to have a "GO" button for starting the sample. The settings must be clearly visible then somehow.
 
 CODE DESIGN TODO:
 - remove "listener" term. Nothing is actually listening. Only change after done with architecture so that i can insert object and stuff.

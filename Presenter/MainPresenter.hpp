@@ -3,5 +3,5 @@
 
 class MainPresenter final : public IPresenterComponent<OutputHandler> {
 public:
-	auto SamplePath(PathQuery pathQuery) -> void;
+	auto SamplePath(const PathQuery& pathQuery) const -> void;
 }
