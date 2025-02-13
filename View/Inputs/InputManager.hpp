@@ -19,7 +19,7 @@ class InputManager : public QWidget
 
 public:
     explicit InputManager(QWidget* parent = nullptr);
-    auto SetListener(InputHandler* inputHandler) -> void;
+    auto SetInputHandler(InputHandler* inputHandler) -> void;
     auto OnProcessButtonPressed(const ProcessType type) const -> void;
     auto OnParametersChanged(const InputParameters& type) const -> void;
     

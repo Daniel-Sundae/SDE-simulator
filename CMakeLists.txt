@@ -90,7 +90,7 @@ target_include_directories(StochasticSim PRIVATE
     ${PROJECT_SOURCE_DIR}/Model/Calculations
     ${PROJECT_SOURCE_DIR}/Model/Processes
     ${PROJECT_SOURCE_DIR}/View
-    ${PROJECT_SOURCE_DIR}/View/Charts
+    ${PROJECT_SOURCE_DIR}/View/Outputs
     ${PROJECT_SOURCE_DIR}/View/Inputs
     ${PROJECT_SOURCE_DIR}/Presenter
     ${Qt6Core_INCLUDE_DIRS}

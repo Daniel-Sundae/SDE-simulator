@@ -1,20 +1,24 @@
 #pragma once
 
-#include "ChartManager.hpp"
-#include "InputManager.hpp"
-#include <QtWidgets\qmainwindow.h>
-#include <QtWidgets\qboxlayout.h>
+#include <QtWidgets/qmainwindow.h>
+
+class QWidget;
+class QHBoxLayout;
+class InputManager;
+class OutputManager;
 
 class MainWindow final : public QMainWindow{
     Q_OBJECT
-
 public:
     explicit MainWindow();
+    auto GetInputManager() const -> InputManager*;
+    auto GetOutputManager() const -> OutputManager*;
 private:
     auto AddWidgets() -> void;
 private:
+    QWidget* m_centralWidget;
     QHBoxLayout* m_mainWindowLayout;
-    const ChartManager* m_chartManager;
-    const InputManager* m_inputManager;
+    OutputManager* m_outputManager;
+    InputManager* m_inputManager;
 };
 

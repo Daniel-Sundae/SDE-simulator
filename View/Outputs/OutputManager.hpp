@@ -8,11 +8,11 @@
 #include <QtCharts/qchart.h>
 
 
-class ChartManager : public QWidget{
+class OutputManager : public QWidget{
     Q_OBJECT
 
 public:
-    explicit ChartManager(QWidget* parent = nullptr);
+    explicit OutputManager(QWidget* parent = nullptr);
 
     auto OnPathReceived(const Path& sampleData) const -> void;
 

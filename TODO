@@ -11,15 +11,20 @@ FUNCTIONALITY TODO:
 - add dashed red driftline. Should be present immediately.
 - Add dot showing the final result of sim in chart graph.
 - Better to have a "GO" button for starting the sample. The settings must be clearly visible then somehow.
+- Introduce SamplerMethod to SimulationParameter type. Euler–Maruyama is standard. Implement template specializations on Increment (current i euler maruyama).
+	E.g. rungekutta adds this term to increment: \frac{1}{2}\left(b\left(\hat{\Upsilon}_n\right)-b\left(Y_n\right)\right)\left(\left(\Delta W_n\right)^2-\delta\right) \delta^{-1 / 2}
 
 CODE DESIGN TODO:
-- remove "listener" term. Nothing is actually listening. Only change after done with architecture so that i can insert object and stuff.
 - send activetype from mainpresenter immediately to outputhandler. Outputhandler generates loadingsymbol while waiting for path(s)
-- Check if possible to trigger all eventr in inputmanager so that the information can be sent to inputhandler to "reset" or initialize it, in case the state is broken somehow.
+- Stresstest to check if inputhandler can get into broken state
+- Use valgrind
+- Use static analyser tool
+- Use sub cmakeprojects
 
 TECH DETAILS TODO:
-- Make sure old data is not leaking. Either outputmanager deletes or data saved to disc
-- use async. Transmit loading signal to chartmanager
+- Make sure old data is not leaking. Either outputmanager deletes or data saved to disc. Valgrind investigate
+- use async. Transmit loading signal to OutputManager
 - use threads for many paths.
 - Use threadpool to avoid spinning up threads
 - Maybe use more than one thread per path (for simple paths like BM). Could write function sampleRange() andattach offset to each range, where offset is previous range's last value.
+- 

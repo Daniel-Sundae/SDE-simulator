@@ -13,7 +13,7 @@ add_library(ViewLib STATIC
     # Optionally add other view-related sources.
 )
 
-# If ChartManager is part of the view then you can add it either here or
+# If OutputManager is part of the view then you can add it either here or
 # in an included subdirectory. For a separate subcomponent structure, consider:
 # add_subdirectory(Charts)
 

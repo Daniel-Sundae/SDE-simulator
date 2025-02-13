@@ -1,6 +1,11 @@
 #include "OutputHandler.hpp"
+#include "OutputManager.hpp"
 
-auto OutputHandler::OnPathReceived(Path& path) -> void
+OutputHandler::OutputHandler()
+	: m_listener(nullptr)
+{}
+
+auto OutputHandler::OnPathReceived(Path& path) const -> void
 {
-	Listener()->
+	Listener()->OnPathReceived(path);
 }

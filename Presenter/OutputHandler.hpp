@@ -1,8 +1,11 @@
-#include "ChartManager.cpp"
-#include <memory>
+#pragma once
+#include "IPresenterComponent.hpp"
+#include "Types.hpp"
 
-class OutputHandler final : public IPresenterComponent<ChartManager> {
+class OutputManager;
+
+class OutputHandler final : public IPresenterComponent<OutputManager> {
 public:
 	explicit OutputHandler();
-	auto OnPathReceived(Path& path) -> void;
+	auto OnPathReceived(Path& path) const -> void;
 };

@@ -20,8 +20,8 @@ enum class ProcessType{
 };
 
 struct ProcessDefinition {
-    Drift drift = [](Time, State) -> State { return 0.0; };
-    Diffusion diffusion = [](Time, State) -> State { return 0.0; };
+    const Drift& drift = [](Time, State) -> State { return 0.0; };
+    const Diffusion& diffusion = [](Time, State) -> State { return 0.0; };
     State startValue = 0;
 };
 
@@ -39,7 +39,8 @@ struct SimulationParameters {
     }
     Time time = 0;
     std::size_t points;
-    // TODO add nr samples here?
+    // TODO add nr samples (for more than one path)
+    // TODO add SolverMethod enum
 };
 
 struct PathQuery {

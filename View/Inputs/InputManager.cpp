@@ -24,7 +24,7 @@ auto InputManager::InitializeLayout() -> void
     setLayout(mainLayout);
 }
 
-auto InputManager::SetListener(InputHandler* inputHandler) -> void
+auto InputManager::SetInputHandler(InputHandler* inputHandler) -> void
 {
     m_inputHandler = inputHandler;
 }

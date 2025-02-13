@@ -1,8 +1,6 @@
 #pragma once
 #include <random>
 #include <cmath>
-#include <QtCharts/qlineseries.h>
-#include "Process.hpp"
 
 namespace Utils
 {

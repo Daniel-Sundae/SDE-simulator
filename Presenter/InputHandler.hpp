@@ -31,4 +31,4 @@ private:
     std::unique_ptr<SimulationParameters> m_simParams;
     std::function<Drift(double)> m_driftGenerator;
     std::function<Diffusion(double)> m_diffusionGenerator;
-}
+};
