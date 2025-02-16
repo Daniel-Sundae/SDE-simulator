@@ -1,75 +1,111 @@
 {
-  "version": 3,
-  "configurePresets": [
-    {
-      "name": "debug-windows",
-      "displayName": "Debug with MinGW Qt Compiler",
-      "description": "Build configuration for Debug using MinGW compiler from Qt",
-      "generator": "MinGW Makefiles",
-      "binaryDir": "${sourceDir}/build/Debug",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_C_COMPILER": "C:/Qt/Tools/mingw1310_64/bin/gcc.exe",
-        "CMAKE_CXX_COMPILER": "C:/Qt/Tools/mingw1310_64/bin/g++.exe"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Windows"
-      }
-    },
-    {
-      "name": "debug-macos",
-      "displayName": "Debug Build for macOS",
-      "description": "Build configuration for Debug on macOS",
-      "generator": "Unix Makefiles",
-      "binaryDir": "${sourceDir}/build/Debug",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_C_COMPILER": "clang",
-        "CMAKE_CXX_COMPILER": "clang++",
-        "CMAKE_CXX_FLAGS": "-isystem /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Darwin"
-      }
-    },
-    {
-      "name": "release-windows",
-      "displayName": "Release with MinGW Qt Compiler",
-      "description": "Build configuration for Release using MinGW compiler from Qt",
-      "generator": "MinGW Makefiles",
-      "binaryDir": "${sourceDir}/build/Release",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_C_COMPILER": "C:/Qt/Tools/mingw1310_64/bin/gcc.exe",
-        "CMAKE_CXX_COMPILER": "C:/Qt/Tools/mingw1310_64/bin/g++.exe"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Windows"
-      }
-    },
-    {
-      "name": "release-macos",
-      "displayName": "Release Build for macOS",
-      "description": "Build configuration for Release on macOS",
-      "generator": "Unix Makefiles",
-      "binaryDir": "${sourceDir}/build/Release",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_C_COMPILER": "clang",
-        "CMAKE_CXX_COMPILER": "clang++",
-        "CMAKE_CXX_FLAGS": "-isystem /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Darwin"
-      }
-    }
-  ]
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "debug-windows-msvc",
+            "displayName": "Debug with MSVC Qt Compiler",
+            "description": "Build configuration for Debug using MSVC compiler",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/Debug-MSVC",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_PREFIX_PATH": "C:/Qt/6.8.2/msvc2022_64/lib/cmake",
+                "CMAKE_C_COMPILER": "cl.exe",
+                "CMAKE_CXX_COMPILER": "cl.exe"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "debug-windows",
+            "displayName": "Debug with MinGW Qt Compiler",
+            "description": "Build configuration for Debug using MinGW compiler from Qt",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/Debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_PREFIX_PATH": "C:/Qt/6.8.2/mingw_64/lib/cmake",
+                "CMAKE_C_COMPILER": "gcc",
+                "CMAKE_CXX_COMPILER": "g++"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "debug-macos",
+            "displayName": "Debug Build for macOS",
+            "description": "Build configuration for Debug on macOS",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/Debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_CXX_COMPILER": "clang++"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Darwin"
+            }
+        },
+        {
+            "name": "release-windows-msvc",
+            "displayName": "Release with MSVC Qt Compiler",
+            "description": "Build configuration for Release using MSVC compiler",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/Release-MSVC",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_PREFIX_PATH": "C:/Qt/6.8.2/msvc2022_64/lib/cmake",
+                "CMAKE_C_COMPILER": "cl.exe",
+                "CMAKE_CXX_COMPILER": "cl.exe"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "release-windows",
+            "displayName": "Release with MinGW Qt Compiler",
+            "description": "Build configuration for Release using MinGW compiler from Qt",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/Release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_PREFIX_PATH": "C:/Qt/6.8.2/mingw_64/lib/cmake",
+                "CMAKE_C_COMPILER": "gcc",
+                "CMAKE_CXX_COMPILER": "g++"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "release-macos",
+            "displayName": "Release Build for macOS",
+            "description": "Build configuration for Release on macOS",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/Release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_CXX_COMPILER": "clang++"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Darwin"
+            }
+        }
+    ]
 }

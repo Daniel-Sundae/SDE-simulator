@@ -3,23 +3,36 @@
 #include <stdexcept>
 #include <functional>
 #include <cstddef>
+#include "DefaultConstants.hpp"
 
-using Time = double;
-using State = double;
-using Path = std::vector<double>;
-using StateDot = double; // dX/dt
-using Drift = std::function<StateDot(Time, State)>;
-using Diffusion = std::function<StateDot(Time, State)>;
+class FunctionWrapper{
+protected:
+    const double parameter;
+    std::function<State(Time, State)> f;
+    FunctionWrapper(double inp_parameter, std::function f)
+        : parameter(inp_parameter) {
+    }
 
-namespace SimulationDefault {
-    constexpr Time time = 10;
-    constexpr std::size_t points = 1000;
-}
-namespace DefinitionDefault {
-    const Drift drift = [](Time, State) -> StateDot { return 0.0; };
-    const Diffusion diffusion = [](Time, State) -> StateDot { return 0.0; };
-    constexpr State startValue = 0;
-}
+public:
+    State operator()(Time t, State s) { return f(t, s); }
+    double getParameter() const { return parameter; }
+};
+
+class Drift : public FunctionWrapper {
+public:
+    Drift(double mu_val) : FunctionWrapper(mu_val) {
+        f = [mu_val](Time t, State s) { return mu_val * s; };
+    }
+    auto Mu() const -> double { return parameter; }
+};
+
+class Diffusion : public FunctionWrapper {
+public:
+    Diffusion(double sigma_val) : FunctionWrapper(sigma_val) {
+        f = [sigma_val](Time t, State s) { return sigma_val * s; };
+    }
+    auto Sigma() const -> double { return parameter; }
+};
 
 enum class ProcessType{
     NONE = 0,

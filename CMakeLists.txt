@@ -59,26 +59,19 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-# Find Qt packages
-if(WIN32)
-    set(CMAKE_PREFIX_PATH "C:/Qt/6.8.0/mingw_64/lib/cmake")
-else()
-    set(CMAKE_PREFIX_PATH "/opt/homebrew/opt/qt@6")
-endif()
-
 # Find required Qt components
 find_package(Qt6 COMPONENTS Core Widgets Charts REQUIRED)
 
-file(GLOB_RECURSE SRC_IMPL "${PROJECT_SOURCE_DIR}/*.cpp")
-set(SOURCES
-    ${SRC_IMPL}
-)
 
-file(GLOB_RECURSE SRC_HEADERS "${PROJECT_SOURCE_DIR}/*.hpp")
-set(HEADERS
-    ${SRC_HEADERS}
+file(GLOB_RECURSE SRC_IMPL
+    "${PROJECT_SOURCE_DIR}/src/*.cpp"
 )
-
+file(GLOB_RECURSE SRC_HEADERS
+    "${PROJECT_SOURCE_DIR}/src/*.hpp"
+    "${PROJECT_SOURCE_DIR}/include/*.hpp"
+)
+set(SOURCES ${SRC_IMPL})
+set(HEADERS ${SRC_HEADERS})
 add_executable(StochasticSim
     ${SOURCES}
     ${HEADERS}
@@ -86,16 +79,13 @@ add_executable(StochasticSim
 
 target_include_directories(StochasticSim PRIVATE
     ${PROJECT_SOURCE_DIR}/include
-    ${PROJECT_SOURCE_DIR}/Model
-    ${PROJECT_SOURCE_DIR}/Model/Calculations
-    ${PROJECT_SOURCE_DIR}/Model/Processes
-    ${PROJECT_SOURCE_DIR}/View
-    ${PROJECT_SOURCE_DIR}/View/Outputs
-    ${PROJECT_SOURCE_DIR}/View/Inputs
-    ${PROJECT_SOURCE_DIR}/Presenter
-    ${Qt6Core_INCLUDE_DIRS}
-    ${Qt6Widgets_INCLUDE_DIRS}
-    ${Qt6Charts_INCLUDE_DIRS}
+    ${PROJECT_SOURCE_DIR}/src/Model
+    ${PROJECT_SOURCE_DIR}/src/Model/Calculations
+    ${PROJECT_SOURCE_DIR}/src/Model/Processes
+    ${PROJECT_SOURCE_DIR}/src/View
+    ${PROJECT_SOURCE_DIR}/src/View/Outputs
+    ${PROJECT_SOURCE_DIR}/src/View/Inputs
+    ${PROJECT_SOURCE_DIR}/src/Presenter
 )
 
 # Link Qt libraries

@@ -28,7 +28,7 @@ public:
 
         static constexpr std::string_view name = "Brownian Motion";
         static constexpr std::string_view acronym = "BM";
-        static constexpr std::string_view description = "Standard brownian motion. μ = 0, σ = 1";
+        static constexpr std::string_view description = "Standard brownian motion.";
         static constexpr std::string_view definition = "dX = dB";
     };
 
