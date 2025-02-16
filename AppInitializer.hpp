@@ -8,7 +8,7 @@ class MainPresenter;
 class AppInitializer {
 public:
 	explicit AppInitializer();
-
+	~AppInitializer();
 private:
 	auto InitializeComponents() -> void;
 	

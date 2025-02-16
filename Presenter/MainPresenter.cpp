@@ -1,5 +1,6 @@
 #include "MainPresenter.hpp"
 #include "PathEngine.hpp"
+#include "InputHandler.hpp"
 
 MainPresenter::MainPresenter()
 	: m_inputHandler(std::make_unique<InputHandler>())

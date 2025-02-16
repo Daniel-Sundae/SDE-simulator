@@ -1,9 +1,9 @@
 #pragma once
 #include "ProcessData.hpp"
+#include "InputHandler.hpp"
 #include <QtWidgets/qwidget.h>
 
-
-class ParametersManager;
+class DefinitionManager;
 class ProcessButtonsManager;
 class InputHandler;
 
@@ -21,14 +21,14 @@ public:
     explicit InputManager(QWidget* parent = nullptr);
     auto SetInputHandler(InputHandler* inputHandler) -> void;
     auto OnProcessButtonPressed(const ProcessType type) const -> void;
-    auto OnParametersChanged(const InputParameters& type) const -> void;
+    auto OnProcessDefinitionModified(const ModifiedDefinitionParam param, double userValue) const -> void;
     
 
 private:
     auto InitializeLayout() -> void;
 
 private:
-    ParametersManager* m_parametersWidget;
+    DefinitionManager* m_parametersWidget;
     ProcessButtonsManager* m_ProcessButtonsManager;
     InputHandler* m_inputHandler;
 };

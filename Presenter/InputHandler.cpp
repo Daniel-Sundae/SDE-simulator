@@ -1,13 +1,13 @@
 #include "InputHandler.hpp"
+#include "ProcessData.hpp"
 #include <assert.h>
 
 InputHandler::InputHandler()
-	: m_processType(NONE)
-	, m_processDefinitionInputs({})
-	, m_simParams({10, 1000}
-	, m_listener(nullptr)
+	: m_processType(ProcessType::NONE)
+	, m_processDefinitionInputs(std::make_unique<ProcessDefinitionInputs>())
+	, m_simParams(SimulationParameters())
 	, m_driftGenerator(nullptr)
-	, m_diffusionGenerator(nullptr))
+	, m_diffusionGenerator(nullptr)
 {}
 
 auto InputHandler::OnProcessButtonPressed(const ProcessType processType) -> void
@@ -34,16 +34,16 @@ auto InputHandler::OnProcessButtonPressed(const ProcessType processType) -> void
     SamplePath();
 }
 
-auto InputHandler::OnProcessDefinitionModified(ModifiedParam param, double userValue) -> void
+auto InputHandler::OnProcessDefinitionModified(const ModifiedDefinitionParam param, double userValue) -> void
 {
 	switch (param) {
-	case ModifiedParam::MU:
+	case ModifiedDefinitionParam::MU:
 		m_processDefinitionInputs->mu = userValue;
 		break;
-	case ModifiedParam::SIGMA:
+	case ModifiedDefinitionParam::SIGMA:
 		m_processDefinitionInputs->sigma = userValue;
 		break;
-	case ModifiedParam::STARTVALUE:
+	case ModifiedDefinitionParam::STARTVALUE:
 		m_processDefinitionInputs->startValue = userValue;
 		break;
 	default:
@@ -54,31 +54,26 @@ auto InputHandler::OnProcessDefinitionModified(ModifiedParam param, double userV
 	}
 }
 
-auto InputHandler::OnSimulationParametersModified(SimulationParameters& simParams) -> void
+auto InputHandler::OnSimulationParametersModified(SimulationParameters simParams) -> void
 {
-	m_simParams = std::make_unique<SimulationParameters>(std::move(simParams));
-	//simParams.reset(simParams);
+	m_simParams = simParams;
 }
 
-auto InputHandler::ProcessDefinition() -> ProcessDefinition
+auto InputHandler::GetProcessDefinition() const -> ProcessDefinition
 {
-	ProcessDefinition def{};
-	def.drift = m_driftGenerator(m_processDefinition.mu);
-	def.diffusion = m_diffusionGenerator(m_processDefinition.sigma);
-	def.startValue = m_processDefinition.startValue;
-	return def;
+	auto drift = m_driftGenerator(m_processDefinitionInputs->mu);
+	auto diffusion = m_diffusionGenerator(m_processDefinitionInputs->sigma);
+	State startValue = m_processDefinitionInputs->startValue;
+	return {drift, diffusion, startValue};
 }
 auto InputHandler::SamplePath() -> void
 {
-	static_assert(m_processType != NONE);
-	static_assert(m_processDefinitionInputs);
-	static_assert(m_simParams);
-	Listener()->SamplePath({ m_processType, ProcessDefinition(), m_simParams });
+	if (m_processDefinitionInputs->mu == 0 && m_processDefinitionInputs->sigma == 0)
+		return;
+	if (m_processType != ProcessType::NONE)
+		return;
+	if (m_simParams.points <= 0 || m_simParams.time <= 0)
+		return;
+
+	Listener()->SamplePath({ m_processType, GetProcessDefinition(), m_simParams });
 }
-
-auto InputHandler::CreateQuery()
-
-//auto InputHandler::SetListener(const MainPresenter* mainPresenter) -> void
-//{
-//	m_listener = mainPresenter;
-//}

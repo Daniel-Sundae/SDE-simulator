@@ -1,16 +1,14 @@
 #include "ProcessButtonsManager.hpp"
-#include "ParametersManager.hpp"
+#include "DefinitionManager.hpp"
 #include "InputHandler.hpp"
-//#include <QtWidgets/qlabel.h>
 #include <QtWidgets/qboxlayout.h>
 #include "InputManager.hpp"
 
 InputManager::InputManager(QWidget* parent)
     : QWidget(parent)
+    , m_parametersWidget(new DefinitionManager(this))
+    , m_ProcessButtonsManager(new ProcessButtonsManager(this))
 {
-    auto m_parametersWidget = new ParametersManager(this, inputPresenter);
-    auto m_ProcessButtonsManager = new ProcessButtonsManager(this, inputPresenter);
-
     InitializeLayout();
 }
 
@@ -34,3 +32,7 @@ auto InputManager::OnProcessButtonPressed(const ProcessType type) const -> void
     m_inputHandler->OnProcessButtonPressed(type);
 }
 
+auto InputManager::OnProcessDefinitionModified(const ModifiedDefinitionParam param, double userValue) const -> void
+{
+    m_inputHandler->OnProcessDefinitionModified(param, userValue);
+}

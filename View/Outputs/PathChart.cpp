@@ -11,8 +11,9 @@ PathChart::PathChart() : QChart()
 
 auto PathChart::UpdatePathChart(const Path& path, const ProcessType type) -> void
 {
-    ProcessMetaData metaData = ProcessData::Create(type);
-    QString title = metaData.name + ": " + metaData.definition;
+    QString title = QString::fromUtf8(ProcessData::Name(type)) +
+        ": " +
+        QString::fromUtf8(ProcessData::Definition(type));
     setTitle(title);
     PlotChart(path);
 }
@@ -21,7 +22,7 @@ auto PathChart::PlotChart(const Path& path) -> void
 {
     if (path.empty()) return;
     removeAllSeries();
-    QLineSeries* series = new QLineSeries();
+    QLineSeries* series = new QLineSeries(this);
     for(size_t i = 0; i < path.size(); ++i) {
         series->append(static_cast<qreal>(i), static_cast<qreal>(path[i]));
     }
@@ -37,7 +38,7 @@ auto PathChart::PlotChart(const Path& path) -> void
     UpdateRangesIfNeeded(path.size(), *min_it, *max_it);
 }
 
-auto PathChart::UpdateRangesIfNeeded(double sampleMaxX, double sampleMinY, double sampleMaxY) -> void
+auto PathChart::UpdateRangesIfNeeded(std::size_t max_X, State min_Y, State max_Y) -> void
 {
     auto xAxis = qobject_cast<QValueAxis*>(axes(Qt::Horizontal).first());
     auto yAxis = qobject_cast<QValueAxis*>(axes(Qt::Vertical).first());
@@ -45,41 +46,40 @@ auto PathChart::UpdateRangesIfNeeded(double sampleMaxX, double sampleMinY, doubl
     if (!xAxis || !yAxis) return;
 
     // X-axis handling
-    double currentXMax = xAxis->max();
-    currentXMax = std::max(currentXMax, sampleMaxX);
-    if(currentXMax > 3 * sampleMaxX) {
-        currentXMax = sampleMaxX;
+    // Use qreal (double) for Qt axis operations
+    qreal currentXMax = xAxis->max();
+    // Convert size_t to qreal for comparison
+    currentXMax = std::max(currentXMax, static_cast<qreal>(max_X));
+    if (currentXMax > 3 * static_cast<qreal>(max_X)) {
+        currentXMax = static_cast<qreal>(max_X);
     }
     xAxis->setRange(0, currentXMax);
 
     // Y-axis handling
-    double currentYMin = yAxis->min();
-    double currentYMax = yAxis->max();
-    
-    // Add 10% padding to the actual data values
-    double paddedMinY = sampleMinY * 1.1;
-    double paddedMaxY = sampleMaxY * 1.1;
+    qreal currentYMin = yAxis->min();
+    qreal currentYMax = yAxis->max();
 
-    // Define hysteresis threshold
-    double hysteresis = (currentYMax - currentYMin) * 0.05;
-    
+    // Convert State to qreal for calculations
+    qreal paddedMinY = static_cast<qreal>(min_Y) * 1.1;
+    qreal paddedMaxY = static_cast<qreal>(max_Y) * 1.1;
+
+    qreal hysteresis = (currentYMax - currentYMin) * 0.05;
+
     bool needsYAdjustment = false;
-    double newMin = currentYMin;
-    double newMax = currentYMax;
+    qreal newMin = currentYMin;
+    qreal newMax = currentYMax;
 
-    // Check if adjustment is needed
-    if (paddedMinY < currentYMin - hysteresis || 
+    if (paddedMinY < currentYMin - hysteresis ||
         paddedMaxY > currentYMax + hysteresis) {
-        
-        double extraPadding = (paddedMaxY - paddedMinY) * 0.1;
+
+        qreal extraPadding = (paddedMaxY - paddedMinY) * 0.1;
         newMin = std::min(currentYMin, paddedMinY - extraPadding);
         newMax = std::max(currentYMax, paddedMaxY + extraPadding);
         needsYAdjustment = true;
     }
 
-    // Force reset if range becomes too large
-    double currentRange = currentYMax - currentYMin;
-    double dataRange = sampleMaxY - sampleMinY;
+    qreal currentRange = currentYMax - currentYMin;
+    qreal dataRange = static_cast<qreal>(max_Y - min_Y);
     if (currentRange > 8 * dataRange) {
         newMin = paddedMinY;
         newMax = paddedMaxY;
@@ -87,16 +87,14 @@ auto PathChart::UpdateRangesIfNeeded(double sampleMaxX, double sampleMinY, doubl
     }
 
     if (needsYAdjustment) {
-        // Round to nearest multiple of 10
         newMin = std::floor(newMin / 10.0) * 10;
         newMax = std::ceil(newMax / 10.0) * 10;
 
-        // Ensure 0 is always in the range
         if (newMin > 0) newMin = 0;
         if (newMax < 0) newMax = 0;
 
         yAxis->setRange(newMin, newMax);
-        yAxis->setTickCount((newMax - newMin) / 10 + 1); // Set tick count to show multiples of 10
+        yAxis->setTickCount(static_cast<int>((newMax - newMin) / 10 + 1));
     }
 }
 

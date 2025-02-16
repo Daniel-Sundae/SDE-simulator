@@ -11,6 +11,6 @@ public:
 
 private:
     auto PlotChart(const Path& sampleData) -> void;
-    auto UpdateRangesIfNeeded(double maxX, double minY, double maxY) -> void;
+    auto UpdateRangesIfNeeded(std::size_t max_X, State min_Y, State max_Y) -> void;
     auto InitializeProcessChart() -> void;
 };

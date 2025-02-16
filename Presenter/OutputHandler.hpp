@@ -6,6 +6,6 @@ class OutputManager;
 
 class OutputHandler final : public IPresenterComponent<OutputManager> {
 public:
-	explicit OutputHandler();
-	auto OnPathReceived(Path& path) const -> void;
+	explicit OutputHandler() = default;
+	auto OnPathReceived(const Path& path) const -> void;
 };

@@ -1,16 +1,16 @@
-﻿#include "ParametersManager.hpp"
+﻿#include "DefinitionManager.hpp"
 #include "InputManager.hpp"
 #include <QtWidgets/qlabel.h>
 #include <QtWidgets/qboxlayout.h>
 #include <QtWidgets/qdoublespinbox>
 
-ParametersManager::ParametersManager(InputManager* parent)
+DefinitionManager::DefinitionManager(InputManager* parent)
     : QWidget(parent)
 {
-	InitializeParametersManager();
+	InitializeDefinitionManager();
 }
 
-auto ParametersManager::InitializeParametersManager() -> void
+auto DefinitionManager::InitializeDefinitionManager() -> void
 {
     auto* layout = new QHBoxLayout(this);
 
@@ -18,7 +18,7 @@ auto ParametersManager::InitializeParametersManager() -> void
     muInput->setRange(-10.0, 10.0);
     muInput->setValue(0.2);
     muInput->setSingleStep(0.1);
-    m_inputs[InputType::MU] = muInput;
+    m_inputs[ModifiedDefinitionParam::MU] = muInput;
     layout->addWidget(new QLabel("Drift (μ):"));
     layout->addWidget(muInput);
 
@@ -26,7 +26,7 @@ auto ParametersManager::InitializeParametersManager() -> void
     sigmaInput->setRange(0.0, 10.0);
     sigmaInput->setValue(0.2);
     sigmaInput->setSingleStep(0.1);
-    m_inputs[InputType::SIGMA] = sigmaInput;
+    m_inputs[ModifiedDefinitionParam::SIGMA] = sigmaInput;
     layout->addWidget(new QLabel("Volatility (σ):"));
     layout->addWidget(sigmaInput);
 
@@ -34,7 +34,7 @@ auto ParametersManager::InitializeParametersManager() -> void
     startValueInput->setRange(-20, 20.0);
     startValueInput->setValue(0);
     startValueInput->setSingleStep(1);
-    m_inputs[InputType::STARTVALUE] = startValueInput;
+    m_inputs[ModifiedDefinitionParam::STARTVALUE] = startValueInput;
     layout->addWidget(new QLabel("Start Value:"));
     layout->addWidget(startValueInput);
     setLayout(layout);
@@ -44,40 +44,40 @@ auto ParametersManager::InitializeParametersManager() -> void
         muInput,
         QOverload<double>::of(&QDoubleSpinBox::valueChanged),
         this,
-        &ParametersManager::OnParametersChanged);
+        [this]() { OnProcessDefinitionModified(ModifiedDefinitionParam::MU); });
     connect(
         sigmaInput,
         QOverload<double>::of(&QDoubleSpinBox::valueChanged),
         this,
-        &ParametersManager::OnParametersChanged);
+        [this]() { OnProcessDefinitionModified(ModifiedDefinitionParam::SIGMA); });
     connect(
         startValueInput,
         QOverload<double>::of(&QDoubleSpinBox::valueChanged),
         this,
-        &ParametersManager::OnParametersChanged);
+        [this]() { OnProcessDefinitionModified(ModifiedDefinitionParam::STARTVALUE); });
 }
 
-auto ParametersManager::GetMuValue() const -> double
+auto DefinitionManager::GetMuValue() const -> double
 {
-    return m_inputs[InputType::MU]->value();
+    return m_inputs.at(ModifiedDefinitionParam::MU)->value();
 }
 
-auto ParametersManager::GetSigmaValue() const -> double
+auto DefinitionManager::GetSigmaValue() const -> double
 {
-    return m_inputs[InputType::SIGMA]->value();
+    return m_inputs.at(ModifiedDefinitionParam::SIGMA)->value();
 }
 
-auto ParametersManager::GetStartValue() const -> double
+auto DefinitionManager::GetStartValue() const -> double
 {
-    return m_inputs[InputType::STARTVALUE]->value();
+    return m_inputs.at(ModifiedDefinitionParam::STARTVALUE)->value();
 }
 
-auto ParametersManager::Parent() const -> InputManager*
+auto DefinitionManager::Parent() const -> InputManager*
 {
     return qobject_cast<InputManager*>(parent());
 }
 
-auto ParametersManager::OnParametersChanged() const -> void
+auto DefinitionManager::OnProcessDefinitionModified(const ModifiedDefinitionParam param) const -> void
 {
-    Parent()->OnParametersChanged(InputParameters{GetMuValue(), GetSigmaValue(), GetStartValue()});
+    Parent()->OnProcessDefinitionModified(param, m_inputs.at(param)->value());
 }

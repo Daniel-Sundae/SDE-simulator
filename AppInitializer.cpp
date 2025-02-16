@@ -1,8 +1,8 @@
 #include "AppInitializer.hpp"
 #include "MainWindow.hpp"
+#include "MainPresenter.hpp"
 #include "InputHandler.hpp"
 #include "OutputHandler.hpp"
-#include "MainPresenter.hpp"
 #include "InputManager.hpp"
 
 AppInitializer::AppInitializer()
@@ -11,7 +11,7 @@ AppInitializer::AppInitializer()
 {
 	InitializeComponents();
 }
-
+AppInitializer::~AppInitializer() = default;
 auto AppInitializer::InitializeComponents() -> void
 {
 

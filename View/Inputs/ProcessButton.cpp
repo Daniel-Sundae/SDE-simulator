@@ -7,7 +7,7 @@ ProcessButton::ProcessButton(ProcessButtonsManager *parent, const ProcessType ty
     : QPushButton(parent)
     , m_processType(type)
 {
-    setText(ProcessData::Acronym(type));
+    setText(QString::fromStdString(std::string(ProcessData::Acronym(type))));
     setToolTip("testdescr");
     
     connect(

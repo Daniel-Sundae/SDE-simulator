@@ -3,7 +3,7 @@
 #include "MainPresenter.hpp"
 #include <memory>
 
-enum class ModifiedParam {
+enum class ModifiedDefinitionParam {
     MU = 0,
     SIGMA,
     STARTVALUE
@@ -13,22 +13,22 @@ class InputHandler final : public IPresenterComponent<MainPresenter> {
 public:
     explicit InputHandler();
     auto OnProcessButtonPressed(const ProcessType processType) -> void;
-    auto OnProcessDefinitionModified(ModifiedParam param, double userValue) -> void;
-    auto OnSimulationParametersModified(SimulationParameters& simParams) -> void;
+    auto OnProcessDefinitionModified(ModifiedDefinitionParam param, double userValue) -> void;
+    auto OnSimulationParametersModified(SimulationParameters simParams) -> void;
 
 private:
-    auto ProcessDefinition() -> ProcessDefinition;
+    auto GetProcessDefinition() const -> ProcessDefinition;
     auto SamplePath() -> void;
 
 private:
     struct ProcessDefinitionInputs {
-        double mu;
-        double sigma;
-        double startValue;
+        double mu = 0;
+        double sigma = 0;
+        double startValue = 0;
     };
     ProcessType m_processType;
     std::unique_ptr<ProcessDefinitionInputs> m_processDefinitionInputs;
-    std::unique_ptr<SimulationParameters> m_simParams;
+    SimulationParameters m_simParams;
     std::function<Drift(double)> m_driftGenerator;
     std::function<Diffusion(double)> m_diffusionGenerator;
 };

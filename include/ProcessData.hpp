@@ -2,6 +2,7 @@
 #include "Types.hpp"
 #include <stdexcept>
 #include <concepts>
+#include <string_view>
 
 
 class ProcessData {
@@ -72,7 +73,15 @@ public:
     }
     static auto Acronym(ProcessType type) -> std::string_view
     {
-        return ProcessData::GetField<_GET_STATIC_FIELD(acronym)>(type);
+        return GET_STATIC_FIELD(acronym);
+    }
+    static auto Description(ProcessType type) -> std::string_view
+    {
+        return GET_STATIC_FIELD(description);
+    }
+    static auto Definition(ProcessType type) -> std::string_view
+    {
+        return GET_STATIC_FIELD(definition);
     }
 #undef GET_STATIC_FIELD
 
