@@ -6,8 +6,8 @@ namespace SimulationDefault {
 }
 
 namespace DefinitionDefault {
-    const Drift drift = [](Time, State) -> StateDot { return 0.0; };
-    const Diffusion diffusion = [](Time, State) -> StateDot { return 0.0; };
+    //const Drift drift = ;
+    //const Diffusion diffusion = Diffusion(0, [](Time, State) -> StateDot { return 0.0; };
     constexpr double mu = 0.2;
     constexpr double sigma = 0.2;
     constexpr State startValue = 0;

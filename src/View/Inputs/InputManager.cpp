@@ -13,8 +13,8 @@ InputManager::InputManager(QWidget* parent)
     , m_inputHandler(nullptr)
 {
     auto layout = new QVBoxLayout(this);
-    layout->addWidget(m_definitionManager);
-    layout->addWidget(m_processButtonsManager);
+    layout->addWidget(m_definitionManager, 2);
+    layout->addWidget(m_processButtonsManager, 6);
 }
 
 auto InputManager::SetInputHandler(InputHandler* inputHandler) -> void

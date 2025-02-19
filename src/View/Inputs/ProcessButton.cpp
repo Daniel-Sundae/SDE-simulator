@@ -8,7 +8,7 @@ ProcessButton::ProcessButton(ProcessButtonsManager *parent, const ProcessType ty
     , m_processType(type)
 {
     setText(QString::fromStdString(std::string(ProcessData::Acronym(type))));
-    setToolTip(QString::fromStdString(std::string(ProcessData::Name(type)));
+    setToolTip(QString::fromStdString(std::string(ProcessData::Name(type))));
     
     connect(
         this,

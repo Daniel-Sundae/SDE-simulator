@@ -7,6 +7,8 @@
 
 class ProcessData {
 public:
+    using DriftType = Drift;
+    using DiffusionType = Diffusion;
 
     template <typename ProcessT>
     struct RequiredFields {
@@ -19,25 +21,25 @@ public:
     };
 
     struct BM : RequiredFields<BM>{
-        static auto Drift() -> Drift {
-            return [](Time, State) { return 0.0; };
+        static auto Drift() -> DriftType {
+            return DriftType(0, [](Time, State) -> StateDot { return 0.0; });
         }
-        static auto Diffusion() -> Diffusion {
-            return [](Time, State) { return 1.0; };
+        static auto Diffusion(const double sigma) -> DiffusionType {
+            return DiffusionType(sigma, [sigma](Time, State) { return sigma; });
         }
 
         static constexpr std::string_view name = "Brownian Motion";
         static constexpr std::string_view acronym = "BM";
         static constexpr std::string_view description = "Standard brownian motion.";
-        static constexpr std::string_view definition = "dX = dB";
+        static constexpr std::string_view definition = "dX = σdB";
     };
 
-    struct GBM : RequiredFields<BM> {
-        static auto Drift(const double mu) -> Drift {
-            return [mu](Time, State s) { return mu * s; };
+    struct GBM : RequiredFields<GBM> {
+        static auto Drift(const double mu) -> DriftType {
+            return DriftType(mu, [mu](Time, State s) { return mu * s; });
         }
-        static auto Diffusion(const double sigma) -> Diffusion {
-            return [sigma](Time, State s) { return sigma * s; };
+        static auto Diffusion(const double sigma) -> DiffusionType {
+            return DiffusionType(sigma, [sigma](Time, State s) { return sigma * s; });
         }
 
         static constexpr std::string_view name = "Geometric Brownian Motion";

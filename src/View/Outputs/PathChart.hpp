@@ -7,7 +7,7 @@ class PathChart : public QChart{
 
 public:
     explicit PathChart();
-    auto UpdatePathChart(const Path &sampleData, const ProcessType type) -> void;
+    auto UpdatePathChart(const Path& path, const PathQuery& pQuery) -> void;
 
 private:
     auto PlotChart(const Path& sampleData) -> void;

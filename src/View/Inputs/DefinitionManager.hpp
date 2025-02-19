@@ -3,12 +3,12 @@
 #include "Types.hpp"
 #include "InputHandler.hpp"
 #include <unordered_map>
-#include <QtWidgets/qwidget.h>
+#include <QtWidgets/qgroupbox.h>
 
 class InputManager;
 class QDoubleSpinBox;
 
-class DefinitionManager : public QWidget
+class DefinitionManager : public QGroupBox
 {
 	Q_OBJECT
 public:
@@ -17,7 +17,8 @@ private:
 	auto GetMuValue() const -> double;
 	auto GetSigmaValue() const -> double;
 	auto GetStartValue() const -> double;
-	auto InitializeDefinitionManager() -> void;
+	auto AddSpinboxes() -> void;
+	auto InitializeDesign() -> void;
 	auto Parent() const -> InputManager*;
 	auto OnProcessDefinitionModified(const ModifiedDefinitionParam param) const -> void;
 

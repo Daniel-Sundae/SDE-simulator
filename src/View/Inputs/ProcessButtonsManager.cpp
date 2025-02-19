@@ -1,12 +1,14 @@
 #include "ProcessButtonsManager.hpp"
 #include "InputManager.hpp"
 #include "ProcessButton.hpp"
+#include "ViewUtils.hpp"
 #include <QtWidgets/qgridlayout.h>
 
 ProcessButtonsManager::ProcessButtonsManager(InputManager* parent) :
-    QWidget(parent)
+    QGroupBox(parent)
 {
     InitializeProcessButtonsManager();
+    InitializeDesign();
 }
 
 auto ProcessButtonsManager::InitializeProcessButtonsManager() -> void
@@ -16,6 +18,12 @@ auto ProcessButtonsManager::InitializeProcessButtonsManager() -> void
     buttonLayout->addWidget(m_buttons[ProcessType::BM]);
     m_buttons[ProcessType::GBM] = new ProcessButton(this, ProcessType::GBM);
     buttonLayout->addWidget(m_buttons[ProcessType::GBM]);
+}
+
+auto ProcessButtonsManager::InitializeDesign() -> void
+{
+    setTitle("Stochastic Processes");
+    setStyleSheet(GUI::GroupBoxDescription());
 }
 
 auto ProcessButtonsManager::OnButtonPressed(ProcessType type) -> void

@@ -8,29 +8,24 @@
 class FunctionWrapper{
 protected:
     const double parameter;
-    std::function<State(Time, State)> f;
-    FunctionWrapper(double inp_parameter, std::function f)
-        : parameter(inp_parameter) {
-    }
-
+    const std::function<StateDot(Time, State)> f;
 public:
-    State operator()(Time t, State s) { return f(t, s); }
-    double getParameter() const { return parameter; }
+    FunctionWrapper(double inp_parameter, std::function<StateDot(Time, State)> inp_f)
+        : parameter(inp_parameter)
+        , f(inp_f)
+    {}
+    auto operator()(Time t, State s) const -> StateDot { return f(t, s); }
 };
 
 class Drift : public FunctionWrapper {
+    using FunctionWrapper::FunctionWrapper;
 public:
-    Drift(double mu_val) : FunctionWrapper(mu_val) {
-        f = [mu_val](Time t, State s) { return mu_val * s; };
-    }
     auto Mu() const -> double { return parameter; }
 };
 
 class Diffusion : public FunctionWrapper {
+    using FunctionWrapper::FunctionWrapper;
 public:
-    Diffusion(double sigma_val) : FunctionWrapper(sigma_val) {
-        f = [sigma_val](Time t, State s) { return sigma_val * s; };
-    }
     auto Sigma() const -> double { return parameter; }
 };
 
@@ -68,13 +63,13 @@ struct SimulationParameters {
 };
 
 struct ProcessDefinition {
-    const Drift drift = DefinitionDefault::drift;
-    const Diffusion diffusion = DefinitionDefault::diffusion;
+    const Drift drift = Drift(0, [](Time, State) -> StateDot { return 0.0; });
+    const Diffusion diffusion = Diffusion(0, [](Time, State) -> StateDot { return 0.0; });
     State startValue = DefinitionDefault::startValue;
 
     ProcessDefinition(Drift d, Diffusion diff, const State start)
-        : drift(std::move(d))
-        , diffusion(std::move(diff))
+        : drift(d)
+        , diffusion(diff)
         , startValue(start)
     {}
 };

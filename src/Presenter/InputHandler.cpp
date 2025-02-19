@@ -22,7 +22,7 @@ auto InputHandler::OnProcessButtonPressed(const ProcessType processType) -> void
 		break;
     case ProcessType::BM:
         m_driftGenerator = [](double) { return ProcessData::BM::Drift(); }; // BM ignores mu
-		m_diffusionGenerator = [](double) { return ProcessData::BM::Diffusion(); }; // BM ignores sigma
+		m_diffusionGenerator = ProcessData::BM::Diffusion;
         break;
     case ProcessType::GBM:
         m_driftGenerator = ProcessData::GBM::Drift;

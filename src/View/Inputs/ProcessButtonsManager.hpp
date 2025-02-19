@@ -3,12 +3,13 @@
 #include <unordered_map>
 #include <memory>
 #include <QtWidgets/qwidget.h>
+#include <QtWidgets/qgroupbox.h>
 
 
 class ProcessButton;
 class InputManager;
 
-class ProcessButtonsManager : public QWidget
+class ProcessButtonsManager : public QGroupBox
 {
 	Q_OBJECT
 public:
@@ -17,6 +18,7 @@ public:
 
 private:
 	auto InitializeProcessButtonsManager() -> void;
+	auto InitializeDesign() -> void;
 
 private:
 	std::unordered_map<ProcessType, ProcessButton*> m_buttons;

@@ -1,60 +1,59 @@
 ﻿#include "DefinitionManager.hpp"
-#include "InputManager.hpp"
-#include <QtWidgets/qlabel.h>
-#include <QtWidgets/qgridlayout.h>
-#include <QtWidgets/qdoublespinbox>
 #include "DefaultConstants.hpp"
+#include "InputManager.hpp"
+#include "ViewUtils.hpp"
+#include <QtWidgets/qdoublespinbox>
+#include <QtWidgets/qgridlayout.h>
+#include <QtWidgets/qformlayout.h>
+#include <QtWidgets/qlabel.h>
 
-DefinitionManager::DefinitionManager(InputManager* parent)
-    : QWidget(parent)
+DefinitionManager::DefinitionManager(InputManager *parent) : QGroupBox(parent)
 {
-	InitializeDefinitionManager();
+    AddSpinboxes();
+    InitializeDesign();
 }
 
-auto DefinitionManager::InitializeDefinitionManager() -> void
+
+auto DefinitionManager::AddSpinboxes() -> void
 {
-    auto* layout = new QGridLayout(this);
-    layout->setSpacing(0);
-    auto* muInput = new QDoubleSpinBox(this);
-    muInput->setRange(-10.0, 10.0);
-    muInput->setValue(DefinitionDefault::mu);
-    muInput->setSingleStep(0.1);
+    auto* layout = new QFormLayout(this);
+
+    // Create spinboxes with compact style
+    auto createSpinBox = [this](double min, double max, double default_value, double step) {
+        auto* spinBox = new QDoubleSpinBox(this);
+        spinBox->setRange(min, max);
+        spinBox->setValue(default_value);
+        spinBox->setSingleStep(step);
+        return spinBox;
+        };
+
+    auto* muInput = createSpinBox(-10.0, 10.0, DefinitionDefault::mu, 0.1);
     m_inputs[ModifiedDefinitionParam::MU] = muInput;
-    layout->addWidget(new QLabel("Drift (μ):"));
-    layout->addWidget(muInput);
+    layout->addRow(new QLabel("Drift (μ):", this), muInput);
 
-    auto* sigmaInput = new QDoubleSpinBox(this);
-    sigmaInput->setRange(0.0, 10.0);
-    sigmaInput->setValue(DefinitionDefault::sigma);
-    sigmaInput->setSingleStep(0.1);
+    auto* sigmaInput = createSpinBox(0.0, 10.0, DefinitionDefault::sigma, 0.1);
     m_inputs[ModifiedDefinitionParam::SIGMA] = sigmaInput;
-    layout->addWidget(new QLabel("Volatility (σ):"));
-    layout->addWidget(sigmaInput);
+    layout->addRow(new QLabel("Diffusion (σ):", this), sigmaInput);
 
-    auto* startValueInput = new QDoubleSpinBox(this);
-    startValueInput->setRange(-20, 20.0);
-    startValueInput->setValue(DefinitionDefault::startValue);
-    startValueInput->setSingleStep(1);
+    auto* startValueInput = createSpinBox(-20.0, 20.0, DefinitionDefault::startValue, 1.0);
     m_inputs[ModifiedDefinitionParam::STARTVALUE] = startValueInput;
-    layout->addWidget(new QLabel("Start Value:"));
-    layout->addWidget(startValueInput);
+    layout->addRow(new QLabel("Start (X<sub>0</sub>):", this), startValueInput);
+
     setLayout(layout);
 
-    connect(
-        muInput,
-        QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-        this,
+    // Connect signals
+    connect(muInput, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
         [this]() { OnProcessDefinitionModified(ModifiedDefinitionParam::MU); });
-    connect(
-        sigmaInput,
-        QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-        this,
+    connect(sigmaInput, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
         [this]() { OnProcessDefinitionModified(ModifiedDefinitionParam::SIGMA); });
-    connect(
-        startValueInput,
-        QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-        this,
+    connect(startValueInput, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
         [this]() { OnProcessDefinitionModified(ModifiedDefinitionParam::STARTVALUE); });
+}
+
+auto DefinitionManager::InitializeDesign() -> void
+{
+    setTitle("Definition");
+    setStyleSheet(GUI::GroupBoxDescription() + GUI::SpinBoxDescription());
 }
 
 auto DefinitionManager::GetMuValue() const -> double
@@ -72,9 +71,9 @@ auto DefinitionManager::GetStartValue() const -> double
     return m_inputs.at(ModifiedDefinitionParam::STARTVALUE)->value();
 }
 
-auto DefinitionManager::Parent() const -> InputManager*
+auto DefinitionManager::Parent() const -> InputManager *
 {
-    return qobject_cast<InputManager*>(parent());
+    return qobject_cast<InputManager *>(parent());
 }
 
 auto DefinitionManager::OnProcessDefinitionModified(const ModifiedDefinitionParam param) const -> void

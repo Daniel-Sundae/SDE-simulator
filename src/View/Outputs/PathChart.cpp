@@ -1,4 +1,4 @@
-#include "PathChart.hpp"
+﻿#include "PathChart.hpp"
 #include "ProcessData.hpp"
 #include "Types.hpp"
 #include "QtCharts/qlineseries.h"
@@ -9,11 +9,18 @@ PathChart::PathChart() : QChart()
     InitializeProcessChart();
 }
 
-auto PathChart::UpdatePathChart(const Path& path, const PathQuery pQuery) -> void
+auto PathChart::UpdatePathChart(const Path& path, const PathQuery& pQuery) -> void
 {
-    QString title = QString::fromUtf8(ProcessData::Name(type)) +
-        ": " +
-        QString::fromUtf8(ProcessData::Definition(type));
+    QString title;
+    QTextStream(&title) << QString::fromUtf8(ProcessData::Name(pQuery.processType))
+        << ": "
+        << QString::fromUtf8(ProcessData::Definition(pQuery.processType))
+        << " with μ = "
+        << QString::number(pQuery.processDefinition.drift.Mu())
+        << ", σ = "
+        << QString::number(pQuery.processDefinition.diffusion.Sigma())
+        << ", X<sub>0</sub> = "
+        << QString::number(pQuery.processDefinition.startValue);
     setTitle(title);
     PlotChart(path);
 }
