@@ -12,9 +12,9 @@ PathChart::PathChart() : QChart()
 auto PathChart::UpdatePathChart(const Path& path, const PathQuery& pQuery) -> void
 {
     QString title;
-    QTextStream(&title) << QString::fromUtf8(ProcessData::Name(pQuery.processType))
+    QTextStream(&title) << QString::fromUtf8(ProcessData::Name(pQuery.processDefinition.type))
         << ": "
-        << QString::fromUtf8(ProcessData::Definition(pQuery.processType))
+        << QString::fromUtf8(ProcessData::Definition(pQuery.processDefinition.type))
         << " with μ = "
         << QString::number(pQuery.processDefinition.drift.Mu())
         << ", σ = "

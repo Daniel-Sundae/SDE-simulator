@@ -4,8 +4,7 @@
 #include <functional>
 #include <cstddef>
 #include "DefaultConstants.hpp"
-
-class FunctionWrapper{
+class FunctionWrapper {
 protected:
     const double parameter;
     const std::function<StateDot(Time, State)> f;
@@ -28,59 +27,60 @@ class Diffusion : public FunctionWrapper {
 public:
     auto Sigma() const -> double { return parameter; }
 };
-
 enum class ProcessType{
     NONE = 0,
     CUSTOM,
     BM,
     GBM,
     Levy,
-    OU
+    OU,
+    BB, // Brownian Bridge
 };
 
 struct SimulationParameters {
     explicit SimulationParameters() = default;
-    explicit SimulationParameters(Time inp_time, std::size_t inp_points)
+    explicit SimulationParameters(Time inp_time, Time inp_dt)
         : time(inp_time)
-        , points(inp_points)
+        , dt(inp_dt)
     {
         AssertValidParameters();
     }
     auto AssertValidParameters() const -> void
     {
-        if (points == 0 || time <= 0) {
+        if (dt <= 0 || time <= 0) {
             throw std::invalid_argument("Time and points must be greater than 0");
         }
     }
-    [[nodiscard]] auto dt() const -> Time
+    [[nodiscard]] auto Points() const -> std::size_t
     {
-        return time / static_cast<Time>(points);
+        return static_cast<std::size_t>(std::ceil(time / dt));
     }
     Time time = SimulationDefault::time;
-    std::size_t points = SimulationDefault::points;
+    Time dt = SimulationDefault::dt;
     // TODO add nr samples (for more than one path)
     // TODO add SolverMethod enum
 };
 
 struct ProcessDefinition {
-    const Drift drift = Drift(0, [](Time, State) -> StateDot { return 0.0; });
-    const Diffusion diffusion = Diffusion(0, [](Time, State) -> StateDot { return 0.0; });
+    ProcessType type = ProcessType::NONE;
+    Drift drift = Drift(0, [](Time, State) -> StateDot { return 0.0; });
+    Diffusion diffusion = Diffusion(0, [](Time, State) -> StateDot { return 0.0; });
     State startValue = DefinitionDefault::startValue;
 
-    ProcessDefinition(Drift d, Diffusion diff, const State start)
-        : drift(d)
+    ProcessDefinition() = default;
+    ProcessDefinition(const ProcessType t, Drift d, Diffusion diff, const State start)
+        : type(t)
+        , drift(d)
         , diffusion(diff)
         , startValue(start)
     {}
 };
 
 struct PathQuery {
-    const ProcessType processType;
-    const ProcessDefinition processDefinition;
-    const SimulationParameters simulationParameters;
-    PathQuery(const ProcessType type, ProcessDefinition def, SimulationParameters simParam)
-        : processType(type)
-        , processDefinition(def)
+    const ProcessDefinition& processDefinition;
+    const SimulationParameters& simulationParameters;
+    PathQuery(const ProcessDefinition& def, const SimulationParameters& simParam)
+        : processDefinition(def)
         , simulationParameters(simParam)
     {}
 };

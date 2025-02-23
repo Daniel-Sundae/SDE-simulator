@@ -3,10 +3,10 @@
 
 auto PathEngine::SamplePath(const PathQuery& pathQuery) const -> Path
 {
-    const std::size_t points = pathQuery.simulationParameters.points;
+    const std::size_t points = pathQuery.simulationParameters.Points();
     auto drift = pathQuery.processDefinition.drift;
     auto diffusion = pathQuery.processDefinition.diffusion;
-    const Time dt = pathQuery.simulationParameters.dt();
+    const Time dt = pathQuery.simulationParameters.dt;
     const State startValue = pathQuery.processDefinition.startValue;
     Path path = {};
     path.reserve(points);

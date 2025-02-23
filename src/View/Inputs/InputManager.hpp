@@ -5,14 +5,8 @@
 #include <QtWidgets/qwidget.h>
 
 class DefinitionManager;
-class ProcessButtonsManager;
+class SimulationManager;
 class InputHandler;
-
-struct InputParameters {
-    double mu;
-    double sigma;
-    double startValue;
-};
 
 class InputManager : public QWidget
 {
@@ -21,12 +15,12 @@ class InputManager : public QWidget
 public:
     explicit InputManager(QWidget* parent = nullptr);
     auto SetInputHandler(InputHandler* inputHandler) -> void;
-    auto OnProcessButtonPressed(const ProcessType type) const -> void;
+    auto OnProcessTypeModified(ProcessType newType) const -> void;
     auto OnProcessDefinitionModified(const ModifiedDefinitionParam param, double userValue) const -> void;
 
 private:
     DefinitionManager* m_definitionManager;
-    ProcessButtonsManager* m_processButtonsManager;
+    SimulationManager* m_simulationManager;
     InputHandler* m_inputHandler;
 };
 

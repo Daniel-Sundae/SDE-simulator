@@ -3,80 +3,81 @@
 #include "InputManager.hpp"
 #include "ViewUtils.hpp"
 #include <QtWidgets/qdoublespinbox>
-#include <QtWidgets/qgridlayout.h>
+#include <QtWidgets/qcombobox>
 #include <QtWidgets/qformlayout.h>
 #include <QtWidgets/qlabel.h>
 
-DefinitionManager::DefinitionManager(InputManager *parent) : QGroupBox(parent)
+DefinitionManager::DefinitionManager(InputManager *parent)
+    : QGroupBox(parent)
 {
-    AddSpinboxes();
+    AddDefinitionWidgets();
     InitializeDesign();
 }
 
 
-auto DefinitionManager::AddSpinboxes() -> void
+auto DefinitionManager::AddDefinitionWidgets() -> void
 {
-    auto* layout = new QFormLayout(this);
-
-    // Create spinboxes with compact style
-    auto createSpinBox = [this](double min, double max, double default_value, double step) {
-        auto* spinBox = new QDoubleSpinBox(this);
-        spinBox->setRange(min, max);
-        spinBox->setValue(default_value);
-        spinBox->setSingleStep(step);
-        return spinBox;
-        };
-
-    auto* muInput = createSpinBox(-10.0, 10.0, DefinitionDefault::mu, 0.1);
-    m_inputs[ModifiedDefinitionParam::MU] = muInput;
-    layout->addRow(new QLabel("Drift (μ):", this), muInput);
-
-    auto* sigmaInput = createSpinBox(0.0, 10.0, DefinitionDefault::sigma, 0.1);
-    m_inputs[ModifiedDefinitionParam::SIGMA] = sigmaInput;
-    layout->addRow(new QLabel("Diffusion (σ):", this), sigmaInput);
-
-    auto* startValueInput = createSpinBox(-20.0, 20.0, DefinitionDefault::startValue, 1.0);
-    m_inputs[ModifiedDefinitionParam::STARTVALUE] = startValueInput;
-    layout->addRow(new QLabel("Start (X<sub>0</sub>):", this), startValueInput);
-
-    setLayout(layout);
-
-    // Connect signals
-    connect(muInput, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
+    std::array<ProcessType, 2> processTypes = {
+        ProcessType::BM,
+        ProcessType::GBM,
+    };
+    auto* processes = new QComboBox(this);
+    for (int i = 0; i < processTypes.size(); ++i) {
+        processes->insertItem(i, QString::fromStdString(std::string(ProcessData::Acronym(processTypes[i]))));
+        processes->setItemData(i, QString::fromStdString(std::string(ProcessData::Name(processTypes[i]))), Qt::ToolTipRole);
+    }
+    m_widgets[ModifiedDefinitionParam::PROCESS] = processes;
+    m_widgets[ModifiedDefinitionParam::MU] = GUI::CreateSpinBox(this, -0.3, 0.3, DefinitionDefault::mu, 0.05);
+    m_widgets[ModifiedDefinitionParam::SIGMA] = GUI::CreateSpinBox(this, 0.0, 20, DefinitionDefault::sigma, 0.1);
+    m_widgets[ModifiedDefinitionParam::STARTVALUE] = GUI::CreateSpinBox(this, -20.0, 20.0, DefinitionDefault::startValue, 1.0);
+    connect(
+        qobject_cast<QComboBox*>(m_widgets[ModifiedDefinitionParam::PROCESS]),
+        QOverload<int>::of(&QComboBox::currentIndexChanged),
+        this,
+        [this, processTypes]() {
+            OnProcessTypeModified(processTypes[qobject_cast<QComboBox*>(m_widgets[ModifiedDefinitionParam::PROCESS])->currentIndex()]);
+        }
+    );
+    connect(
+        qobject_cast<QDoubleSpinBox*>(m_widgets[ModifiedDefinitionParam::MU]),
+        QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+        this,
         [this]() { OnProcessDefinitionModified(ModifiedDefinitionParam::MU); });
-    connect(sigmaInput, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
+    connect(
+        qobject_cast<QDoubleSpinBox*>(m_widgets[ModifiedDefinitionParam::SIGMA]),
+        QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+        this,
         [this]() { OnProcessDefinitionModified(ModifiedDefinitionParam::SIGMA); });
-    connect(startValueInput, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
+    connect(
+        qobject_cast<QDoubleSpinBox*>(m_widgets[ModifiedDefinitionParam::STARTVALUE]),
+        QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+        this,
         [this]() { OnProcessDefinitionModified(ModifiedDefinitionParam::STARTVALUE); });
+
 }
 
 auto DefinitionManager::InitializeDesign() -> void
 {
     setTitle("Definition");
-    setStyleSheet(GUI::GroupBoxDescription() + GUI::SpinBoxDescription());
+    setStyleSheet(GUI::GroupBoxDescription() + GUI::ComboBoxDescription() + GUI::SpinBoxDescription());
+    auto* definitionLayout = new QFormLayout(this);
+    definitionLayout->addRow(new QLabel("Process:", this), m_widgets[ModifiedDefinitionParam::PROCESS]);
+    definitionLayout->addRow(new QLabel("Drift (μ):", this), m_widgets[ModifiedDefinitionParam::MU]);
+    definitionLayout->addRow(new QLabel("Diffusion (σ):", this), m_widgets[ModifiedDefinitionParam::SIGMA]);
+    definitionLayout->addRow(new QLabel("Start (X<sub>0</sub>):", this), m_widgets[ModifiedDefinitionParam::STARTVALUE]);
 }
 
-auto DefinitionManager::GetMuValue() const -> double
-{
-    return m_inputs.at(ModifiedDefinitionParam::MU)->value();
-}
-
-auto DefinitionManager::GetSigmaValue() const -> double
-{
-    return m_inputs.at(ModifiedDefinitionParam::SIGMA)->value();
-}
-
-auto DefinitionManager::GetStartValue() const -> double
-{
-    return m_inputs.at(ModifiedDefinitionParam::STARTVALUE)->value();
-}
-
-auto DefinitionManager::Parent() const -> InputManager *
+auto DefinitionManager::Parent() const -> InputManager*
 {
     return qobject_cast<InputManager *>(parent());
 }
 
+auto DefinitionManager::OnProcessTypeModified(const ProcessType newType) const -> void
+{
+    Parent()->OnProcessTypeModified(newType);
+}
+
 auto DefinitionManager::OnProcessDefinitionModified(const ModifiedDefinitionParam param) const -> void
 {
-    Parent()->OnProcessDefinitionModified(param, m_inputs.at(param)->value());
+    Parent()->OnProcessDefinitionModified(param, qobject_cast<QDoubleSpinBox*>(m_widgets.at(param))->value());
 }

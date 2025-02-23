@@ -5,7 +5,8 @@
 #include <memory>
 
 enum class ModifiedDefinitionParam {
-    MU = 0,
+    PROCESS = 0,
+    MU,
     SIGMA,
     STARTVALUE
 };
@@ -13,23 +14,17 @@ enum class ModifiedDefinitionParam {
 class InputHandler final : public IPresenterComponent<MainPresenter> {
 public:
     explicit InputHandler();
-    auto OnProcessButtonPressed(const ProcessType processType) -> void;
+    auto OnProcessTypeModified(ProcessType newType) -> void;
     auto OnProcessDefinitionModified(ModifiedDefinitionParam param, double userValue) -> void;
-    auto OnSimulationParametersModified(SimulationParameters simParams) -> void;
+    auto OnSimulationParametersModified(const SimulationParameters& simParams) -> void;
 
 private:
-    auto GetProcessDefinition() const -> ProcessDefinition;
     auto SamplePath() -> void;
 
 private:
-    struct ProcessDefinitionInputs {
-        double mu = DefinitionDefault::mu;
-        double sigma = DefinitionDefault::sigma;
-        double startValue = DefinitionDefault::startValue;
-    };
-    ProcessType m_processType;
-    std::unique_ptr<ProcessDefinitionInputs> m_processDefinitionInputs;
-    SimulationParameters m_simParams;
-    std::function<Drift(double)> m_driftGenerator;
-    std::function<Diffusion(double)> m_diffusionGenerator;
+
+    std::unique_ptr<ProcessDefinition> m_processDefinition;
+    std::unique_ptr<SimulationParameters> m_simulationParameters;
+    double m_inputMu;
+    double m_inputSigma;
 };

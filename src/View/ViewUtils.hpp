@@ -1,5 +1,7 @@
 #pragma once
-#include <QString>
+#include <QtCore/qstring.h>
+#include <QtWidgets/qspinbox.h>
+#include <QtWidgets/qpushbutton.h>
 
 namespace GUI
 {
@@ -22,6 +24,17 @@ namespace GUI
             }
         )";
     }
+
+    inline auto ComboBoxDescription() -> QString
+    {
+        return R"(
+            QComboBoxBox {
+                min-height: 20px;
+                min-width: 80px;
+                max-width: 80px;
+            }")";
+    }
+
     inline auto SpinBoxDescription() -> QString
     {
         return R"(
@@ -31,5 +44,15 @@ namespace GUI
                 max-width: 80px;
             }")";
     }
+
+    inline auto CreateSpinBox(QWidget* parent, double min, double max, double default_value, double step) -> QDoubleSpinBox*
+    {
+        auto* spinBox = new QDoubleSpinBox(parent);
+        spinBox->setRange(min, max);
+        spinBox->setValue(default_value);
+        spinBox->setSingleStep(step);
+        return spinBox;
+    };
+
 }
 
