@@ -1,5 +1,6 @@
 #include "PathEngine.hpp"
 #include "Utils.hpp"
+#include "assert.h"
 
 auto PathEngine::SamplePath(const PathQuery& pathQuery) const -> Path
 {
@@ -9,8 +10,8 @@ auto PathEngine::SamplePath(const PathQuery& pathQuery) const -> Path
     const Time dt = pathQuery.simulationParameters.dt;
     const State startValue = pathQuery.processDefinition.startValue;
     Path path = {};
+    assert(points != 0);
     path.reserve(points);
-    if (points <= 0) return path;
     path.push_back(startValue);
     for (std::size_t i = 1; i < points; ++i)
         path.push_back(path.back() + Increment(drift, diffusion, static_cast<Time>(i) * dt, path.back(), dt));

@@ -9,6 +9,8 @@ class InputManager;
 class QPushButton;
 class QDoubleSpinBox;
 
+
+
 class DefinitionManager : public QGroupBox
 {
 	Q_OBJECT
@@ -22,8 +24,8 @@ private:
 	auto InitializeDesign() -> void;
 	auto Parent() const -> InputManager*;
 	auto OnProcessTypeModified(const ProcessType newType) const -> void;
-	auto OnProcessDefinitionModified(const ModifiedDefinitionParam param) const -> void;
+	auto OnProcessDefinitionModified(const DefinitionWidget param) const -> void;
 private:
-	std::unordered_map<ModifiedDefinitionParam, QWidget*> m_widgets;
+	std::unordered_map<DefinitionWidget, QWidget*> m_widgets;
 };
 

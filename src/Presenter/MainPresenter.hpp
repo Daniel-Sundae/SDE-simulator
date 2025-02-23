@@ -9,6 +9,7 @@ class MainPresenter final : public IPresenterComponent<OutputHandler> {
 public:
 	explicit MainPresenter();
 	auto SamplePath(const PathQuery& pathQuery) const -> void;
+	auto Clear() const -> void;
 	auto GetInputHandler() const -> InputHandler*;
 	auto GetOutputHandler() const -> OutputHandler*;
 private:

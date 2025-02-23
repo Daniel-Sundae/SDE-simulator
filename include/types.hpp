@@ -27,6 +27,7 @@ class Diffusion : public FunctionWrapper {
 public:
     auto Sigma() const -> double { return parameter; }
 };
+
 enum class ProcessType{
     NONE = 0,
     CUSTOM,
@@ -34,7 +35,38 @@ enum class ProcessType{
     GBM,
     Levy,
     OU,
-    BB, // Brownian Bridge
+    BB,
+};
+
+enum class SolverType {
+    EULER_MARUYAMA = 0,
+    RUNGE_KUTTA,
+};
+
+enum class ActionWidget {
+    GO = 0,
+    CLEAR,
+};
+
+enum class DefinitionWidget {
+    PROCESS = 0,
+    MU,
+    SIGMA,
+    STARTVALUE
+};
+
+enum class SimulationWidget {
+    SOLVER = 0,
+    TIME,
+    dt,
+    SAMPLES,
+};
+
+enum class SettingsWidget {
+    THREADS = 0,
+    AUTOUPDATE,
+    AUTOCLEAR,
+    FIXSEED,
 };
 
 struct SimulationParameters {
@@ -62,7 +94,7 @@ struct SimulationParameters {
 };
 
 struct ProcessDefinition {
-    ProcessType type = ProcessType::NONE;
+    ProcessType type = ProcessType::BM;
     Drift drift = Drift(0, [](Time, State) -> StateDot { return 0.0; });
     Diffusion diffusion = Diffusion(0, [](Time, State) -> StateDot { return 0.0; });
     State startValue = DefinitionDefault::startValue;

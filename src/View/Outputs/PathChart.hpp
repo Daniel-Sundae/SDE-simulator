@@ -2,6 +2,8 @@
 #include "Types.hpp"
 #include <QtCharts/qchart.h>
 
+class QChartView;
+
 class PathChart : public QChart{
     Q_OBJECT
 

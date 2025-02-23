@@ -1,10 +1,12 @@
 ﻿#include "PathChart.hpp"
 #include "ProcessData.hpp"
 #include "Types.hpp"
-#include "QtCharts/qlineseries.h"
-#include "QtCharts/qvalueaxis.h"
+#include <QtCharts/qlineseries.h>
+#include <QtCharts/qchartview.h>
+#include <QtCharts/qvalueaxis.h>
 
-PathChart::PathChart() : QChart()
+PathChart::PathChart()
+    : QChart()
 {
     InitializeProcessChart();
 }
@@ -113,8 +115,8 @@ auto PathChart::InitializeProcessChart() -> void
     QValueAxis* yAxis = new QValueAxis(this);
     addAxis(xAxis, Qt::AlignBottom);
     addAxis(yAxis, Qt::AlignLeft);
-    xAxis->setTitleText("Time");
-    yAxis->setTitleText("Value");
+    xAxis->setTitleText("t (s)");
+    yAxis->setTitleText("X<sub>t</sub>");
     xAxis->setGridLineVisible(true);
     yAxis->setGridLineVisible(true);
     xAxis->setRange(0, 10);  // Set some default range

@@ -3,10 +3,10 @@
 template <typename ListenerType>
 class IPresenterComponent{
 public:
-	auto SetListener(const ListenerType* listener) -> void
+	auto SetListener(ListenerType* listener) -> void
 	{ m_listener = listener; };
-	auto Listener() const -> const ListenerType*
+	auto Listener() const -> ListenerType*
 	{ return m_listener; }
 protected:
-	const ListenerType* m_listener;
+	ListenerType* m_listener;
 };

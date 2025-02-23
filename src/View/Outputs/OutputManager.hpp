@@ -14,9 +14,11 @@ class OutputManager : public QWidget{
 public:
     explicit OutputManager(QWidget* parent = nullptr);
     auto OnPathReceived(const PathQuery& query, const Path& sampleData) const -> void;
-
+    auto Clear() -> void;
+private:
+    auto GetPathChart() const->PathChart*;
 private:
     QVBoxLayout* m_layout;
-    PathChart* m_chart;
-    QChartView* m_chartView;
+    QChartView* m_pathChartView;
+    QChartView* m_distributionChartView;
 };

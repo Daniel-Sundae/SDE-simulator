@@ -18,3 +18,5 @@ Makefile
 
 # Ignore Qt-specific build directories (if applicable)
 .qt/
+
+cppcheck-result.txt

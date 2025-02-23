@@ -4,9 +4,9 @@
 
 int main(int argc, char *argv[])
 {
-    qDebug() << "Application starting...";
     QApplication app(argc, argv);
-    AppInitializer a{};
+
+    AppInitializer a(app);
     return app.exec();
 }
 
