@@ -27,6 +27,7 @@ CODE DESIGN TODO:
 TECH DETAILS TODO:
 - Make sure old data is not leaking. Either outputmanager deletes or data saved to disc. Valgrind investigate
 - use async. Transmit loading signal to OutputManager
+- swap out std::function to something more performant
 - use threads for many paths.
 - Use threadpool to avoid spinning up threads
 - Maybe use more than one thread per path (for simple paths like BM). Could write function sampleRange() andattach offset to each range, where offset is previous range's last value.
