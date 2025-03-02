@@ -1,6 +1,5 @@
 #include "PathChart.hpp"
 #include "OutputManager.hpp"
-#include "ViewUtils.hpp"
 
 
 OutputManager::OutputManager(QWidget *parent)
@@ -10,8 +9,6 @@ OutputManager::OutputManager(QWidget *parent)
     , m_distributionChartView(new QChartView(this))
 {   
     auto* pathChart = new PathChart();
-    //pathChart->setTheme(QChart::ChartThemeBrownSand);
-    GUI::DarkChartTheme(pathChart);
     m_pathChartView->setChart(pathChart);
     m_layout->addWidget(m_pathChartView);
     m_layout->addWidget(m_distributionChartView);
@@ -23,15 +20,24 @@ auto OutputManager::GetPathChart() const -> PathChart*
     return static_cast<PathChart*>(m_pathChartView->chart());
 }
 
-auto OutputManager::OnPathReceived(const PathQuery& query, const Path& sampleData) const -> void
+auto OutputManager::UpdateChartTitle(const PathQuery& pQuery) const -> void
 {
-    GetPathChart()->UpdatePathChart(sampleData, query);
-    // Send last datapoint to distributionchart
+    GetPathChart()->UpdateTitle(pQuery);
+}
+
+auto OutputManager::PlotDriftLine(const Path& driftLine) const -> void
+{
+    GetPathChart()->PlotDriftLine(driftLine);
+}
+
+auto OutputManager::PlotPath(const Path& path) const -> void
+{
+    GetPathChart()->PlotPath(path);
 }
 
 auto OutputManager::Clear() -> void
 {
-    GetPathChart()->removeAllSeries();
+    GetPathChart()->ClearPaths();
 
     // Send last datapoint to distributionchart
 }

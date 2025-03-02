@@ -7,7 +7,7 @@
 
 
 SettingsManager::SettingsManager(InputManager* parent)
-	: QGroupBox(parent)
+	: InputManagerGroupBox(parent)
 {
     AddCheckBoxes();
     AddSeedWidget();
@@ -22,9 +22,6 @@ auto SettingsManager::AddCheckBoxes() -> void
     auto* autoUpdate = new QCheckBox(this);
     autoUpdate->setChecked(true);
     m_widgets[SettingsWidget::AUTOUPDATE] = autoUpdate;
-    auto* autoClear = new QCheckBox(this);
-    autoClear->setChecked(true);
-    m_widgets[SettingsWidget::AUTOCLEAR] = autoClear;
 }
 
 auto SettingsManager::AddSeedWidget() -> void
@@ -32,7 +29,11 @@ auto SettingsManager::AddSeedWidget() -> void
     auto* seedWidget = new QWidget(this);
     auto* seedCheckBox = new QCheckBox(seedWidget);
     seedCheckBox->setChecked(false);
-    auto* seedSpinBox = GUI::CreateIntSpinBox(seedWidget, 1, 1000000, 1, 1);
+    auto* seedSpinBox = new QSpinBox(this);
+    seedSpinBox->setValue(1);
+    seedSpinBox->setMinimum(1);
+    seedSpinBox->setMaximum(1000000);
+    seedSpinBox->setSingleStep(1);
     seedSpinBox->setEnabled(false);
     connect(seedCheckBox,
         &QCheckBox::toggled,
@@ -57,15 +58,7 @@ auto SettingsManager::InitializeDesign() -> void
     auto* autoUpdateLabel = new QLabel("Auto-update:", this);
     autoUpdateLabel->setToolTip("Resample automatically when Definition changes.");
     simulationLayout->addRow(autoUpdateLabel, m_widgets[SettingsWidget::AUTOUPDATE]);
-    auto* autoClearLabel = new QLabel("Auto-clear:", this);
-    autoClearLabel->setToolTip("Clear existing samples automatically.");
-    simulationLayout->addRow(autoClearLabel, m_widgets[SettingsWidget::AUTOCLEAR]);
     auto* fixSeedLabel = new QLabel("Fix seed:", this);
     fixSeedLabel->setToolTip("Set source of randomness.");
     simulationLayout->addRow(fixSeedLabel, m_widgets[SettingsWidget::FIXSEED]);
-}
-
-auto SettingsManager::Parent() const -> InputManager*
-{
-    return qobject_cast<InputManager*>(parent());
 }

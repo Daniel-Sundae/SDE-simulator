@@ -28,7 +28,17 @@ auto InputManager::SetInputHandler(InputHandler* inputHandler) -> void
     m_inputHandler = inputHandler;
 }
 
-auto InputManager::OnProcessTypeModified(ProcessType newType) const -> void
+auto InputManager::OnGoButtonClicked() const -> void
+{
+    m_inputHandler->SamplePath();
+}
+
+auto InputManager::OnClearButtonClicked() const -> void
+{
+    m_inputHandler->Clear();
+}
+
+auto InputManager::OnProcessTypeModified(const ProcessType newType) const -> void
 {
     m_inputHandler->OnProcessTypeModified(newType);
 }
@@ -38,12 +48,7 @@ auto InputManager::OnProcessDefinitionModified(const DefinitionWidget param, dou
     m_inputHandler->OnProcessDefinitionModified(param, userValue);
 }
 
-auto InputManager::OnGoButtonClicked() const -> void
+auto InputManager::OnSolverTypeModified(const SolverType newType) const -> void
 {
-    m_inputHandler->SamplePath();
-}
-
-auto InputManager::OnClearButtonClicked() const -> void
-{
-    m_inputHandler->Clear();
+    m_inputHandler->OnSolverTypeModified(newType);
 }

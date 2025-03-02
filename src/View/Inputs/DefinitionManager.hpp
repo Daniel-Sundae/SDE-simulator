@@ -1,30 +1,19 @@
 #pragma once
 
 #include "Types.hpp"
-#include "InputHandler.hpp"
+#include "InputManager.hpp"
 #include <unordered_map>
 #include <QtWidgets/qgroupbox.h>
 
-class InputManager;
-class QPushButton;
-class QDoubleSpinBox;
-
-
-
-class DefinitionManager : public QGroupBox
+class DefinitionManager : public InputManagerGroupBox
 {
 	Q_OBJECT
 public:
 	explicit DefinitionManager(InputManager* parent);
 private:
-	auto GetMuValue() const -> double;
-	auto GetSigmaValue() const -> double;
-	auto GetStartValue() const -> double;
+	auto UpdateWidgetProperties(ProcessType process, bool initialize = false) -> void;
 	auto AddDefinitionWidgets() -> void;
 	auto InitializeDesign() -> void;
-	auto Parent() const -> InputManager*;
-	auto OnProcessTypeModified(const ProcessType newType) const -> void;
-	auto OnProcessDefinitionModified(const DefinitionWidget param) const -> void;
 private:
 	std::unordered_map<DefinitionWidget, QWidget*> m_widgets;
 };

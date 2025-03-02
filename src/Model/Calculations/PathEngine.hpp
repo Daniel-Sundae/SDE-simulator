@@ -1,5 +1,7 @@
 #pragma once
 #include "Types.hpp"
+#include "PathQuery.hpp"
+
 class PathEngine{
 public:
 	auto SamplePath(const PathQuery& pathQuery) const -> Path;

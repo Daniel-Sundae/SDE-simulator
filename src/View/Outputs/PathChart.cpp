@@ -1,127 +1,174 @@
 ﻿#include "PathChart.hpp"
 #include "ProcessData.hpp"
 #include "Types.hpp"
+#include "ViewUtils.hpp"
 #include <QtCharts/qlineseries.h>
 #include <QtCharts/qchartview.h>
 #include <QtCharts/qvalueaxis.h>
 
 PathChart::PathChart()
     : QChart()
+    , m_xAxis(new QValueAxis(this))
+    , m_yAxis(new QValueAxis(this))
+    , m_zeroLine(new QLineSeries(this))
 {
+    InitializeAxis();
     InitializeProcessChart();
 }
 
-auto PathChart::UpdatePathChart(const Path& path, const PathQuery& pQuery) -> void
+auto PathChart::UpdateTitle(const PathQuery& pQuery) -> void
 {
     QString title;
-    QTextStream(&title) << QString::fromUtf8(ProcessData::Name(pQuery.processDefinition.type))
+    QTextStream(&title)
+        << "Definition: "
+        << QString::fromUtf8(ProcessData::GetName(pQuery.processDefinition.type))
         << ": "
-        << QString::fromUtf8(ProcessData::Definition(pQuery.processDefinition.type))
+        << QString::fromUtf8(ProcessData::GetDefinition(pQuery.processDefinition.type))
         << " with μ = "
         << QString::number(pQuery.processDefinition.drift.Mu())
         << ", σ = "
         << QString::number(pQuery.processDefinition.diffusion.Sigma())
         << ", X<sub>0</sub> = "
-        << QString::number(pQuery.processDefinition.startValue);
+        << QString::number(pQuery.processDefinition.startValueData)
+        << '\n'
+        << "Simulation: Time = "
+        << QString::number(pQuery.simulationParameters.time)
+        << ", dt = "
+        << QString::number(pQuery.simulationParameters.dt)
+        ;
     setTitle(title);
-    PlotChart(path);
 }
 
-auto PathChart::PlotChart(const Path& path) -> void
+auto PathChart::ClearPaths() -> void
+{
+    for (QAbstractSeries* s : series()) {
+        if (s != m_zeroLine) {
+            removeSeries(s);
+        }
+    }
+}
+
+auto PathChart::PlotDriftLine(const Path& driftLine) -> void
+{
+    PlotPath(driftLine);
+    GUI::SetDriftStyle(qobject_cast<QLineSeries*>(series().last()));
+}
+
+auto PathChart::PlotPath(const Path& path) -> void
 {
     if (path.empty()) return;
-    removeAllSeries();
-    QLineSeries* series = new QLineSeries(this);
-    for(size_t i = 0; i < path.size(); ++i) {
-        series->append(static_cast<qreal>(i), static_cast<qreal>(path[i]));
-    }
-    addSeries(series);
 
-    auto xAxis = qobject_cast<QValueAxis*>(axes(Qt::Horizontal).first());
-    auto yAxis = qobject_cast<QValueAxis*>(axes(Qt::Vertical).first());
-    if (xAxis && yAxis) {
-        series->attachAxis(xAxis);
-        series->attachAxis(yAxis);
+    QLineSeries* series = new QLineSeries(this);
+    QVector<QPointF> points;
+    points.reserve(path.size());
+    for (size_t i = 0; i < path.size(); ++i) {
+        points.append(QPointF(i, path[i]));
     }
+    series->replace(points);
+    addSeries(series);
+    series->attachAxis(m_xAxis);
+    series->attachAxis(m_yAxis);
     auto [min_it, max_it] = std::minmax_element(path.begin(), path.end());
+    GUI::SetPathStyle(series);
     UpdateRangesIfNeeded(path.size(), *min_it, *max_it);
+    m_zeroLine->clear();
+    m_zeroLine->append(m_xAxis->min(), 0);
+    m_zeroLine->append(m_xAxis->max(), 0);
 }
 
 auto PathChart::UpdateRangesIfNeeded(std::size_t max_X, State min_Y, State max_Y) -> void
 {
-    auto xAxis = qobject_cast<QValueAxis*>(axes(Qt::Horizontal).first());
-    auto yAxis = qobject_cast<QValueAxis*>(axes(Qt::Vertical).first());
+    // ---------- X-Axis Range Handling ----------
 
-    if (!xAxis || !yAxis) return;
+    qreal desiredXMax = static_cast<qreal>(max_X);
+    qreal currentXMax = m_xAxis->max();
 
-    // X-axis handling
-    // Use qreal (double) for Qt axis operations
-    qreal currentXMax = xAxis->max();
-    // Convert size_t to qreal for comparison
-    currentXMax = std::max(currentXMax, static_cast<qreal>(max_X));
-    if (currentXMax > 3 * static_cast<qreal>(max_X)) {
-        currentXMax = static_cast<qreal>(max_X);
+    bool adjustX = false;
+    qreal newXMax = currentXMax;
+
+    if (desiredXMax > currentXMax) {
+        newXMax = std::ceil(desiredXMax / 10.0) * 10;
+        adjustX = true;
     }
-    xAxis->setRange(0, currentXMax);
-
-    // Y-axis handling
-    qreal currentYMin = yAxis->min();
-    qreal currentYMax = yAxis->max();
-
-    // Convert State to qreal for calculations
-    qreal paddedMinY = static_cast<qreal>(min_Y) * 1.1;
-    qreal paddedMaxY = static_cast<qreal>(max_Y) * 1.1;
-
-    qreal hysteresis = (currentYMax - currentYMin) * 0.05;
-
-    bool needsYAdjustment = false;
-    qreal newMin = currentYMin;
-    qreal newMax = currentYMax;
-
-    if (paddedMinY < currentYMin - hysteresis ||
-        paddedMaxY > currentYMax + hysteresis) {
-
-        qreal extraPadding = (paddedMaxY - paddedMinY) * 0.1;
-        newMin = std::min(currentYMin, paddedMinY - extraPadding);
-        newMax = std::max(currentYMax, paddedMaxY + extraPadding);
-        needsYAdjustment = true;
+    else if (currentXMax > 3.0 * desiredXMax) {
+        newXMax = std::ceil(desiredXMax / 10.0) * 10;
+        adjustX = true;
     }
 
-    qreal currentRange = currentYMax - currentYMin;
-    qreal dataRange = static_cast<qreal>(max_Y - min_Y);
-    if (currentRange > 8 * dataRange) {
-        newMin = paddedMinY;
-        newMax = paddedMaxY;
-        needsYAdjustment = true;
+    if (adjustX) {
+        m_xAxis->setRange(0, newXMax);
+        int tickCount = std::min(11, std::max(5, static_cast<int>(newXMax / 20.0) + 1));
+        m_xAxis->setTickCount(tickCount);
     }
 
-    if (needsYAdjustment) {
-        newMin = std::floor(newMin / 10.0) * 10;
-        newMax = std::ceil(newMax / 10.0) * 10;
+    // ---------- Y-Axis Range Handling ----------
+    constexpr qreal yPaddingFactor = 0.15;  // 15% padding for Y
 
-        if (newMin > 0) newMin = 0;
-        if (newMax < 0) newMax = 0;
+    qreal dataYMin = static_cast<qreal>(min_Y);
+    qreal dataYMax = static_cast<qreal>(max_Y);
+    qreal dataYRange = dataYMax - dataYMin;
 
-        yAxis->setRange(newMin, newMax);
-        yAxis->setTickCount(static_cast<int>((newMax - newMin) / 10 + 1));
+    qreal paddingY = std::max(1.0, dataYRange * yPaddingFactor);
+    qreal desiredYMin = dataYMin - paddingY;
+    qreal desiredYMax = dataYMax + paddingY;
+
+    qreal currentYMin = m_yAxis->min();
+    qreal currentYMax = m_yAxis->max();
+    qreal currentYRange = currentYMax - currentYMin;
+
+    bool adjustY = false;
+    qreal hysteresis = std::max(1.0, currentYRange * 0.05);  // 5% hysteresis
+
+    if (desiredYMin < currentYMin - hysteresis || desiredYMax > currentYMax + hysteresis) {
+        adjustY = true;
     }
+    else if (currentYRange > 5.0 * dataYRange && dataYRange > 0) {
+        adjustY = true;
+    }
+
+    if (adjustY) {
+        qreal roundTo = std::max(1.0, std::pow(10, std::floor(std::log10(dataYRange / 5))));
+        qreal newYMin = std::floor(desiredYMin / roundTo) * roundTo;
+        qreal newYMax = std::ceil(desiredYMax / roundTo) * roundTo;
+
+        if (newYMin > 0 && newYMin < dataYRange * 0.5) newYMin = 0;
+        if (newYMax < 0 && newYMax > -dataYRange * 0.5) newYMax = 0;
+
+        if (newYMax - newYMin < 1.0) {
+            qreal midPoint = (newYMax + newYMin) / 2.0;
+            newYMin = midPoint - 0.5;
+            newYMax = midPoint + 0.5;
+        }
+
+        m_yAxis->setRange(newYMin, newYMax);
+
+        int tickCount = std::min(11, std::max(5, static_cast<int>((newYMax - newYMin) / roundTo) + 1));
+        m_yAxis->setTickCount(tickCount);
+    }
+}
+
+auto PathChart::InitializeAxis() -> void
+{
+    addAxis(m_xAxis, Qt::AlignBottom);
+    addAxis(m_yAxis, Qt::AlignLeft);
+    m_xAxis->setTitleText("t (s)");
+    m_yAxis->setTitleText("X<sub>t</sub>");
+    m_xAxis->setGridLineVisible(false);
+    m_yAxis->setGridLineVisible(false);
+    m_xAxis->setRange(0, 10);
+    m_yAxis->setRange(-10, 10);
 }
 
 auto PathChart::InitializeProcessChart() -> void
 {
-    setTheme(QChart::ChartThemeBlueNcs);
+    GUI::SetChartStyle(this);
     legend()->setVisible(false);
-    QValueAxis* xAxis = new QValueAxis(this);
-    QValueAxis* yAxis = new QValueAxis(this);
-    addAxis(xAxis, Qt::AlignBottom);
-    addAxis(yAxis, Qt::AlignLeft);
-    xAxis->setTitleText("t (s)");
-    yAxis->setTitleText("X<sub>t</sub>");
-    xAxis->setGridLineVisible(true);
-    yAxis->setGridLineVisible(true);
-    xAxis->setRange(0, 10);  // Set some default range
-    yAxis->setRange(-10, 10);  // Set some default range
-    yAxis->setTickCount(3);
-    yAxis->setMinorTickCount(2);
+    m_zeroLine->setPen(QPen(Qt::gray, 1.0));
+    addSeries(m_zeroLine);
+    m_zeroLine->attachAxis(m_xAxis);
+    m_zeroLine->attachAxis(m_yAxis);
+    // Initialize with default range
+    m_zeroLine->append(0, 0);
+    m_zeroLine->append(10, 0); // Match initial m_xAxis range
 }
 

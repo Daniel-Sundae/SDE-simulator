@@ -3,15 +3,27 @@
 #include <stdexcept>
 #include <functional>
 #include <cstddef>
-#include "DefaultConstants.hpp"
+
+using Time = double;
+using State = double;
+using Path = std::vector<double>;
+using StateDot = double; // dX/dt
+using Range = std::pair<double, double>;
+template <typename T>
+concept IntOrDouble = std::same_as<T, int> || std::same_as<T, double>;
+
 class FunctionWrapper {
 protected:
     const double parameter;
     const std::function<StateDot(Time, State)> f;
 public:
-    FunctionWrapper(double inp_parameter, std::function<StateDot(Time, State)> inp_f)
-        : parameter(inp_parameter)
-        , f(inp_f)
+    FunctionWrapper()
+        : parameter(0)
+        , f([](Time, State) -> StateDot { return 0; })
+    {}
+    FunctionWrapper(double _parameter, std::function<StateDot(Time, State)> _f)
+        : parameter(_parameter)
+        , f(_f)
     {}
     auto operator()(Time t, State s) const -> StateDot { return f(t, s); }
 };
@@ -65,54 +77,6 @@ enum class SimulationWidget {
 enum class SettingsWidget {
     THREADS = 0,
     AUTOUPDATE,
-    AUTOCLEAR,
     FIXSEED,
 };
 
-struct SimulationParameters {
-    explicit SimulationParameters() = default;
-    explicit SimulationParameters(Time inp_time, Time inp_dt)
-        : time(inp_time)
-        , dt(inp_dt)
-    {
-        AssertValidParameters();
-    }
-    auto AssertValidParameters() const -> void
-    {
-        if (dt <= 0 || time <= 0) {
-            throw std::invalid_argument("Time and points must be greater than 0");
-        }
-    }
-    [[nodiscard]] auto Points() const -> std::size_t
-    {
-        return static_cast<std::size_t>(std::ceil(time / dt));
-    }
-    Time time = SimulationDefault::time;
-    Time dt = SimulationDefault::dt;
-    // TODO add nr samples (for more than one path)
-    // TODO add SolverMethod enum
-};
-
-struct ProcessDefinition {
-    ProcessType type = ProcessType::BM;
-    Drift drift = Drift(0, [](Time, State) -> StateDot { return 0.0; });
-    Diffusion diffusion = Diffusion(0, [](Time, State) -> StateDot { return 0.0; });
-    State startValue = DefinitionDefault::startValue;
-
-    ProcessDefinition() = default;
-    ProcessDefinition(const ProcessType t, Drift d, Diffusion diff, const State start)
-        : type(t)
-        , drift(d)
-        , diffusion(diff)
-        , startValue(start)
-    {}
-};
-
-struct PathQuery {
-    const ProcessDefinition& processDefinition;
-    const SimulationParameters& simulationParameters;
-    PathQuery(const ProcessDefinition& def, const SimulationParameters& simParam)
-        : processDefinition(def)
-        , simulationParameters(simParam)
-    {}
-};

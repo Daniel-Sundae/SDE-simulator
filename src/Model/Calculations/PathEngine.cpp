@@ -8,11 +8,11 @@ auto PathEngine::SamplePath(const PathQuery& pathQuery) const -> Path
     auto drift = pathQuery.processDefinition.drift;
     auto diffusion = pathQuery.processDefinition.diffusion;
     const Time dt = pathQuery.simulationParameters.dt;
-    const State startValue = pathQuery.processDefinition.startValue;
+    const State startValueData = pathQuery.processDefinition.startValueData;
     Path path = {};
     assert(points != 0);
     path.reserve(points);
-    path.push_back(startValue);
+    path.push_back(startValueData);
     for (std::size_t i = 1; i < points; ++i)
         path.push_back(path.back() + Increment(drift, diffusion, static_cast<Time>(i) * dt, path.back(), dt));
     return path;

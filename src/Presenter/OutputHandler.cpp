@@ -5,12 +5,17 @@ OutputHandler::OutputHandler()
 	: IPresenterComponent()
 { }
 
-auto OutputHandler::OnPathReceived(const PathQuery& query, const Path& path) const -> void
+auto OutputHandler::OnPathReceived(const PathQuery& pQuery, const Path& path) const -> void
 {
-	Listener()->OnPathReceived(query, path);
+	Listener()->PlotPath(path);
+	Listener()->UpdateChartTitle(pQuery);
+}
+auto OutputHandler::OnDriftLineReceived(const Path& driftLine) const -> void
+{
+	Listener()->PlotDriftLine(driftLine);
 }
 
-auto OutputHandler::Clear() const -> void
+auto OutputHandler::OnClear() const -> void
 {
 	Listener()->Clear();
 }

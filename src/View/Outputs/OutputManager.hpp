@@ -13,10 +13,19 @@ class OutputManager : public QWidget{
 
 public:
     explicit OutputManager(QWidget* parent = nullptr);
-    auto OnPathReceived(const PathQuery& query, const Path& sampleData) const -> void;
+
+    // PathChart
+    auto UpdateChartTitle(const PathQuery& pQuery) const -> void;
+    auto PlotPath(const Path& path) const -> void;
+    auto PlotDriftLine(const Path& driftLine) const -> void;
     auto Clear() -> void;
+
+    // DistributionChart
+
+
 private:
     auto GetPathChart() const->PathChart*;
+    //auto GetDirstributionChart() const->DistributionChart*;
 private:
     QVBoxLayout* m_layout;
     QChartView* m_pathChartView;

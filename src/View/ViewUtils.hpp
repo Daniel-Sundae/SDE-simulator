@@ -60,72 +60,33 @@ namespace GUI
         )";
     }
 
-    inline auto CreateIntSpinBox(QWidget* parent, int min, int max, int default_value, int step) -> QSpinBox*
+    inline auto SetDriftStyle(QLineSeries* driftSeries) -> void
     {
-        auto* spinBox = new QSpinBox(parent);
-        spinBox->setRange(min, max);
-        spinBox->setValue(default_value);
-        spinBox->setSingleStep(step);
-        return spinBox;
-    };
+        const QColor highlightColor = QColor(Qt::GlobalColor::red);
+        QPen seriesPen(highlightColor, 1);
+        seriesPen.setStyle(Qt::PenStyle::DashLine);
+        driftSeries->setPen(seriesPen);
+    }
 
-    inline auto CreateDoubleSpinBox(QWidget* parent, double min, double max, double default_value, double step) -> QDoubleSpinBox*
+    inline auto SetPathStyle(QLineSeries* series) -> void
     {
-        auto* spinBox = new QDoubleSpinBox(parent);
-        spinBox->setRange(min, max);
-        spinBox->setValue(default_value);
-        spinBox->setSingleStep(step);
-        return spinBox;
-    };
+        const QColor highlightColor = QColor(42, 130, 218);
+        const QPen seriesPen(highlightColor, 1);
+        series->setPen(seriesPen);
+    }
 
-    inline auto DarkChartTheme(QChart* chart) -> void
+    inline auto SetChartStyle(QChart* chart) -> void
     {
-        // Background colors
         chart->setBackgroundBrush(QColor(25, 25, 25));
         chart->setBackgroundPen(Qt::NoPen);
-        chart->setPlotAreaBackgroundBrush(QColor(25, 25, 25));
-        chart->setPlotAreaBackgroundVisible(true);
-
-        // Title
         chart->setTitleBrush(QBrush(Qt::white));
 
-        // Legend
-        auto* legend = chart->legend();
-        legend->setLabelColor(Qt::white);
-        legend->setBackgroundVisible(true);
-        legend->setColor(Qt::white);
-        legend->setBrush(QColor(53, 53, 53));
-
-        // Configure all axes
         const QList<QAbstractAxis*> axes = chart->axes();
         for (QAbstractAxis* axis : axes) {
             axis->setLabelsColor(Qt::white);
             axis->setTitleBrush(QBrush(Qt::white));
-            axis->setGridLineColor(QColor(75, 75, 75));
-            axis->setMinorGridLineColor(QColor(65, 65, 65));
             axis->setLinePen(QPen(Qt::white));
         }
-
-        // Series colors
-        const QPen seriesPen(QColor(42, 130, 218), 2);
-
-        // Apply to all series
-        const QList<QAbstractSeries*> seriesList = chart->series();
-        for (QAbstractSeries* series : seriesList) {
-            if (auto* lineSeries = qobject_cast<QLineSeries*>(series)) {
-                lineSeries->setPen(seriesPen);
-            }
-            // Handle other series types if needed
-            else if (auto* scatterSeries = qobject_cast<QScatterSeries*>(series)) {
-                scatterSeries->setPen(seriesPen);
-                scatterSeries->setBrush(QBrush(QColor(42, 130, 218)));
-            }
-            else if (auto* splineSeries = qobject_cast<QSplineSeries*>(series)) {
-                splineSeries->setPen(seriesPen);
-            }
-            // Add more series types as needed
-        }
     }
-
 }
 

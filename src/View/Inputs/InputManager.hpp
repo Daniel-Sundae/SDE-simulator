@@ -3,6 +3,7 @@
 #include "InputHandler.hpp"
 #include <QtWidgets/qboxlayout.h>
 #include <QtWidgets/qwidget.h>
+#include <QtWidgets/qgroupbox.h>
 
 class ActionManager;
 class DefinitionManager;
@@ -17,10 +18,15 @@ class InputManager : public QWidget
 public:
     explicit InputManager(QWidget* parent = nullptr);
     auto SetInputHandler(InputHandler* inputHandler) -> void;
-    auto OnProcessTypeModified(ProcessType newType) const -> void;
-    auto OnProcessDefinitionModified(const DefinitionWidget param, double userValue) const -> void;
     auto OnGoButtonClicked() const -> void;
     auto OnClearButtonClicked() const -> void;
+    auto OnProcessTypeModified(const ProcessType newType) const -> void;
+    auto OnProcessDefinitionModified(const DefinitionWidget param, double userValue) const -> void;
+    auto OnSolverTypeModified(const SolverType newType) const -> void;
+    template<IntOrDouble T>
+    auto OnSimulationParametersModified(const SimulationWidget param, T userValue) const -> void {
+        m_inputHandler->OnSimulationParametersModified(param, userValue);
+    }
 
 private:
     ActionManager* m_actionManager;
@@ -30,3 +36,13 @@ private:
     InputHandler* m_inputHandler;
 };
 
+class InputManagerGroupBox : public QGroupBox {
+public:
+    InputManagerGroupBox(QWidget* parent = nullptr)
+        : QGroupBox(parent)
+    {}
+
+    InputManager* Parent() const {
+        return qobject_cast<InputManager*>(parent());
+    }
+};

@@ -1,13 +1,8 @@
 #pragma once
-#include "BasicTypes.hpp"
+#include "Types.hpp"
 namespace SimulationDefault {
-    constexpr Time time = 100;
-    constexpr Time dt = 0.1;
+    constexpr SolverType solver = SolverType::EULER_MARUYAMA;
+    constexpr Time time = 10;
+    constexpr Time dt = 0.01;
     constexpr std::size_t samples = 1;
-}
-
-namespace DefinitionDefault {
-    constexpr double mu = 0.1;
-    constexpr double sigma = 0.1;
-    constexpr State startValue = 0;
 }

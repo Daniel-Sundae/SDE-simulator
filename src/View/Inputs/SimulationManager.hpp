@@ -1,9 +1,8 @@
 #pragma once
 #include "Types.hpp"
-#include <QtWidgets/qgroupbox.h>
-class InputManager;
+#include "InputManager.hpp"
 
-class SimulationManager : public QGroupBox
+class SimulationManager : public InputManagerGroupBox
 {
 	Q_OBJECT
 public:
@@ -12,7 +11,12 @@ private:
 	auto AddComboBoxes() -> void;
 	auto AddSpinBoxes() -> void;
 	auto InitializeDesign() -> void;
-	auto Parent() const -> InputManager*;
+	//template<IntOrDouble T>
+	//auto SimulationModifiedCb(SimulationWidget param) {
+	//	return [this, param](T newValue) {
+	//		Parent()->OnSimulationParametersModified(param, newValue);
+	//		};
+	//};
 private:
 	std::unordered_map<SimulationWidget, QWidget*> m_widgets;
 };

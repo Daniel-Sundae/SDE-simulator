@@ -3,7 +3,7 @@
 #include "ViewUtils.hpp"
 
 ActionManager::ActionManager(InputManager *parent)
-    : QGroupBox(parent)
+    : InputManagerGroupBox(parent)
 {
     AddActionWidgets();
 }
@@ -31,9 +31,4 @@ auto ActionManager::AddActionWidgets() -> void
     layout->addWidget(goButton);
     layout->addWidget(clearButton);
     setStyleSheet(GUI::GroupBoxDescription());
-}
-
-auto ActionManager::Parent() const -> InputManager*
-{
-    return qobject_cast<InputManager *>(parent());
 }

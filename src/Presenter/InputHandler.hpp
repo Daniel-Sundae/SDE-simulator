@@ -1,6 +1,7 @@
 #pragma once
 #include "Types.hpp"
 #include "DefaultConstants.hpp"
+#include "PathQuery.hpp"
 #include "MainPresenter.hpp"
 #include <memory>
 
@@ -10,7 +11,9 @@ public:
     explicit InputHandler();
     auto OnProcessTypeModified(ProcessType newType) -> void;
     auto OnProcessDefinitionModified(DefinitionWidget param, double userValue) -> void;
-    auto OnSimulationParametersModified(const SimulationParameters& simParams) -> void;
+    auto OnSolverTypeModified(SolverType newType) -> void;
+    template <IntOrDouble T>
+    auto OnSimulationParametersModified(const SimulationWidget param, T userValue) -> void;
     auto SamplePath() -> void;
     auto Clear() -> void;
 private:
@@ -21,3 +24,5 @@ private:
     double m_inputMu;
     double m_inputSigma;
 };
+
+#include "InputHandler.inl"

@@ -1,5 +1,4 @@
 ﻿#include "SimulationManager.hpp"
-#include "InputManager.hpp"
 #include "ViewUtils.hpp"
 #include <QtWidgets/qcombobox.h>
 #include <QtWidgets/qformlayout.h>
@@ -7,7 +6,7 @@
 
 
 SimulationManager::SimulationManager(InputManager* parent)
-	: QGroupBox(parent)
+	: InputManagerGroupBox(parent)
 {
     AddComboBoxes();
     AddSpinBoxes();
@@ -16,24 +15,75 @@ SimulationManager::SimulationManager(InputManager* parent)
 
 auto SimulationManager::AddComboBoxes() -> void
 {
-    std::array<std::pair< SolverType, std::pair<std::string, std::string> >, 2> solversTypes = {
+    std::array<std::pair< SolverType, std::pair<std::string, std::string> >, 2> solverTypes = {
     std::pair{SolverType::EULER_MARUYAMA, std::pair{"EM", "Euler-Maruyama"}},
     std::pair{SolverType::RUNGE_KUTTA, std::pair{"RK", "Runge-Kutta"}},
     };
     auto* solvers = new QComboBox(this);
-    for (int i = 0; i < solversTypes.size(); ++i) {
-        solvers->insertItem(i, QString::fromStdString(solversTypes[i].second.first));
-        solvers->setItemData(i, QString::fromStdString(solversTypes[i].second.second), Qt::ToolTipRole);
+    for (int i = 0; i < solverTypes.size(); ++i) {
+        solvers->insertItem(i, QString::fromStdString(solverTypes[i].second.first));
+        solvers->setItemData(i, QString::fromStdString(solverTypes[i].second.second), Qt::ToolTipRole);
     }
 
     m_widgets[SimulationWidget::SOLVER] = solvers;
+    connect(
+        qobject_cast<QComboBox*>(m_widgets[SimulationWidget::SOLVER]),
+        QOverload<int>::of(&QComboBox::currentIndexChanged),
+        this,
+        [this, solverTypes]() {
+            SolverType newSolver = solverTypes[qobject_cast<QComboBox*>(m_widgets[SimulationWidget::SOLVER])->currentIndex()].first;
+            Parent()->OnSolverTypeModified(newSolver);
+        }
+    );
 }
 
 auto SimulationManager::AddSpinBoxes() -> void
 {
-    m_widgets[SimulationWidget::TIME] = GUI::CreateIntSpinBox(this, 0, 10000, SimulationDefault::time, 500);
-    m_widgets[SimulationWidget::dt] = GUI::CreateDoubleSpinBox(this, 0, 10, SimulationDefault::dt, 0.1);
-    m_widgets[SimulationWidget::SAMPLES] = GUI::CreateIntSpinBox(this, 1, 100, SimulationDefault::samples, 1);
+    auto* timeWidget = new QDoubleSpinBox(this);
+    timeWidget->setValue(100);
+    timeWidget->setMinimum(0);
+    timeWidget->setMaximum(1000);
+    timeWidget->setSingleStep(50);
+    m_widgets[SimulationWidget::TIME] = timeWidget;
+    auto* dtWidget = new QDoubleSpinBox(this);
+    dtWidget->setValue(0.1);
+    dtWidget->setMinimum(0);
+    dtWidget->setMaximum(1);
+    dtWidget->setSingleStep(0.1);
+    m_widgets[SimulationWidget::dt] = dtWidget;
+    auto* samplesWidget = new QSpinBox(this);
+    samplesWidget->setValue(1);
+    samplesWidget->setMinimum(1);
+    samplesWidget->setMaximum(100);
+    samplesWidget->setSingleStep(1);
+    m_widgets[SimulationWidget::SAMPLES] = samplesWidget;
+
+    auto simulationModifiedCb = [this](SimulationWidget param) {
+	    return [this, param]<typename T> requires IntOrDouble<T>(T newValue) {
+		    Parent()->OnSimulationParametersModified(param, newValue);
+		};
+    };
+
+    connect(
+        timeWidget,
+        QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+        this,
+        simulationModifiedCb(SimulationWidget::TIME)
+    );
+
+    connect(
+        dtWidget,
+        QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+        this,
+        simulationModifiedCb(SimulationWidget::dt)
+    );
+
+    connect(
+        samplesWidget,
+        QOverload<int>::of(&QSpinBox::valueChanged),
+        this,
+        simulationModifiedCb(SimulationWidget::SAMPLES)
+    );
 }
 
 auto SimulationManager::InitializeDesign() -> void
@@ -49,18 +99,3 @@ auto SimulationManager::InitializeDesign() -> void
     simulationLayout->addRow(samplesLabel, m_widgets[SimulationWidget::SAMPLES]);
 
 }
-
-auto SimulationManager::Parent() const -> InputManager*
-{
-    return qobject_cast<InputManager*>(parent());
-}
-
-//auto SimulationManager::OnProcessTypeModified(const ProcessType newType) const -> void
-//{
-//    Parent()->OnProcessTypeModified(newType);
-//}
-//
-//auto SimulationManager::OnProcessSimulationModified(const SimulationWidget param) const -> void
-//{
-//    Parent()->OnProcessSimulationModified(param, qobject_cast<QDoubleSpinBox*>(m_widgets.at(param))->value());
-//}
