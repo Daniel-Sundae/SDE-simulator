@@ -70,13 +70,13 @@ auto PathChart::PlotPath(const Path& path) -> void
     series->attachAxis(m_yAxis);
     auto [min_it, max_it] = std::minmax_element(path.begin(), path.end());
     GUI::SetPathStyle(series);
-    UpdateRangesIfNeeded(path.size(), *min_it, *max_it);
+    UpdateAxisIfNeeded(path.size(), *min_it, *max_it);
     m_zeroLine->clear();
     m_zeroLine->append(m_xAxis->min(), 0);
     m_zeroLine->append(m_xAxis->max(), 0);
 }
 
-auto PathChart::UpdateRangesIfNeeded(std::size_t max_X, State min_Y, State max_Y) -> void
+auto PathChart::UpdateAxisIfNeeded(std::size_t max_X, State min_Y, State max_Y) -> void
 {
     // ---------- X-Axis Range Handling ----------
 
@@ -167,7 +167,6 @@ auto PathChart::InitializeProcessChart() -> void
     addSeries(m_zeroLine);
     m_zeroLine->attachAxis(m_xAxis);
     m_zeroLine->attachAxis(m_yAxis);
-    // Initialize with default range
     m_zeroLine->append(0, 0);
     m_zeroLine->append(10, 0); // Match initial m_xAxis range
 }

@@ -17,7 +17,7 @@ public:
     auto ClearPaths() -> void;
     auto PlotDriftLine(const Path& driftLine) -> void;
 private:
-    auto UpdateRangesIfNeeded(std::size_t max_X, State min_Y, State max_Y) -> void;
+    auto UpdateAxisIfNeeded(std::size_t max_X, State min_Y, State max_Y) -> void;
     auto InitializeAxis() -> void;
     auto InitializeProcessChart() -> void;
 private:

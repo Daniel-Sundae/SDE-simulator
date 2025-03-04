@@ -1,6 +1,6 @@
 #include "PathChart.hpp"
+#include "DistributionChart.hpp"
 #include "OutputManager.hpp"
-
 
 OutputManager::OutputManager(QWidget *parent)
     : QWidget(parent)
@@ -11,21 +11,24 @@ OutputManager::OutputManager(QWidget *parent)
     auto* pathChart = new PathChart();
     m_pathChartView->setChart(pathChart);
     m_layout->addWidget(m_pathChartView);
+    auto* distributionChart = new DistributionChart();
+    m_distributionChartView->setChart(distributionChart);
     m_layout->addWidget(m_distributionChartView);
     setLayout(m_layout);
 }
 
-auto OutputManager::GetPathChart() const -> PathChart*
-{
-    return static_cast<PathChart*>(m_pathChartView->chart());
-}
 
-auto OutputManager::UpdateChartTitle(const PathQuery& pQuery) const -> void
+////////////////////////////////////////
+//// PATH CHART
+////////////////////////////////////////
+
+
+auto OutputManager::UpdatePathChartTitle(const PathQuery& pQuery) const -> void
 {
     GetPathChart()->UpdateTitle(pQuery);
 }
 
-auto OutputManager::PlotDriftLine(const Path& driftLine) const -> void
+auto OutputManager::PlotPathChartDriftLine(const Path& driftLine) const -> void
 {
     GetPathChart()->PlotDriftLine(driftLine);
 }
@@ -35,9 +38,36 @@ auto OutputManager::PlotPath(const Path& path) const -> void
     GetPathChart()->PlotPath(path);
 }
 
-auto OutputManager::Clear() -> void
+auto OutputManager::ClearPaths() -> void
 {
     GetPathChart()->ClearPaths();
+}
 
-    // Send last datapoint to distributionchart
+////////////////////////////////////////
+//// DISTRIBUTION CHART
+////////////////////////////////////////
+
+auto OutputManager::UpdateDistributionChartTitle(const PathQuery& pQuery) const -> void
+{
+    GetDistributionChart()->UpdateTitle(pQuery);
+}
+
+auto OutputManager::PlotDistribution(const std::vector<State>& results) const -> void
+{
+    GetDistributionChart()->PlotDistribution(results);
+}
+
+auto OutputManager::ClearDistribution() -> void
+{
+    GetDistributionChart()->ClearDistribution();
+}
+
+auto OutputManager::GetPathChart() const -> PathChart*
+{
+    return static_cast<PathChart*>(m_pathChartView->chart());
+}
+
+auto OutputManager::GetDistributionChart() const -> DistributionChart*
+{
+    return static_cast<DistributionChart*>(m_distributionChartView->chart());
 }

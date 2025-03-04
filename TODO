@@ -1,15 +1,11 @@
 
 MATH TODO:
-- Implement such that I can see which weights f(t,w) are being used at each time step, and each outcome, when plotting f(t,w)Bs
 - Implement example 3.1.1. Can I see that using left edge Bt as weight gives 0 on average while right edge gives T? (Stratonovic vs ito)
-- Add solver types
 
 
 FUNCTIONALITY TODO:
-- sample many times without removing plots + Clear button
 - loading symbol for simulation taking time
-- get maxmu and minmu for spinboxes in processdata. CAn make it much more intuitive-
-- add dashed red driftline. Should be present immediately. Also have clear where y = 0 is.
+- Make sure driftline is present immediately.
 - Add dot showing the final result of sim in chart graph.
 - Better to have a "GO" button for starting the sample. The settings must be clearly visible then somehow.
 - add fix seed button. when enabled samplespinbox should be not enabled and hardcoded set to 1. Doesn't make sense to repeat simulations when each simulation is equivalent.
@@ -31,3 +27,8 @@ TECH DETAILS TODO:
 - use threads for many paths.
 - Use threadpool to avoid spinning up threads
 - Maybe use more than one thread per path (for simple paths like BM). Could write function sampleRange() andattach offset to each range, where offset is previous range's last value.
+
+DESIGN CHOICES MADE:
+- Every query is self contained, meaning chart is always cleared when doing a new sample
+- There simulation is non blocking and user can cancel query
+

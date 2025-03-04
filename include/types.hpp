@@ -6,9 +6,11 @@
 
 using Time = double;
 using State = double;
+using Density = double;
 using Path = std::vector<double>;
+using Paths = std::vector<Path>;
 using StateDot = double; // dX/dt
-using Range = std::pair<double, double>;
+//using Range = std::pair<double, double>;
 template <typename T>
 concept IntOrDouble = std::same_as<T, int> || std::same_as<T, double>;
 

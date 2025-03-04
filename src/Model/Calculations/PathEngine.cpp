@@ -2,28 +2,27 @@
 #include "Utils.hpp"
 #include "assert.h"
 
-auto PathEngine::SamplePath(const PathQuery& pathQuery) const -> Path
+auto PathEngine::SamplePaths(const PathQuery& pathQuery) const -> Paths
 {
-    const std::size_t points = pathQuery.simulationParameters.Points();
-    auto drift = pathQuery.processDefinition.drift;
-    auto diffusion = pathQuery.processDefinition.diffusion;
-    const Time dt = pathQuery.simulationParameters.dt;
-    const State startValueData = pathQuery.processDefinition.startValueData;
-    Path path = {};
-    assert(points != 0);
-    path.reserve(points);
-    path.push_back(startValueData);
-    for (std::size_t i = 1; i < points; ++i)
-        path.push_back(path.back() + Increment(drift, diffusion, static_cast<Time>(i) * dt, path.back(), dt));
-    return path;
-}
-
-auto PathEngine::SamplePaths(const PathQuery& pathQuery, std::size_t samples) const -> std::vector<Path>
-{
-    std::vector<Path> paths = {};
+    const auto samplePath = [this, &pathQuery]() -> Path {
+        const std::size_t points = pathQuery.simulationParameters.Points();
+        auto& drift = pathQuery.processDefinition.drift;
+        auto& diffusion = pathQuery.processDefinition.diffusion;
+        const Time dt = pathQuery.simulationParameters.dt;
+        const State startValueData = pathQuery.processDefinition.startValueData;
+        Path path = {};
+        assert(points != 0);
+        path.reserve(points);
+        path.push_back(startValueData);
+        for (std::size_t i = 1; i < points; ++i)
+            path.push_back(path.back() + Increment(drift, diffusion, static_cast<Time>(i) * dt, path.back(), dt));
+        return path;
+    };
+    Paths paths;
+    const std::size_t samples = pathQuery.simulationParameters.samples;
     paths.reserve(samples);
     for (std::size_t i = 0; i<samples; ++i)
-        paths.push_back(SamplePath(pathQuery));
+        paths.push_back(samplePath());
     return paths;
 }
 

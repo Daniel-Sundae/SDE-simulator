@@ -4,8 +4,7 @@
 
 class PathEngine{
 public:
-	auto SamplePath(const PathQuery& pathQuery) const -> Path;
-	auto SamplePaths(const PathQuery& pathQuery, std::size_t samples) const -> std::vector<Path>;
+	auto SamplePaths(const PathQuery& pathQuery) const -> Paths;
 private:
 	inline auto Increment(
 		const Drift& drift,
