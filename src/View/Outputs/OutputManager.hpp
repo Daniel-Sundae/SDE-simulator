@@ -1,12 +1,14 @@
 #pragma once
 
-#include "PathChart.hpp"
 #include "Types.hpp"
 #include <QtWidgets/qwidget.h>
 #include <QtWidgets/qboxlayout.h>
 #include <QtCharts/qchartview.h>
 #include <QtCharts/qchart.h>
 
+class PathQuery;
+class PathChart;
+class DistributionChart;
 
 class OutputManager : public QWidget{
     Q_OBJECT

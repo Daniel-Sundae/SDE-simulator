@@ -4,7 +4,7 @@
 #include "PathQuery.hpp"
 #include "MainPresenter.hpp"
 #include <memory>
-
+#include <optional>
 
 class InputHandler final : public IPresenterComponent<MainPresenter> {
 public:
@@ -14,10 +14,12 @@ public:
     auto OnSolverTypeModified(SolverType newType) -> void;
     template <IntOrDouble T>
     auto OnSimulationParametersModified(const SimulationWidget param, T userValue) -> void;
-    auto SamplePath() -> void;
+    auto SamplePaths() -> void;
     auto Clear() -> void;
 private:
     auto CanSample() const -> bool;
+    auto CreateDriftQuery(const PathQuery& pQuery) const -> std::optional<PathQuery>;
+    auto CreatePDFQuery(const PathQuery& pQuery) const -> PDFQuery;
 private:
     std::unique_ptr<ProcessDefinition> m_processDefinition;
     std::unique_ptr<SimulationParameters> m_simulationParameters;

@@ -4,7 +4,8 @@
 
 class PathEngine{
 public:
-	auto SamplePaths(const PathQuery& pathQuery) const -> Paths;
+	auto SamplePaths(const PathQuery& pQuery) const -> Paths;
+	auto PDFData(const PDFQuery& pdfQuery) const -> PDF;
 private:
 	inline auto Increment(
 		const Drift& drift,

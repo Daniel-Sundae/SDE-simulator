@@ -20,7 +20,7 @@ auto DistributionChart::UpdateTitle(const PathQuery& pQuery) -> void
 	QString title;
 	QTextStream ts(&title);
 	ts << "Sampled distribution";
-	if (ProcessData::GetSolution(pQuery.processDefinition.type)){
+	if (ProcessData::GetPDF(pQuery.processDefinition.type)){
 		ts << " vs theoretical Probability Density Function";
 	}
 
@@ -42,7 +42,7 @@ auto DistributionChart::UpdateTitle(const PathQuery& pQuery) -> void
 	setTitle(title);
 }
 
-auto DistributionChart::PlotDistribution(const std::vector<State>& results) -> void
+auto DistributionChart::PlotDistribution(const Distribution& results) -> void
 {
 	const auto [min_it, max_it] = std::minmax_element(results.begin(), results.end());
 	const double barChartWidth = std::min(*max_it - *min_it, 0.5);
@@ -68,8 +68,9 @@ auto DistributionChart::ClearDistribution() -> void
 	removeAllSeries();
 }
 
-auto DistributionChart::PlotTheoreticalPDF(const std::vector<double> density) -> void
+auto DistributionChart::PlotTheoreticalPDF(const std::vector<Density>& density) -> void
 {
+	if(density.size()){}
 }
 
 auto DistributionChart::PlotExpValLine(const State EV) -> void

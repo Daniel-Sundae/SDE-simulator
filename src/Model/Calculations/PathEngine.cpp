@@ -26,6 +26,15 @@ auto PathEngine::SamplePaths(const PathQuery& pathQuery) const -> Paths
     return paths;
 }
 
+auto PathEngine::PDFData(const PDFQuery& pdfQuery) const -> PDF
+{
+    const std::size_t points = pdfQuery.points;
+    const double increment = pdfQuery.increment;
+    for (std::size_t i = 1; i < points; ++i)
+        path.push_back(path.back() + Increment(drift, diffusion, static_cast<Time>(i) * dt, path.back(), dt));
+    return path;
+}
+
 auto PathEngine::Increment(
     const Drift& drift,
     const Diffusion& diffusion,

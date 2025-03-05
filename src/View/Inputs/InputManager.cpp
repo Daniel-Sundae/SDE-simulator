@@ -30,7 +30,7 @@ auto InputManager::SetInputHandler(InputHandler* inputHandler) -> void
 
 auto InputManager::OnGoButtonClicked() const -> void
 {
-    m_inputHandler->SamplePath();
+    m_inputHandler->SamplePaths();
 }
 
 auto InputManager::OnClearButtonClicked() const -> void

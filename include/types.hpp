@@ -7,12 +7,18 @@
 using Time = double;
 using State = double;
 using Density = double;
-using Path = std::vector<double>;
+using Path = std::vector<State>;
 using Paths = std::vector<Path>;
+using Distribution = std::vector<State>;
+using PDF = std::vector<Density>; // Probability density function
 using StateDot = double; // dX/dt
-//using Range = std::pair<double, double>;
+using Range = std::pair<double, double>;
 template <typename T>
 concept IntOrDouble = std::same_as<T, int> || std::same_as<T, double>;
+class PathQuery;
+class PDFQuery;
+template <typename T>
+concept Query = std::same_as<T, PathQuery> || std::same_as<T, PDFQuery>;
 
 class FunctionWrapper {
 protected:
@@ -40,6 +46,18 @@ class Diffusion : public FunctionWrapper {
     using FunctionWrapper::FunctionWrapper;
 public:
     auto Sigma() const -> double { return parameter; }
+};
+
+class PDF {
+    const double EV;
+    const double stddev;
+    const std::function<Density(State)> pdf;
+    PDF(double _EV, double _stddev, std::function<Density(State)> _pdf)
+        : EV(_EV)
+        , stddev(_stddev)
+        , pdf(_pdf)
+    {}
+    auto operator()(State s) const -> Density { return pdf(s); }
 };
 
 enum class ProcessType{

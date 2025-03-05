@@ -89,9 +89,9 @@ target_include_directories(StochasticSim PRIVATE
 )
 
 # Link Qt libraries
-target_link_libraries(StochasticSim PRIVATE 
-    Qt6::Core 
-    Qt6::Widgets 
+target_link_libraries(StochasticSim PRIVATE
+    Qt6::Core
+    Qt6::Widgets
     Qt6::Charts
 )
 

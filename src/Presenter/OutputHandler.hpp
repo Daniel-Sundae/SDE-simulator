@@ -12,4 +12,5 @@ public:
 	auto OnPathsReceived(const PathQuery& query, const Paths& paths) const -> void;
 	auto OnDriftLineReceived(const Path& driftLine) const -> void;
 	auto OnClear() const -> void;
+
 };

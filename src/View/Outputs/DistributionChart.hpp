@@ -1,5 +1,4 @@
 #pragma once
-#include "BasicTypes.hpp"
 #include "PathQuery.hpp"
 #include <QtCharts/qchart.h>
 
@@ -12,9 +11,9 @@ class DistributionChart : public QChart {
 public:
     explicit DistributionChart();
     auto UpdateTitle(const PathQuery& pQuery) -> void;
-    auto PlotDistribution(const std::vector<State>& results) -> void;
+    auto PlotDistribution(const Distribution& results) -> void;
     auto ClearDistribution() -> void;
-    auto PlotTheoreticalPDF(const std::vector<double> density) -> void;
+    auto PlotTheoreticalPDF(const std::vector<Density>& density) -> void;
     auto PlotExpValLine(const State EV) -> void;
 private:
     auto InitializeAxis() -> void;

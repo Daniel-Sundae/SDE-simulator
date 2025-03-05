@@ -1,16 +1,13 @@
 #pragma once
 #include "Types.hpp"
-//#include "BasicTypes.hpp"
 #include "DefaultConstants.hpp"
 #include <stdexcept>
 #include <concepts>
 #include <string_view>
 
-
+// TODO: Make all these namespaces
 class ProcessData {
 public:
-    using DriftFunc = Drift;
-    using DiffusionFunc = Diffusion;
 
     struct Constants {
         const Range allowedValues;
@@ -32,28 +29,34 @@ public:
     };
 
     struct BM : RequiredFields<BM> {
-        static inline auto Drift() -> DriftFunc {
-            return DriftFunc(0, [](Time, State) -> StateDot { return 0.0; });
+        static inline auto GetDrift() -> Drift {
+            return Drift(0, [](Time, State) -> StateDot { return 0.0; });
         }
-        static inline auto Diffusion(const double _sigma) -> DiffusionFunc {
-            return DiffusionFunc(_sigma, [_sigma](Time, State) { return _sigma; });
+        static inline auto Diffusion(const double _sigma) -> Diffusion {
+            return Diffusion(_sigma, [_sigma](Time, State) { return _sigma; });
         }
         // Theoretical solution for BM:
         // f(s)=\frac{1}{\sqrt{2 \pi \sigma^2 T}} \exp \left[-\frac{(s - S_0 - \mu T)^2}{2 \sigma^2 T}\right]
-        static inline auto PDF(const State startValue, const Time time, const double _mu, const double _sigma) -> std::function<Density(State)> {
+        static inline auto GetPDF(const State startValue, const Time time, const double _mu, const double _sigma) -> PDF {
+
+            //const double EV = startValue + _mu * time;
+            const double EV = startValue; // This error should be visible!
+            const double stddev = _sigma * std::sqrt(time);
+
+            // Pre computed constants
             const double sqrt_2pi = std::sqrt(2.0 * PI);
             const double sigma_t = _sigma * std::sqrt(time);
             const double variance_t = _sigma * _sigma * time;
             const double two_variance_t = 2.0 * variance_t;
             const double drift_term = _mu * time;
-
-            return [=](const State endValue) -> Density {
+            const auto _pdf = [=](const State endValue) -> Density {
                 const double diff = endValue - startValue - drift_term;
                 const double diff_squared = diff * diff;
                 const double denominator = sigma_t * sqrt_2pi;
                 const double exponent = -diff_squared / two_variance_t;
                 return std::exp(exponent) / denominator;
                 };
+            return PDF(EV, stddev, _pdf);
         }
 
         static constexpr std::string_view name = "Brownian Motion";
@@ -63,26 +66,31 @@ public:
         static constexpr Constants muData{ {0,0},0,0.1 };
         static constexpr Constants sigmaData{ {0,1.2},0.2,0.1 };
         static constexpr Constants startValueData{ {-100,100},0,1 };
-        static constexpr auto pdf = &PDF;
+        static constexpr auto pdf = &GetPDF;
     };
 
     struct GBM : RequiredFields<GBM> {
-        static inline auto Drift(const double _mu) -> DriftFunc {
-            return DriftFunc(_mu, [_mu](Time, State s) { return _mu * s; });
+        static inline auto GetDrift(const double _mu) -> Drift {
+            return Drift(_mu, [_mu](Time, State s) { return _mu * s; });
         }
-        static inline auto Diffusion(const double _sigma) -> DiffusionFunc {
-            return DiffusionFunc(_sigma, [_sigma](Time, State s) { return _sigma * s; });
+        static inline auto GetDiffusion(const double _sigma) -> Diffusion {
+            return Diffusion(_sigma, [_sigma](Time, State s) { return _sigma * s; });
         }
         // Theoretical solution for GBM:
         // f(s)=\frac{1}{s \sqrt{2 \pi \sigma^2 T}} \exp \left[-\frac{\left(\ln \left(\frac{s}{S_0}\right)-\left(\mu-\frac{\sigma^2}{2}\right) T\right)^2}{2 \sigma^2 T}\right]
-        static inline auto PDF(const State startValue, const Time time, const double _mu, const double _sigma) -> std::function<Density(State)> {
+        static inline auto GetPDF(const State startValue, const Time time, const double _mu, const double _sigma) -> PDF {
+
+            const double EV = startValue * std::exp(_mu * time);
+            const double stddev = EV * sqrt(exp(_sigma * _sigma * time) - 1);
+
+            // Pre computed constants
             const double sigma_squared = _sigma * _sigma;
             const double adjusted_drift = _mu - 0.5 * sigma_squared;
             const double sqrt_2pi = std::sqrt(2.0 * PI);
             const double sigma_t = _sigma * std::sqrt(time);
             const double variance_t = sigma_squared * time;
             const double two_variance_t = 2.0 * variance_t;
-            return [=](const State endValue) -> Density {
+            const auto _pdf = [=](const State endValue) -> Density {
                 if (endValue < 0.0) {
                     throw std::invalid_argument("GBM cannot take negative value");
                 }
@@ -94,6 +102,7 @@ public:
                 const double exponent = -diff_squared / two_variance_t;
                 return std::exp(exponent) / denominator;
                 };
+            return PDF(EV, stddev, _pdf);
         }
 
         static constexpr std::string_view name = "Geometric Brownian Motion";
@@ -103,12 +112,16 @@ public:
         static constexpr Constants muData{ {-0.5,0.5},0,0.1 };
         static constexpr Constants sigmaData{ {0,1},0.2,0.1 };
         static constexpr Constants startValueData{ {0.1,100},1,1 };
-        static constexpr auto pdf = &PDF;
+        static constexpr PDF pdf = &GetPDF;
     };
 
-    static auto GetDrift(ProcessType processType, const double _mu) -> DriftFunc
+    static constexpr auto drift = [](double _mu) {
+        return GetDrift();
+        };
+
+    static auto GetDrift(ProcessType processType, const double _mu) -> Drift
     {
-        switch (processType) 
+        switch (processType)
         {
             case ProcessType::NONE:
                 throw std::invalid_argument("Not implemented yet");
@@ -116,17 +129,17 @@ public:
             case ProcessType::CUSTOM:
                 throw std::invalid_argument("Not implemented yet");
             case ProcessType::BM:
-                return BM::Drift();
+                return BM::GetDrift();
                 break;
             case ProcessType::GBM:
-                return GBM::Drift(_mu);
+                return GBM::GetDrift(_mu);
                 break;
             default:
                 throw std::invalid_argument("Not implemented yet");
             }
     }
 
-    static auto GetDiffusion(ProcessType processType, const double _sigma) -> DiffusionFunc
+    static auto GetDiffusion(ProcessType processType, const double _sigma) -> Diffusion
     {
         switch (processType)
         {
@@ -139,7 +152,7 @@ public:
             return BM::Diffusion(_sigma);
             break;
         case ProcessType::GBM:
-            return GBM::Diffusion(_sigma);
+            return GBM::GetDiffusion(_sigma);
             break;
         default:
             throw std::invalid_argument("Not implemented yet");
@@ -193,8 +206,7 @@ public:
     {
         return GET_STATIC_FIELD(startValueData);
     }
-    // Returns function pointer to the appropriate process's PDF function
-    static auto GetPDF(ProcessType type) -> decltype(GET_STATIC_FIELD(pdf))
+    static auto GetPDF(ProcessType type) -> PDF
     {
         return GET_STATIC_FIELD(pdf);
     }

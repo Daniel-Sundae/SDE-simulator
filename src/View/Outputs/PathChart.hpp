@@ -1,5 +1,4 @@
 #pragma once
-#include "BasicTypes.hpp"
 #include "PathQuery.hpp"
 #include <QtCharts/qchart.h>
 
