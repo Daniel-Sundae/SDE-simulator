@@ -1,11 +1,13 @@
 #pragma once
 #include "Types.hpp"
-#include "PathQuery.hpp"
+
+struct PathQuery;
+struct PDFQuery;
 
 class PathEngine{
 public:
 	auto SamplePaths(const PathQuery& pQuery) const -> Paths;
-	auto PDFData(const PDFQuery& pdfQuery) const -> PDF;
+	auto SamplePDF(const PDFQuery& pdfQuery) const -> PDFData;
 private:
 	inline auto Increment(
 		const Drift& drift,

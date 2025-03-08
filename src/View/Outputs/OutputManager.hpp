@@ -6,7 +6,7 @@
 #include <QtCharts/qchartview.h>
 #include <QtCharts/qchart.h>
 
-class PathQuery;
+struct PathQuery;
 class PathChart;
 class DistributionChart;
 

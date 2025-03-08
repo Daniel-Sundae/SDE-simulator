@@ -25,7 +25,8 @@ auto MainPresenter::GetDrift(const PathQuery& pQuery) const -> void
 auto MainPresenter::GetPDFData(const PDFQuery& pdfQuery) const -> void
 {
 	PathEngine engine{};
-	Listener()->OnDriftLineReceived(engine.PDFData(pdfQuery));
+	(void)pdfQuery;
+	//Listener()->OnDriftLineReceived(engine.PDFData(pdfQuery));
 }
 
 auto MainPresenter::Clear() const -> void

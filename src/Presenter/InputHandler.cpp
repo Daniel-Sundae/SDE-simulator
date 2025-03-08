@@ -1,5 +1,6 @@
 #include "InputHandler.hpp"
 #include "ProcessData.hpp"
+#include "PDFQuery.hpp"
 #include <assert.h>
 
 InputHandler::InputHandler()
@@ -103,6 +104,7 @@ auto InputHandler::CreateDriftQuery(const PathQuery& pQuery) const -> std::optio
 }
 
 auto InputHandler::CreatePDFQuery(const PathQuery& pQuery) const -> PDFQuery {
-	return PDFQuery({ ProcessData::GetPDF(pQuery.processDefinition.type), pQuery.simulationParameters.Points(), pQuery.simulationParameters.dt });
+	PDF pdf = ProcessData::GetPDF(pQuery.processDefinition.type, pQuery.processDefinition.startValueData, pQuery.simulationParameters.time, pQuery.processDefinition.drift.Mu(), pQuery.processDefinition.diffusion.Sigma());
+	return PDFQuery(pdf, pQuery.simulationParameters.Points(), pQuery.simulationParameters.dt);
 }
 

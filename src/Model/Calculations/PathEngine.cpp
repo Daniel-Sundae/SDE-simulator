@@ -1,5 +1,7 @@
 #include "PathEngine.hpp"
 #include "Utils.hpp"
+#include "PathQuery.hpp"
+#include "PDFQuery.hpp"
 #include "assert.h"
 
 auto PathEngine::SamplePaths(const PathQuery& pathQuery) const -> Paths
@@ -26,7 +28,7 @@ auto PathEngine::SamplePaths(const PathQuery& pathQuery) const -> Paths
     return paths;
 }
 
-auto PathEngine::PDFData(const PDFQuery& pdfQuery) const -> PDF
+auto PathEngine::SamplePDF(const PDFQuery& pdfQuery) const -> PDFData
 {
     const std::size_t points = pdfQuery.points;
     const double increment = pdfQuery.increment;

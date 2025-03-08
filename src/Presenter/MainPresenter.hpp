@@ -3,6 +3,8 @@
 #include <memory>
 #include "OutputHandler.hpp"
 
+struct PathQuery;
+struct PDFQuery;
 class InputHandler;
 
 class MainPresenter final : public IPresenterComponent<OutputHandler> {

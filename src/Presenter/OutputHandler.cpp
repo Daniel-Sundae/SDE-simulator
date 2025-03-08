@@ -28,5 +28,3 @@ auto OutputHandler::OnClear() const -> void
 {
 	Listener()->ClearPaths();
 }
-
-auto OutputHandler::SamplePDF

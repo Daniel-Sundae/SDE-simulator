@@ -1,10 +1,12 @@
 #pragma once
 #include "Types.hpp"
-#include "DefaultConstants.hpp"
 #include "PathQuery.hpp"
+#include "DefaultConstants.hpp"
 #include "MainPresenter.hpp"
 #include <memory>
 #include <optional>
+
+struct PDFQuery;
 
 class InputHandler final : public IPresenterComponent<MainPresenter> {
 public:

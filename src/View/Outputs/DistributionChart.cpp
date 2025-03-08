@@ -20,7 +20,7 @@ auto DistributionChart::UpdateTitle(const PathQuery& pQuery) -> void
 	QString title;
 	QTextStream ts(&title);
 	ts << "Sampled distribution";
-	if (ProcessData::GetPDF(pQuery.processDefinition.type)){
+	if (ProcessData::GetPDF(pQuery.processDefinition.type, 0,0,0,0)){
 		ts << " vs theoretical Probability Density Function";
 	}
 
