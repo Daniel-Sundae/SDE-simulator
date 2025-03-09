@@ -17,19 +17,6 @@
             }
         },
         {
-            "name": "Debug StochasticSim (Windows)",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/build/Debug/StochasticSim_Debug.exe",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "miDebuggerPath": "C:/Qt/Tools/mingw1310_64/bin/gdb.exe"
-        },
-        {
             "name": "Release StochasticSim (macOS)",
             "type": "cppdbg",
             "request": "launch",
@@ -43,19 +30,6 @@
             "osx": {
                 "MIMode": "lldb"
             }
-        },
-        {
-            "name": "Release StochasticSim (Windows)",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/build/Release/StochasticSim_Release.exe",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "miDebuggerPath": "C:/Qt/Tools/mingw1310_64/bin/gdb.exe"
         }
     ]
 }

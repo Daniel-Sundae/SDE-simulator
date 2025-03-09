@@ -1,6 +1,7 @@
 #include "MainPresenter.hpp"
 #include "PathEngine.hpp"
 #include "InputHandler.hpp"
+#include "PDFQuery.hpp"
 #include <cassert>
 
 MainPresenter::MainPresenter()
@@ -19,14 +20,13 @@ auto MainPresenter::GetDrift(const PathQuery& pQuery) const -> void
 {
 	assert(pQuery.simulationParameters.samples == 1);
 	PathEngine engine{};
-	Listener()->OnDriftLineReceived(engine.SamplePaths(pQuery)[0]);
+	Listener()->OnDriftDataReceived(engine.SamplePaths(pQuery)[0]);
 }
 
 auto MainPresenter::GetPDFData(const PDFQuery& pdfQuery) const -> void
 {
 	PathEngine engine{};
-	(void)pdfQuery;
-	//Listener()->OnDriftLineReceived(engine.PDFData(pdfQuery));
+	Listener()->OnPDFDataReceived(pdfQuery.pdf.EV(), engine.SamplePDF(pdfQuery));
 }
 
 auto MainPresenter::Clear() const -> void

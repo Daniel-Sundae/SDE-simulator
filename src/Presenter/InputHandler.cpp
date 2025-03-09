@@ -96,7 +96,7 @@ auto InputHandler::CreateDriftQuery(const PathQuery& pQuery) const -> std::optio
 			pQuery.simulationParameters.time,
 			pQuery.simulationParameters.dt,
 			1);
-		return PathQuery({ definition, simulationParams });
+		return PathQuery( definition, simulationParams );
 	}
 	else {
 		return std::nullopt;

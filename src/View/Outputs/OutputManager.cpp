@@ -28,7 +28,7 @@ auto OutputManager::UpdatePathChartTitle(const PathQuery& pQuery) const -> void
     GetPathChart()->UpdateTitle(pQuery);
 }
 
-auto OutputManager::PlotPathChartDriftLine(const Path& driftLine) const -> void
+auto OutputManager::PlotPathChartDriftData(const Path& driftLine) const -> void
 {
     GetPathChart()->PlotDriftLine(driftLine);
 }
@@ -47,20 +47,34 @@ auto OutputManager::ClearPaths() -> void
 //// DISTRIBUTION CHART
 ////////////////////////////////////////
 
-auto OutputManager::UpdateDistributionChartTitle(const PathQuery& pQuery) const -> void
+auto OutputManager::UpdateDistributionChartTitle(const ProcessType type) const -> void
 {
-    GetDistributionChart()->UpdateTitle(pQuery);
+    GetDistributionChart()->UpdateTitle(type);
 }
 
-auto OutputManager::PlotDistribution(const std::vector<State>& results) const -> void
+auto OutputManager::PlotDistribution(const Distribution& distribution) const -> void
 {
-    GetDistributionChart()->PlotDistribution(results);
+    GetDistributionChart()->PlotDistribution(distribution);
+}
+
+auto OutputManager::PlotPDF(const PDFData& pdfData) const -> void
+{
+    GetDistributionChart()->PlotPDF(pdfData);
+}
+
+auto OutputManager::PlotEV(const State EV) const -> void
+{
+    GetDistributionChart()->PlotExpValLine(EV);
 }
 
 auto OutputManager::ClearDistribution() -> void
 {
     GetDistributionChart()->ClearDistribution();
 }
+
+////////////////////////////////////////
+//// ACCESSORS
+////////////////////////////////////////
 
 auto OutputManager::GetPathChart() const -> PathChart*
 {

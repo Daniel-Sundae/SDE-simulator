@@ -3,7 +3,7 @@
 #include <cassert>
 #include <type_traits>
 
-template <IntOrDouble T>
+template <UInt64OrDouble T>
 auto InputHandler::OnSimulationParametersModified(const SimulationWidget param, T userValue) -> void
 {
 	switch (param) {

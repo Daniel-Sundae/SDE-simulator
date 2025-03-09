@@ -20,9 +20,9 @@ auto SimulationManager::AddComboBoxes() -> void
     std::pair{SolverType::RUNGE_KUTTA, std::pair{"RK", "Runge-Kutta"}},
     };
     auto* solvers = new QComboBox(this);
-    for (int i = 0; i < solverTypes.size(); ++i) {
-        solvers->insertItem(i, QString::fromStdString(solverTypes[i].second.first));
-        solvers->setItemData(i, QString::fromStdString(solverTypes[i].second.second), Qt::ToolTipRole);
+    for (std::size_t i = 0; i < solverTypes.size(); ++i) {
+        solvers->insertItem(static_cast<int>(i), QString::fromStdString(solverTypes[i].second.first));
+        solvers->setItemData(static_cast<int>(i), QString::fromStdString(solverTypes[i].second.second), Qt::ToolTipRole);
     }
 
     m_widgets[SimulationWidget::SOLVER] = solvers;
@@ -31,10 +31,18 @@ auto SimulationManager::AddComboBoxes() -> void
         QOverload<int>::of(&QComboBox::currentIndexChanged),
         this,
         [this, solverTypes]() {
-            SolverType newSolver = solverTypes[qobject_cast<QComboBox*>(m_widgets[SimulationWidget::SOLVER])->currentIndex()].first;
+            int currentIdx = qobject_cast<QComboBox*>(m_widgets[SimulationWidget::SOLVER])->currentIndex();
+            SolverType newSolver = solverTypes[static_cast<std::size_t>(currentIdx)].first;
             Parent()->OnSolverTypeModified(newSolver);
         }
     );
+}
+
+template <UInt64OrDouble T>
+auto SimulationManager::SimulationModifiedCb(SimulationWidget param) const{
+    return [this, param](T newValue) {
+        Parent()->OnSimulationParametersModified(param, newValue);
+    };
 }
 
 auto SimulationManager::AddSpinBoxes() -> void
@@ -58,31 +66,25 @@ auto SimulationManager::AddSpinBoxes() -> void
     samplesWidget->setSingleStep(1);
     m_widgets[SimulationWidget::SAMPLES] = samplesWidget;
 
-    auto simulationModifiedCb = [this](SimulationWidget param) {
-	    return [this, param]<typename T> requires IntOrDouble<T>(T newValue) {
-		    Parent()->OnSimulationParametersModified(param, newValue);
-		};
-    };
-
     connect(
         timeWidget,
         QOverload<double>::of(&QDoubleSpinBox::valueChanged),
         this,
-        simulationModifiedCb(SimulationWidget::TIME)
+        SimulationModifiedCb<double>(SimulationWidget::TIME)
     );
 
     connect(
         dtWidget,
         QOverload<double>::of(&QDoubleSpinBox::valueChanged),
         this,
-        simulationModifiedCb(SimulationWidget::dt)
+        SimulationModifiedCb<double>(SimulationWidget::dt)
     );
 
     connect(
         samplesWidget,
         QOverload<int>::of(&QSpinBox::valueChanged),
         this,
-        simulationModifiedCb(SimulationWidget::SAMPLES)
+        SimulationModifiedCb<std::uint64_t>(SimulationWidget::SAMPLES)
     );
 }
 

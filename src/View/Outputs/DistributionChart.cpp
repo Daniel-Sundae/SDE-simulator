@@ -15,12 +15,12 @@ DistributionChart::DistributionChart()
 	InitializeDistributionChart();
 }
 
-auto DistributionChart::UpdateTitle(const PathQuery& pQuery) -> void
+auto DistributionChart::UpdateTitle(const ProcessType type) -> void
 {
 	QString title;
 	QTextStream ts(&title);
 	ts << "Sampled distribution";
-	if (ProcessData::GetPDF(pQuery.processDefinition.type, 0,0,0,0)){
+	if (ProcessData::GetPDF(type, 0,0,0,0)){
 		ts << " vs theoretical Probability Density Function";
 	}
 
@@ -51,7 +51,7 @@ auto DistributionChart::PlotDistribution(const Distribution& results) -> void
 
 	std::vector<int> histogram(numBins, 0);
 	for (double res : results) {
-		int binIndex = static_cast<int>((res - *min_it) / binWidth);
+		std::size_t binIndex = static_cast<std::size_t>((res - *min_it) / binWidth);
 		histogram[binIndex]++;
 	}
 	QBarSeries* series = new QBarSeries(this);
@@ -68,14 +68,14 @@ auto DistributionChart::ClearDistribution() -> void
 	removeAllSeries();
 }
 
-auto DistributionChart::PlotTheoreticalPDF(const std::vector<Density>& density) -> void
+auto DistributionChart::PlotPDF(const PDFData& density) -> void
 {
-	if(density.size()){}
+	(void)density;
 }
 
 auto DistributionChart::PlotExpValLine(const State EV) -> void
 {
-	if(EV){}
+	(void)EV;
 }
 
 auto DistributionChart::InitializeAxis() -> void

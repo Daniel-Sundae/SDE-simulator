@@ -11,12 +11,8 @@ private:
 	auto AddComboBoxes() -> void;
 	auto AddSpinBoxes() -> void;
 	auto InitializeDesign() -> void;
-	//template<IntOrDouble T>
-	//auto SimulationModifiedCb(SimulationWidget param) {
-	//	return [this, param](T newValue) {
-	//		Parent()->OnSimulationParametersModified(param, newValue);
-	//		};
-	//};
 private:
+	template <UInt64OrDouble T>
+	auto SimulationModifiedCb(SimulationWidget param) const;
 	std::unordered_map<SimulationWidget, QWidget*> m_widgets;
 };

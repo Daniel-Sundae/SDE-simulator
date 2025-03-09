@@ -1,5 +1,6 @@
 #include "OutputHandler.hpp"
 #include "OutputManager.hpp"
+#include "PathQuery.hpp"
 
 OutputHandler::OutputHandler()
 	: IPresenterComponent()
@@ -10,7 +11,7 @@ auto OutputHandler::OnPathsReceived(const PathQuery& pQuery, const Paths& paths)
 	Listener()->ClearPaths();
 	Listener()->ClearDistribution();
 	Listener()->UpdatePathChartTitle(pQuery);
-	Listener()->UpdateDistributionChartTitle(pQuery);
+	Listener()->UpdateDistributionChartTitle(pQuery.processDefinition.type);
 	std::vector<State> distribution;
 	distribution.reserve(paths.size());
 	for (const auto& p : paths) {
@@ -19,9 +20,16 @@ auto OutputHandler::OnPathsReceived(const PathQuery& pQuery, const Paths& paths)
 	}
 	Listener()->PlotDistribution(distribution);
 }
-auto OutputHandler::OnDriftLineReceived(const Path& driftLine) const -> void
+
+auto OutputHandler::OnDriftDataReceived(const Path& driftData) const -> void
 {
-	Listener()->PlotPathChartDriftLine(driftLine);
+	Listener()->PlotPathChartDriftData(driftData);
+}
+
+auto OutputHandler::OnPDFDataReceived(const State EV, const PDFData& pdfData) const -> void
+{
+	Listener()->PlotPDF(pdfData);
+	Listener()->PlotEV(EV);
 }
 
 auto OutputHandler::OnClear() const -> void

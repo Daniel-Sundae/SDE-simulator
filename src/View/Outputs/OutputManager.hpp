@@ -19,12 +19,14 @@ public:
     // PathChart
     auto UpdatePathChartTitle(const PathQuery& pQuery) const -> void;
     auto PlotPath(const Path& path) const -> void;
-    auto PlotPathChartDriftLine(const Path& driftLine) const -> void;
+    auto PlotPathChartDriftData(const Path& driftLine) const -> void;
     auto ClearPaths() -> void;
 
     // DistributionChart
-    auto UpdateDistributionChartTitle(const PathQuery& pQuery) const -> void;
-    auto PlotDistribution(const std::vector<State>& results) const -> void;
+    auto UpdateDistributionChartTitle(const ProcessType t) const -> void;
+    auto PlotDistribution(const Distribution& distribution) const -> void;
+    auto PlotPDF(const PDFData& pdfData) const -> void;
+    auto PlotEV(const State EV) const -> void;
     auto ClearDistribution() -> void;
 
 private:

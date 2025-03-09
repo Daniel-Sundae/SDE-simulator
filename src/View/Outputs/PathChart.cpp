@@ -60,7 +60,7 @@ auto PathChart::PlotPath(const Path& path) -> void
 
     QLineSeries* series = new QLineSeries(this);
     QVector<QPointF> points;
-    points.reserve(path.size());
+    points.reserve(static_cast<qsizetype>(path.size()));
     for (size_t i = 0; i < path.size(); ++i) {
         points.append(QPointF(i, path[i]));
     }

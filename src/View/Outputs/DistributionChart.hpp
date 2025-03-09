@@ -10,10 +10,10 @@ class DistributionChart : public QChart {
 
 public:
     explicit DistributionChart();
-    auto UpdateTitle(const PathQuery& pQuery) -> void;
+    auto UpdateTitle(const ProcessType type) -> void;
     auto PlotDistribution(const Distribution& results) -> void;
     auto ClearDistribution() -> void;
-    auto PlotTheoreticalPDF(const std::vector<Density>& density) -> void;
+    auto PlotPDF(const PDFData& pdfData) -> void;
     auto PlotExpValLine(const State EV) -> void;
 private:
     auto InitializeAxis() -> void;

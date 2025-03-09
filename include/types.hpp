@@ -14,7 +14,7 @@ using PDFData = std::vector<Density>;
 using StateDot = double; // dX/dt
 using Range = std::pair<double, double>;
 template <typename T>
-concept IntOrDouble = std::same_as<T, int> || std::same_as<T, double>;
+concept UInt64OrDouble = std::same_as<T, u_int64_t> || std::same_as<T, double>;
 
 class FunctionWrapper {
 protected:
@@ -45,18 +45,24 @@ public:
 };
 
 class PDF {
-    const double EV;
-    const double stddev;
+    const State m_EV;
+    const double m_stddev;
     const std::function<Density(State)> pdf;
 public:
     PDF(double _EV, double _stddev, std::function<Density(State)> _pdf)
-        : EV(_EV)
-        , stddev(_stddev)
+        : m_EV(_EV)
+        , m_stddev(_stddev)
         , pdf(_pdf)
     {}
     auto operator()(State s) const -> Density { return pdf(s); }
     explicit operator bool() const {
         return pdf ? true : false;
+    }
+    auto EV() const -> double{
+        return m_EV;
+    }
+    auto StdDev() const -> double{
+        return m_stddev;
     }
 };
 

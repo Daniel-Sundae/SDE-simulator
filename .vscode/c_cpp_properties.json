@@ -5,58 +5,32 @@
             "name": "Mac",
             "compileCommands": "${workspaceFolder}/build/Debug/compile_commands.json",
             "defines": [],
-            "includePath": [
-                "${workspaceFolder}/**",
-                "${workspaceFolder}/include",
-                "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include",
-                "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1",
-                "/Library/Developer/CommandLineTools/usr/include/c++/v1",
-                "/usr/local/include"
-            ],
+            "includePath": ["${workspaceFolder}/**"],
             "macFrameworkPath": [
-                "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks"
+                "/Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk/System/Library/Frameworks",
+                "/opt/homebrew/lib"
             ],
             "compilerPath": "/usr/bin/clang++",
             "cStandard": "c17",
             "cppStandard": "c++20",
             "intelliSenseMode": "macos-clang-arm64",
+            "configurationProvider": "ms-vscode.cmake-tools",
             "compilerArgs": [
-                "-isystem",
-                "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1"
+                "-isystem", "/Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk/usr/include/c++/v1",
+                "-isystem", "/opt/homebrew/include",
+                "-iframework", "/opt/homebrew/lib"
             ],
             "browse": {
                 "path": [
                     "${workspaceFolder}/**",
-                    "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include",
-                    "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1",
-                    "/Library/Developer/CommandLineTools/usr/include/c++/v1"
-                ],
-                "limitSymbolsToIncludedHeaders": true
-            }
-        },        
-        {
-            "name": "Windows",
-            "compileCommands": "${workspaceFolder}/build/Debug/compile_commands.json",
-            "defines": [],
-            "includePath": [
-                "${workspaceFolder}/**",
-                "${workspaceFolder}/include",
-                "C:/Qt/6.8.0/mingw_64/include/**",
-                "C:/Qt/6.8.0/mingw_64/include/QtCore",
-                "C:/Qt/6.8.0/mingw_64/include/QtWidgets",
-                "C:/Qt/6.8.0/mingw_64/include/QtCharts"
-            ],
-            "compilerPath": "C:/Qt/Tools/mingw1310_64/bin/g++.exe", // Path to your MinGW g++ compiler
-            "cStandard": "c17",
-            "cppStandard": "c++20",
-            "intelliSenseMode": "windows-gcc-x64",
-            "compilerArgs": [
-                "-IC:/Qt/Tools/mingw1310_64/include" // Adjust if necessary
-            ],
-            "browse": {
-                "path": [
-                    "${workspaceFolder}/**",
-                    "C:/Qt/Tools/mingw1310_64/include/**" // Ensure IntelliSense can browse MinGW headers
+                    "/Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk/usr/include",
+                    "/Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk/usr/include/c++/v1",
+                    "/Library/Developer/CommandLineTools/usr/include/c++/v1",
+                    "/opt/homebrew/include",
+                    "/opt/homebrew/lib/QtCore.framework/Headers",
+                    "/opt/homebrew/lib/QtWidgets.framework/Headers",
+                    "/opt/homebrew/lib/QtGui.framework/Headers",
+                    "/opt/homebrew/lib/QtCharts.framework/Headers"
                 ],
                 "limitSymbolsToIncludedHeaders": true
             }

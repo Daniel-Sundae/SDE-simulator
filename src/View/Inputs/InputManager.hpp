@@ -23,7 +23,7 @@ public:
     auto OnProcessTypeModified(const ProcessType newType) const -> void;
     auto OnProcessDefinitionModified(const DefinitionWidget param, double userValue) const -> void;
     auto OnSolverTypeModified(const SolverType newType) const -> void;
-    template<IntOrDouble T>
+    template<UInt64OrDouble T>
     auto OnSimulationParametersModified(const SimulationWidget param, T userValue) const -> void {
         m_inputHandler->OnSimulationParametersModified(param, userValue);
     }
