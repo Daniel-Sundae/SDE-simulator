@@ -38,9 +38,9 @@ auto OutputManager::PlotPath(const Path& path) const -> void
     GetPathChart()->PlotPath(path);
 }
 
-auto OutputManager::ClearPaths() -> void
+auto OutputManager::ClearPathChart() -> void
 {
-    GetPathChart()->ClearPaths();
+    GetPathChart()->ClearPathChart();
 }
 
 ////////////////////////////////////////
@@ -62,14 +62,19 @@ auto OutputManager::PlotPDF(const PDFData& pdfData) const -> void
     GetDistributionChart()->PlotPDF(pdfData);
 }
 
+auto OutputManager::SetXAxisRange(const Range pdfDomain) const -> void
+{
+    GetDistributionChart()->SetXAxisRange(pdfDomain);
+}
+
 auto OutputManager::PlotEV(const State EV) const -> void
 {
     GetDistributionChart()->PlotExpValLine(EV);
 }
 
-auto OutputManager::ClearDistribution() -> void
+auto OutputManager::ClearDistributionChart() -> void
 {
-    GetDistributionChart()->ClearDistribution();
+    GetDistributionChart()->ClearDistributionChart();
 }
 
 ////////////////////////////////////////

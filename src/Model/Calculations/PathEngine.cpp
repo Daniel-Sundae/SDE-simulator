@@ -28,19 +28,9 @@ auto PathEngine::SamplePaths(const PathQuery& pathQuery) const -> Paths
     return paths;
 }
 
-auto PathEngine::SamplePDF(const PDFQuery& pdfQuery) const -> PDFData
+auto PathEngine::GeneratePDFData(const PDFQuery& pdfQuery) const -> PDFData
 {
-    const std::size_t points = pdfQuery.points;
-    
-    // const double increment = pdfQuery.increment;
-    const double start = pdfQuery.pdf.EV() - 5*pdfQuery.pdf.StdDev();
-    const double end = pdfQuery.pdf.EV() + 5*pdfQuery.pdf.StdDev();
-    const double increment = (end - start)/points;
-    PDFData data = {};
-    data.reserve(points);
-    for (std::size_t i = 0; i < points; ++i)
-        data.push_back(pdfQuery.pdf(start + i * increment));
-    return data;
+    return pdfQuery.pdf.GeneratePDFData(pdfQuery.points);
 }
 
 auto PathEngine::Increment(

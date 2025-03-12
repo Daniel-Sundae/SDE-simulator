@@ -11,6 +11,7 @@ PathChart::PathChart()
     , m_xAxis(new QValueAxis(this))
     , m_yAxis(new QValueAxis(this))
     , m_zeroLine(new QLineSeries(this))
+    , m_driftCurve(new QLineSeries(this))
 {
     InitializeAxis();
     InitializeProcessChart();
@@ -39,11 +40,12 @@ auto PathChart::UpdateTitle(const PathQuery& pQuery) -> void
     setTitle(title);
 }
 
-auto PathChart::ClearPaths() -> void
+auto PathChart::ClearPathChart() -> void
 {
     for (QAbstractSeries* s : series()) {
         if (s != m_zeroLine) {
             removeSeries(s);
+            // delete s;
         }
     }
 }
@@ -51,7 +53,8 @@ auto PathChart::ClearPaths() -> void
 auto PathChart::PlotDriftLine(const Path& driftLine) -> void
 {
     PlotPath(driftLine);
-    GUI::SetDriftStyle(qobject_cast<QLineSeries*>(series().last()));
+    // m_driftCurve->clear();
+    // m_driftCurve = qobject_cast<QLineSeries*>(series().last());
 }
 
 auto PathChart::PlotPath(const Path& path) -> void
@@ -169,5 +172,12 @@ auto PathChart::InitializeProcessChart() -> void
     m_zeroLine->attachAxis(m_yAxis);
     m_zeroLine->append(0, 0);
     m_zeroLine->append(10, 0); // Match initial m_xAxis range
+    m_driftCurve->setPen(QPen(Qt::gray, 1.0));
+    addSeries(m_driftCurve);
+    m_driftCurve->attachAxis(m_xAxis);
+    m_driftCurve->attachAxis(m_yAxis);
+    m_driftCurve->append(0, 0);
+    m_driftCurve->append(10, 0);
+    GUI::SetDriftStyle(m_driftCurve);
 }
 

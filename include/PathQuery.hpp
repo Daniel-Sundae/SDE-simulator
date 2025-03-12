@@ -55,8 +55,8 @@ public:
 };
 
 struct PathQuery {
-    const ProcessDefinition& processDefinition;
-    const SimulationParameters& simulationParameters;
+    const ProcessDefinition processDefinition;
+    const SimulationParameters simulationParameters;
     PathQuery(const ProcessDefinition& def, const SimulationParameters& simParam)
         : processDefinition(def)
         , simulationParameters(simParam)

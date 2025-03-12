@@ -20,7 +20,7 @@
             }
         },
         {
-            "name": "debug-windows",
+            "name": "debug-windows-mingw_64",
             "displayName": "Debug with MinGW Qt Compiler",
             "description": "Build configuration for Debug using MinGW compiler from Qt",
             "generator": "Ninja",
@@ -73,7 +73,7 @@
             }
         },
         {
-            "name": "release-windows",
+            "name": "release-windows-mingw_64",
             "displayName": "Release with MinGW Qt Compiler",
             "description": "Build configuration for Release using MinGW compiler from Qt",
             "generator": "Ninja",

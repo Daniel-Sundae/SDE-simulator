@@ -68,9 +68,16 @@ namespace GUI
         driftSeries->setPen(seriesPen);
     }
 
+    inline auto SetPDFStyle(QLineSeries* driftSeries) -> void
+    {
+        const QColor highlightColor = QColor(255, 121, 0); // Orange
+        QPen seriesPen(highlightColor, 1);
+        driftSeries->setPen(seriesPen);
+    }
+
     inline auto SetPathStyle(QLineSeries* series) -> void
     {
-        const QColor highlightColor = QColor(42, 130, 218);
+        const QColor highlightColor = QColor(42, 130, 218); // Blue
         const QPen seriesPen(highlightColor, 1);
         series->setPen(seriesPen);
     }

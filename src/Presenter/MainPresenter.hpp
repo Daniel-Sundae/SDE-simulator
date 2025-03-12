@@ -12,7 +12,7 @@ public:
 	explicit MainPresenter();
 	auto SamplePaths(const PathQuery& pathQuery) const -> void;
 	auto GetDrift(const PathQuery& query) const -> void;
-	auto GetPDFData(const PDFQuery& pdfQuery) const -> void;
+	auto GeneratePDFData(const PDFQuery& pdfQuery) const -> void;
 	auto Clear() const -> void;
 	auto GetInputHandler() const -> InputHandler*;
 	auto GetOutputHandler() const -> OutputHandler*;

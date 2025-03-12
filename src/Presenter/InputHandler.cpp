@@ -77,7 +77,7 @@ auto InputHandler::SamplePaths() -> void
 	Listener()->SamplePaths(pQuery);
 	if(deterministicQuery)
 		Listener()->GetDrift(*deterministicQuery);
-	Listener()->GetPDFData(pdfQuery);
+	Listener()->GeneratePDFData(pdfQuery);
 }
 
 auto InputHandler::CreateDriftQuery(const PathQuery& pQuery) const -> std::optional<PathQuery> {
@@ -105,6 +105,6 @@ auto InputHandler::CreateDriftQuery(const PathQuery& pQuery) const -> std::optio
 
 auto InputHandler::CreatePDFQuery(const PathQuery& pQuery) const -> PDFQuery {
 	PDF pdf = ProcessData::GetPDF(pQuery.processDefinition.type, pQuery.processDefinition.startValueData, pQuery.simulationParameters.time, pQuery.processDefinition.drift.Mu(), pQuery.processDefinition.diffusion.Sigma());
-	return PDFQuery(pdf, pQuery.simulationParameters.Points(), pQuery.simulationParameters.dt);
+	return PDFQuery(pdf, pQuery.simulationParameters.Points());
 }
 

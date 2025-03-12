@@ -23,18 +23,18 @@ auto MainPresenter::GetDrift(const PathQuery& pQuery) const -> void
 	Listener()->OnDriftDataReceived(engine.SamplePaths(pQuery)[0]);
 }
 
-auto MainPresenter::GetPDFData(const PDFQuery& pdfQuery) const -> void
+auto MainPresenter::GeneratePDFData(const PDFQuery& pdfQuery) const -> void
 {
 	PathEngine engine{};
-	Listener()->OnPDFDataReceived(pdfQuery.pdf.EV(), engine.SamplePDF(pdfQuery));
+	engine.GeneratePDFData(pdfQuery);
+	Listener()->OnPDFReceived(pdfQuery.pdf);
 }
 
 auto MainPresenter::Clear() const -> void
 {
-	m_outputHandler->OnClear();
+	Listener()->OnClear();
 }
 
-// TODO: Do i need these two?
 auto MainPresenter::GetInputHandler() const -> InputHandler*
 {
 	return m_inputHandler.get();

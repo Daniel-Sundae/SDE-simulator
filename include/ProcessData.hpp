@@ -40,16 +40,16 @@ public:
         static constexpr Constants muData{ {0,0},0,0.1 };
         static constexpr Constants sigmaData{ {0,1.2},0.2,0.1 };
         static constexpr Constants startValueData{ {-100,100},0,1 };
-        static auto drift(const double _mu) const -> Drift {
+        static auto drift(const double _mu) -> Drift {
             // _mu is unused but necessary for uniform lambda signature.
             // Supress compiler warning.
             (void)_mu;
             return Drift(0, [](Time, State) -> StateDot { return 0.0; });
         };
-        static auto diffusion(const double _sigma) const -> Diffusion {
+        static auto diffusion(const double _sigma) -> Diffusion {
             return Diffusion(_sigma, [_sigma](Time, State) { return _sigma; });
         };
-        static auto pdf(const State startValue, const Time time, const double _mu, const double _sigma) const -> PDF {
+        static auto pdf(const State startValue, const Time time, const double _mu, const double _sigma) -> PDF {
             const double EV = startValue + _mu * time;
             //const double EV = startValue; // This is incorrect EV
             const double stddev = _sigma * std::sqrt(time);
@@ -80,15 +80,15 @@ public:
         static constexpr Constants muData{ {-0.5,0.5},0,0.1 };
         static constexpr Constants sigmaData{ {0,1},0.2,0.1 };
         static constexpr Constants startValueData{ {0.1,100},1,1 };
-        static auto drift(const double _mu) const -> Drift {
+        static auto drift(const double _mu) -> Drift {
             return Drift(_mu, [_mu](Time, State s) { return _mu * s; });
             };
-        static auto diffusion(const double _sigma) const -> Diffusion {
+        static auto diffusion(const double _sigma) -> Diffusion {
             return Diffusion(_sigma, [_sigma](Time, State s) { return _sigma * s; });
             };
         // Theoretical solution for GBM:
         // f(s)=\frac{1}{s \sqrt{2 \pi \sigma^2 T}} \exp \left[-\frac{\left(\ln \left(\frac{s}{S_0}\right)-\left(\mu-\frac{\sigma^2}{2}\right) T\right)^2}{2 \sigma^2 T}\right]
-        static auto pdf(const State startValue, const Time time, const double _mu, const double _sigma) const -> PDF {
+        static auto pdf(const State startValue, const Time time, const double _mu, const double _sigma) -> PDF {
             const double EV = startValue * std::exp(_mu * time);
             const double stddev = EV * sqrt(exp(_sigma * _sigma * time) - 1);
             // Pre computed constants

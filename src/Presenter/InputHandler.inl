@@ -14,7 +14,7 @@ auto InputHandler::OnSimulationParametersModified(const SimulationWidget param, 
 		m_simulationParameters->dt = userValue;
 		break;
 	case SimulationWidget::SAMPLES:
-		if constexpr (std::is_same_v<T, int>)
+		if constexpr (std::is_same_v<T, uint64_t>)
 			m_simulationParameters->samples = userValue;
 		else
 			assert(false && "SAMPLES parameter must be used with int type");

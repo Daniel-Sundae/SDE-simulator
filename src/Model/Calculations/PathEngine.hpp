@@ -7,7 +7,7 @@ struct PDFQuery;
 class PathEngine{
 public:
 	auto SamplePaths(const PathQuery& pQuery) const -> Paths;
-	auto SamplePDF(const PDFQuery& pdfQuery) const -> PDFData;
+	auto GeneratePDFData(const PDFQuery& pdfQuery) const -> PDFData;
 private:
 	inline auto Increment(
 		const Drift& drift,

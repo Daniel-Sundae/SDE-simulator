@@ -20,14 +20,15 @@ public:
     auto UpdatePathChartTitle(const PathQuery& pQuery) const -> void;
     auto PlotPath(const Path& path) const -> void;
     auto PlotPathChartDriftData(const Path& driftLine) const -> void;
-    auto ClearPaths() -> void;
+    auto ClearPathChart() -> void;
 
     // DistributionChart
     auto UpdateDistributionChartTitle(const ProcessType t) const -> void;
     auto PlotDistribution(const Distribution& distribution) const -> void;
     auto PlotPDF(const PDFData& pdfData) const -> void;
+    auto SetXAxisRange(const Range pdfDomain) const -> void;
     auto PlotEV(const State EV) const -> void;
-    auto ClearDistribution() -> void;
+    auto ClearDistributionChart() -> void;
 
 private:
     auto GetPathChart() const -> PathChart*;
