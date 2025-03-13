@@ -14,13 +14,15 @@ public:
     auto UpdateTitle(const PathQuery& pQuery) -> void;
     auto PlotPath(const Path& sampleData) -> void;
     auto ClearPathChart() -> void;
-    auto PlotDriftLine(const Path& driftLine) -> void;
+    auto PlotDriftCurve(const Path& driftLine) -> void;
+    auto SetMaxTime(const Time time) -> void;
 private:
-    auto UpdateAxisIfNeeded(std::size_t max_X, State min_Y, State max_Y) -> void;
+    auto UpdateZeroLine() -> void;
+    auto UpdateYAxisIfNeeded(State min_Y, State max_Y) -> void;
     auto InitializeAxis() -> void;
     auto InitializeProcessChart() -> void;
 private:
-    QValueAxis* m_xAxis;
+    QValueAxis* m_xAxisTime;
     QValueAxis* m_yAxis;
     QLineSeries* m_zeroLine;
     QLineSeries* m_driftCurve;

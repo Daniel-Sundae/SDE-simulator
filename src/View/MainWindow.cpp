@@ -10,7 +10,7 @@ MainWindow::MainWindow()
     , m_inputManager(new InputManager(m_centralWidget))
 {
     setCentralWidget(m_centralWidget);
-    setWindowTitle("Qt6 Window with Button");
+    setWindowTitle("SDE Simulator");
     resize(1300, 600);
     AddWidgets();
     show();

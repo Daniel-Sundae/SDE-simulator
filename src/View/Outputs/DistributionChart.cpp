@@ -51,7 +51,10 @@ auto DistributionChart::PlotDistribution(const Distribution& results) -> void
 
 auto DistributionChart::ClearDistributionChart() -> void
 {
-	removeAllSeries();
+	for (QAbstractSeries* s : series()) {
+		removeSeries(s);
+		delete s;
+    }
 }
 
 auto DistributionChart::PlotPDF(const PDFData& pdfData) -> void

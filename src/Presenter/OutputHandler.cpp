@@ -9,18 +9,17 @@ OutputHandler::OutputHandler()
 
 auto OutputHandler::OnPathsReceived(const PathQuery& pQuery, const Paths& paths) -> void
 {
-	(void)pQuery;
-	(void)paths;
-	// Listener()->ClearPathChart();
-	// Listener()->UpdatePathChartTitle(pQuery);
-	// Listener()->UpdateDistributionChartTitle(pQuery.processDefinition.type);
-	// Distribution distribution;
-	// distribution.reserve(paths.size());
-	// for (const auto& p : paths) {
-	// 	Listener()->PlotPath(p);
-	// 	distribution.push_back(p.back());
-	// }
-	// m_distribution = std::move(distribution);
+	Listener()->ClearPathChart();
+	Listener()->SetPathChartMaxTime(pQuery.simulationParameters.time);
+	Listener()->UpdatePathChartTitle(pQuery);
+	Listener()->UpdateDistributionChartTitle(pQuery.processDefinition.type);
+	Distribution distribution;
+	distribution.reserve(paths.size());
+	for (const auto& p : paths) {
+		Listener()->PlotPath(p);
+		distribution.push_back(p.back());
+	}
+	m_distribution = std::move(distribution);
 }
 
 auto OutputHandler::OnDriftDataReceived(const Path& driftData) const -> void

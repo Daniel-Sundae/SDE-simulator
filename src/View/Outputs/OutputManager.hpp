@@ -21,6 +21,7 @@ public:
     auto PlotPath(const Path& path) const -> void;
     auto PlotPathChartDriftData(const Path& driftLine) const -> void;
     auto ClearPathChart() -> void;
+    auto SetPathChartMaxTime(const Time time) -> void;
 
     // DistributionChart
     auto UpdateDistributionChartTitle(const ProcessType t) const -> void;

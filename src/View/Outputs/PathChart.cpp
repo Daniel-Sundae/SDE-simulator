@@ -8,7 +8,7 @@
 
 PathChart::PathChart()
     : QChart()
-    , m_xAxis(new QValueAxis(this))
+    , m_xAxisTime(new QValueAxis(this))
     , m_yAxis(new QValueAxis(this))
     , m_zeroLine(new QLineSeries(this))
     , m_driftCurve(new QLineSeries(this))
@@ -43,18 +43,22 @@ auto PathChart::UpdateTitle(const PathQuery& pQuery) -> void
 auto PathChart::ClearPathChart() -> void
 {
     for (QAbstractSeries* s : series()) {
-        if (s != m_zeroLine) {
+        if (s != m_zeroLine && s != m_driftCurve) {
             removeSeries(s);
-            // delete s;
+            delete s;
         }
     }
 }
 
-auto PathChart::PlotDriftLine(const Path& driftLine) -> void
+auto PathChart::PlotDriftCurve(const Path& driftLine) -> void
 {
-    PlotPath(driftLine);
-    // m_driftCurve->clear();
-    // m_driftCurve = qobject_cast<QLineSeries*>(series().last());
+    QVector<QPointF> points;
+    points.reserve(static_cast<qsizetype>(driftLine.size()));
+    const double intervalWidth = (m_xAxisTime->max() - m_xAxisTime->min())/driftLine.size();
+    for (size_t i = 0; i < driftLine.size(); ++i) {
+        points.append(QPointF(i*intervalWidth, driftLine[i]));
+    }
+    m_driftCurve->replace(points);    
 }
 
 auto PathChart::PlotPath(const Path& path) -> void
@@ -62,51 +66,37 @@ auto PathChart::PlotPath(const Path& path) -> void
     if (path.empty()) return;
 
     QLineSeries* series = new QLineSeries(this);
+    addSeries(series);
     QVector<QPointF> points;
     points.reserve(static_cast<qsizetype>(path.size()));
+    const double intervalWidth = (m_xAxisTime->max() - m_xAxisTime->min())/path.size();
     for (size_t i = 0; i < path.size(); ++i) {
-        points.append(QPointF(i, path[i]));
+        points.append(QPointF(i*intervalWidth , path[i]));
     }
     series->replace(points);
-    addSeries(series);
-    series->attachAxis(m_xAxis);
+    series->attachAxis(m_xAxisTime);
     series->attachAxis(m_yAxis);
     auto [min_it, max_it] = std::minmax_element(path.begin(), path.end());
     GUI::SetPathStyle(series);
-    UpdateAxisIfNeeded(path.size(), *min_it, *max_it);
-    m_zeroLine->clear();
-    m_zeroLine->append(m_xAxis->min(), 0);
-    m_zeroLine->append(m_xAxis->max(), 0);
+    UpdateYAxisIfNeeded(*min_it, *max_it);
+    UpdateZeroLine();
 }
 
-auto PathChart::UpdateAxisIfNeeded(std::size_t max_X, State min_Y, State max_Y) -> void
+auto PathChart::SetMaxTime(const Time time) -> void
 {
-    // ---------- X-Axis Range Handling ----------
+    m_xAxisTime->setRange(0, time);
+}
 
-    qreal desiredXMax = static_cast<qreal>(max_X);
-    qreal currentXMax = m_xAxis->max();
+auto PathChart::UpdateZeroLine() -> void
+{
+    m_zeroLine->clear();
+    m_zeroLine->append(m_xAxisTime->min(), 0);
+    m_zeroLine->append(m_xAxisTime->max(), 0);
+}
 
-    bool adjustX = false;
-    qreal newXMax = currentXMax;
-
-    if (desiredXMax > currentXMax) {
-        newXMax = std::ceil(desiredXMax / 10.0) * 10;
-        adjustX = true;
-    }
-    else if (currentXMax > 3.0 * desiredXMax) {
-        newXMax = std::ceil(desiredXMax / 10.0) * 10;
-        adjustX = true;
-    }
-
-    if (adjustX) {
-        m_xAxis->setRange(0, newXMax);
-        int tickCount = std::min(11, std::max(5, static_cast<int>(newXMax / 20.0) + 1));
-        m_xAxis->setTickCount(tickCount);
-    }
-
-    // ---------- Y-Axis Range Handling ----------
+auto PathChart::UpdateYAxisIfNeeded(State min_Y, State max_Y) -> void
+{
     constexpr qreal yPaddingFactor = 0.15;  // 15% padding for Y
-
     qreal dataYMin = static_cast<qreal>(min_Y);
     qreal dataYMax = static_cast<qreal>(max_Y);
     qreal dataYRange = dataYMax - dataYMin;
@@ -147,18 +137,19 @@ auto PathChart::UpdateAxisIfNeeded(std::size_t max_X, State min_Y, State max_Y) 
 
         int tickCount = std::min(11, std::max(5, static_cast<int>((newYMax - newYMin) / roundTo) + 1));
         m_yAxis->setTickCount(tickCount);
+        m_yAxis->applyNiceNumbers();
     }
 }
 
 auto PathChart::InitializeAxis() -> void
 {
-    addAxis(m_xAxis, Qt::AlignBottom);
+    addAxis(m_xAxisTime, Qt::AlignBottom);
     addAxis(m_yAxis, Qt::AlignLeft);
-    m_xAxis->setTitleText("t (s)");
+    m_xAxisTime->setTitleText("Time (s)");
     m_yAxis->setTitleText("X<sub>t</sub>");
-    m_xAxis->setGridLineVisible(false);
+    m_xAxisTime->setGridLineVisible(false);
     m_yAxis->setGridLineVisible(false);
-    m_xAxis->setRange(0, 10);
+    m_xAxisTime->setRange(0, 10);
     m_yAxis->setRange(-10, 10);
 }
 
@@ -168,16 +159,15 @@ auto PathChart::InitializeProcessChart() -> void
     legend()->setVisible(false);
     m_zeroLine->setPen(QPen(Qt::gray, 1.0));
     addSeries(m_zeroLine);
-    m_zeroLine->attachAxis(m_xAxis);
+    m_zeroLine->attachAxis(m_xAxisTime);
     m_zeroLine->attachAxis(m_yAxis);
     m_zeroLine->append(0, 0);
-    m_zeroLine->append(10, 0); // Match initial m_xAxis range
+    m_zeroLine->append(10, 0); // Match initial m_xAxisTime range
     m_driftCurve->setPen(QPen(Qt::gray, 1.0));
     addSeries(m_driftCurve);
-    m_driftCurve->attachAxis(m_xAxis);
+    m_driftCurve->attachAxis(m_xAxisTime);
     m_driftCurve->attachAxis(m_yAxis);
-    m_driftCurve->append(0, 0);
-    m_driftCurve->append(10, 0);
     GUI::SetDriftStyle(m_driftCurve);
+    setMargins(QMargins(50, 20, 20, 20));
 }
 

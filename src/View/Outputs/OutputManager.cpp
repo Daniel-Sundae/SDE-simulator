@@ -30,7 +30,7 @@ auto OutputManager::UpdatePathChartTitle(const PathQuery& pQuery) const -> void
 
 auto OutputManager::PlotPathChartDriftData(const Path& driftLine) const -> void
 {
-    GetPathChart()->PlotDriftLine(driftLine);
+    GetPathChart()->PlotDriftCurve(driftLine);
 }
 
 auto OutputManager::PlotPath(const Path& path) const -> void
@@ -41,6 +41,11 @@ auto OutputManager::PlotPath(const Path& path) const -> void
 auto OutputManager::ClearPathChart() -> void
 {
     GetPathChart()->ClearPathChart();
+}
+
+auto OutputManager::SetPathChartMaxTime(const Time time) -> void
+{
+    GetPathChart()->SetMaxTime(time);
 }
 
 ////////////////////////////////////////
