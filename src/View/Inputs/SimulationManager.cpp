@@ -47,14 +47,14 @@ auto SimulationManager::SimulationModifiedCb(SimulationWidget param) const{
 
 auto SimulationManager::AddSpinBoxes() -> void
 {
-    auto* timeWidget = new QDoubleSpinBox(this);
-    timeWidget->setValue(100);
+    auto* timeWidget = new QSpinBox(this);
+    timeWidget->setValue(static_cast<uint64_t>(SimulationDefault::time));
     timeWidget->setMinimum(0);
-    timeWidget->setMaximum(1000);
-    timeWidget->setSingleStep(50);
+    timeWidget->setMaximum(100);
+    timeWidget->setSingleStep(10);
     m_widgets[SimulationWidget::TIME] = timeWidget;
     auto* dtWidget = new QDoubleSpinBox(this);
-    dtWidget->setValue(0.1);
+    dtWidget->setValue(SimulationDefault::dt);
     dtWidget->setMinimum(0);
     dtWidget->setMaximum(1);
     dtWidget->setSingleStep(0.1);
@@ -62,15 +62,15 @@ auto SimulationManager::AddSpinBoxes() -> void
     auto* samplesWidget = new QSpinBox(this);
     samplesWidget->setValue(1);
     samplesWidget->setMinimum(1);
-    samplesWidget->setMaximum(100);
+    samplesWidget->setMaximum(1000);
     samplesWidget->setSingleStep(1);
     m_widgets[SimulationWidget::SAMPLES] = samplesWidget;
 
     connect(
         timeWidget,
-        QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+        QOverload<int>::of(&QSpinBox::valueChanged),
         this,
-        SimulationModifiedCb<double>(SimulationWidget::TIME)
+        SimulationModifiedCb<uint64_t>(SimulationWidget::TIME)
     );
 
     connect(

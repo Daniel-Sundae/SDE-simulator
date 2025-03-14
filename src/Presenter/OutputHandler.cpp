@@ -29,12 +29,11 @@ auto OutputHandler::OnDriftDataReceived(const Path& driftData) const -> void
 
 auto OutputHandler::OnPDFReceived(const PDF& pdf) const -> void
 {
-	(void)pdf;
-	// Listener()->ClearDistributionChart();
-	// Listener()->SetXAxisRange(pdf.GetSupport());
-	// Listener()->PlotPDF(pdf.GetPDFData());
-	// Listener()->PlotEV(pdf.EV());
-	// Listener()->PlotDistribution(m_distribution); // Paths must have been sampled first
+	Listener()->ClearDistributionChart();
+	Listener()->SetXAxisRange(pdf.GetSupport());
+	Listener()->PlotPDF(pdf.GetPDFData());
+	Listener()->PlotEV(pdf.EV());
+	Listener()->PlotDistribution(m_distribution); // Paths must have been sampled first
 }
 
 auto OutputHandler::OnClear() const -> void

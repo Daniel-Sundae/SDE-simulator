@@ -72,35 +72,26 @@ auto InputHandler::SamplePaths() -> void
 		m_processDefinition->startValueData);
 
 	const PathQuery pQuery = PathQuery{ *m_processDefinition, *m_simulationParameters };
-	const auto deterministicQuery = CreateDriftQuery(pQuery);
+	const PathQuery deterministicQuery = CreateDriftQuery(pQuery);
 	const PDFQuery pdfQuery = CreatePDFQuery(pQuery);
 	Listener()->SamplePaths(pQuery);
-	if(deterministicQuery)
-		Listener()->GetDrift(*deterministicQuery);
+	Listener()->GetDrift(deterministicQuery);
 	Listener()->GeneratePDFData(pdfQuery);
 }
 
-auto InputHandler::CreateDriftQuery(const PathQuery& pQuery) const -> std::optional<PathQuery> {
-	// If diffusion is non-zero we query for drift too
-	// NOTE: need robust way of checking zero-ness of diffusion func. (sigma = 0 !=> GetDrift(state, time) = 0)
-	// Example: Diffusion(t, X_t) = sqrt(abs(X_t)) which is independent of user sigma.
-	// TODO This is temporary solution: Assume sigma = 0 => Diffusion = 0
-	if (pQuery.processDefinition.diffusion.Sigma() != 0 && pQuery.processDefinition.drift.Mu() != 0) {
-		auto definition = ProcessDefinition(
-			pQuery.processDefinition.type,
-			pQuery.processDefinition.drift,
-			{},
-			pQuery.processDefinition.startValueData);
-		auto simulationParams = SimulationParameters(
-			pQuery.simulationParameters.solver,
-			pQuery.simulationParameters.time,
-			pQuery.simulationParameters.dt,
-			1);
-		return PathQuery( definition, simulationParams );
-	}
-	else {
-		return std::nullopt;
-	}
+auto InputHandler::CreateDriftQuery(const PathQuery& pQuery) const -> PathQuery {
+
+	auto definition = ProcessDefinition(
+		pQuery.processDefinition.type,
+		pQuery.processDefinition.drift,
+		{},
+		pQuery.processDefinition.startValueData);
+	auto simulationParams = SimulationParameters(
+		pQuery.simulationParameters.solver,
+		pQuery.simulationParameters.time,
+		pQuery.simulationParameters.dt,
+		1);
+	return PathQuery( definition, simulationParams );
 }
 
 auto InputHandler::CreatePDFQuery(const PathQuery& pQuery) const -> PDFQuery {

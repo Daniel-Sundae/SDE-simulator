@@ -20,23 +20,23 @@ PathChart::PathChart()
 auto PathChart::UpdateTitle(const PathQuery& pQuery) -> void
 {
     QString title;
-    QTextStream(&title)
-        << "Definition: "
-        << QString::fromUtf8(ProcessData::GetName(pQuery.processDefinition.type))
-        << ": "
-        << QString::fromUtf8(ProcessData::GetDefinition(pQuery.processDefinition.type))
-        << " with μ = "
-        << QString::number(pQuery.processDefinition.drift.Mu())
-        << ", σ = "
-        << QString::number(pQuery.processDefinition.diffusion.Sigma())
-        << ", X<sub>0</sub> = "
-        << QString::number(pQuery.processDefinition.startValueData)
-        << '\n'
-        << "Simulation: Time = "
-        << QString::number(pQuery.simulationParameters.time)
-        << ", dt = "
-        << QString::number(pQuery.simulationParameters.dt)
-        ;
+    QTextStream stream(&title);
+    stream << "Definition: "
+           << QString::fromUtf8(ProcessData::GetName(pQuery.processDefinition.type))
+           << ": "
+           << QString::fromUtf8(ProcessData::GetDefinition(pQuery.processDefinition.type))
+           << " with μ = "
+           << QString::number(pQuery.processDefinition.drift.Mu())
+           << ", σ = "
+           << QString::number(pQuery.processDefinition.diffusion.Sigma())
+           << ", X<sub>0</sub> = "
+           << QString::number(pQuery.processDefinition.startValueData)
+           << '\n'
+           << "Simulation: Time = "
+           << QString::number(pQuery.simulationParameters.time)
+           << ", dt = "
+           << QString::number(pQuery.simulationParameters.dt);
+    stream.flush();
     setTitle(title);
 }
 

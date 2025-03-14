@@ -20,7 +20,7 @@ public:
     auto Clear() -> void;
 private:
     auto CanSample() const -> bool;
-    auto CreateDriftQuery(const PathQuery& pQuery) const -> std::optional<PathQuery>;
+    auto CreateDriftQuery(const PathQuery& pQuery) const -> PathQuery;
     auto CreatePDFQuery(const PathQuery& pQuery) const -> PDFQuery;
 private:
     std::unique_ptr<ProcessDefinition> m_processDefinition;
