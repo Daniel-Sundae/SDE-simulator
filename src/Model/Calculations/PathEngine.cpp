@@ -8,8 +8,8 @@ auto PathEngine::SamplePaths(const PathQuery& pathQuery) const -> Paths
 {
     const auto samplePath = [this, &pathQuery]() -> Path {
         const std::size_t points = pathQuery.simulationParameters.Points();
-        auto& drift = pathQuery.processDefinition.drift;
-        auto& diffusion = pathQuery.processDefinition.diffusion;
+        const auto& drift = pathQuery.processDefinition.drift;
+        const auto& diffusion = pathQuery.processDefinition.diffusion;
         const Time dt = pathQuery.simulationParameters.dt;
         const State startValueData = pathQuery.processDefinition.startValueData;
         Path path = {};

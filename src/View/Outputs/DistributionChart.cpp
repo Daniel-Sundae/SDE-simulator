@@ -33,17 +33,17 @@ auto DistributionChart::PlotDistribution(const Distribution& results) -> void
 {
 	const std::size_t flooredSize = static_cast<std::size_t>(std::floor(results.size()/2));
 	const std::size_t numBins = (flooredSize > 20) ? flooredSize : 20;
-	const double binWidth = (m_xAxis->max() - m_xAxis->min()) / numBins;
+	const double binWidth = (m_xAxis->max() - m_xAxis->min()) / static_cast<qreal>(numBins);
 
 	std::vector<std::size_t> histogram(numBins, 0);
 	for (double res : results) {
-		std::size_t binIndex = static_cast<std::size_t>((res - m_xAxis->min()) / binWidth);
+		std::size_t binIndex = static_cast<std::size_t>((res - m_xAxis->min()) / static_cast<qreal>(binWidth));
 		histogram[binIndex]++;
 	}
 	QBarSeries* series = new QBarSeries(this);
 	QBarSet* set = new QBarSet("Distribution");
 	for (std::size_t count : histogram) {
-		set->append(static_cast<double>(count) / results.size());
+		set->append(static_cast<double>(count) / static_cast<double>(results.size()));
 	}
 	series->append(set);
 	addSeries(series);
@@ -66,9 +66,9 @@ auto DistributionChart::PlotPDF(const PDFData& pdfData) -> void
     points.reserve(static_cast<qsizetype>(pdfData.size()));
 
     double yMax = 0.0;
-	const double increment = (m_xAxis->max()-m_xAxis->min())/pdfData.size();
+	const double increment = (m_xAxis->max()-m_xAxis->min())/static_cast<qreal>(pdfData.size());
     for (size_t i = 0; i < pdfData.size(); ++i) {
-        points.append(QPointF(m_xAxis->min() + i*increment, pdfData[i]));
+        points.append(QPointF(m_xAxis->min() + static_cast<double>(i)*increment, pdfData[i]));
         if (pdfData[i] > yMax)
             yMax = pdfData[i];
     }

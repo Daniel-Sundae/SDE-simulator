@@ -54,11 +54,11 @@ auto PathChart::PlotDriftCurve(const Path& driftLine) -> void
 {
     QVector<QPointF> points;
     points.reserve(static_cast<qsizetype>(driftLine.size()));
-    const double intervalWidth = (m_xAxisTime->max() - m_xAxisTime->min())/driftLine.size();
+    const double intervalWidth = (m_xAxisTime->max() - m_xAxisTime->min())/static_cast<qreal>(driftLine.size());
     for (size_t i = 0; i < driftLine.size(); ++i) {
-        points.append(QPointF(i*intervalWidth, driftLine[i]));
+        points.append(QPointF(static_cast<double>(i)*intervalWidth, driftLine[i]));
     }
-    m_driftCurve->replace(points);    
+    m_driftCurve->replace(points);
 }
 
 auto PathChart::PlotPath(const Path& path) -> void
@@ -69,9 +69,9 @@ auto PathChart::PlotPath(const Path& path) -> void
     addSeries(series);
     QVector<QPointF> points;
     points.reserve(static_cast<qsizetype>(path.size()));
-    const double intervalWidth = (m_xAxisTime->max() - m_xAxisTime->min())/path.size();
+    const double intervalWidth = (m_xAxisTime->max() - m_xAxisTime->min())/static_cast<qreal>(path.size());
     for (size_t i = 0; i < path.size(); ++i) {
-        points.append(QPointF(i*intervalWidth , path[i]));
+        points.append(QPointF(static_cast<double>(i)*intervalWidth , path[i]));
     }
     series->replace(points);
     series->attachAxis(m_xAxisTime);

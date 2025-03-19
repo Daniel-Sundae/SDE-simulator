@@ -20,7 +20,7 @@ auto DefinitionManager::UpdateWidgetProperties(ProcessType process, bool initial
     ProcessData::Constants muData = ProcessData::GetMuData(process);
     muWidget->setRange(muData.allowedValues.first, muData.allowedValues.second);
     muWidget->setSingleStep(muData.incrementSize);
-    
+
     auto* sigmaWidget = qobject_cast<QDoubleSpinBox*>(m_widgets[DefinitionWidget::SIGMA]);
     ProcessData::Constants sigmaData = ProcessData::GetSigmaData(process);
     sigmaWidget->setRange(sigmaData.allowedValues.first, sigmaData.allowedValues.second);
@@ -45,7 +45,7 @@ auto DefinitionManager::AddDefinitionWidgets() -> void
         ProcessType::GBM,
     };
     auto* processes = new QComboBox(this);
-    for (u_int8_t i = 0; i < processTypes.size(); ++i) {
+    for (int i = 0; i < static_cast<int>(processTypes.size()); ++i) {
         processes->insertItem(i, QString::fromStdString(std::string(ProcessData::GetAcronym(processTypes[i]))));
         processes->setItemData(i, QString::fromStdString(std::string(ProcessData::GetName(processTypes[i]))), Qt::ToolTipRole);
     }
@@ -66,7 +66,7 @@ auto DefinitionManager::AddDefinitionWidgets() -> void
         qobject_cast<QComboBox*>(m_widgets[DefinitionWidget::PROCESS]),
         QOverload<int>::of(&QComboBox::currentIndexChanged),
         this,
-        [this, processTypes](u_int8_t newIndex) {
+        [this, processTypes](int newIndex) {
             Parent()->OnProcessTypeModified(processTypes[newIndex]);
             UpdateWidgetProperties(processTypes[newIndex]);
         }

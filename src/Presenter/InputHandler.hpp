@@ -14,7 +14,7 @@ public:
     auto OnProcessTypeModified(ProcessType newType) -> void;
     auto OnProcessDefinitionModified(DefinitionWidget param, double userValue) -> void;
     auto OnSolverTypeModified(SolverType newType) -> void;
-    template <UInt64OrDouble T>
+    template <IntOrDouble T>
     auto OnSimulationParametersModified(const SimulationWidget param, T userValue) -> void;
     auto SamplePaths() -> void;
     auto Clear() -> void;

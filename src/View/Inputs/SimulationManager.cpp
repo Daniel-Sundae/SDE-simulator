@@ -38,7 +38,7 @@ auto SimulationManager::AddComboBoxes() -> void
     );
 }
 
-template <UInt64OrDouble T>
+template <IntOrDouble T>
 auto SimulationManager::SimulationModifiedCb(SimulationWidget param) const{
     return [this, param](T newValue) {
         Parent()->OnSimulationParametersModified(param, newValue);
@@ -70,7 +70,7 @@ auto SimulationManager::AddSpinBoxes() -> void
         timeWidget,
         QOverload<int>::of(&QSpinBox::valueChanged),
         this,
-        SimulationModifiedCb<uint64_t>(SimulationWidget::TIME)
+        SimulationModifiedCb<int>(SimulationWidget::TIME)
     );
 
     connect(
@@ -84,7 +84,7 @@ auto SimulationManager::AddSpinBoxes() -> void
         samplesWidget,
         QOverload<int>::of(&QSpinBox::valueChanged),
         this,
-        SimulationModifiedCb<std::uint64_t>(SimulationWidget::SAMPLES)
+        SimulationModifiedCb<int>(SimulationWidget::SAMPLES)
     );
 }
 

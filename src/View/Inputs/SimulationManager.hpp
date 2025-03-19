@@ -12,7 +12,7 @@ private:
 	auto AddSpinBoxes() -> void;
 	auto InitializeDesign() -> void;
 private:
-	template <UInt64OrDouble T>
+	template <IntOrDouble T>
 	auto SimulationModifiedCb(SimulationWidget param) const;
 	std::unordered_map<SimulationWidget, QWidget*> m_widgets;
 };

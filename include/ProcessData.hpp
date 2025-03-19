@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <concepts>
 #include <string_view>
+#include <cmath>
 
 // TODO: Make all these namespaces
 class ProcessData {
@@ -32,19 +33,15 @@ public:
     };
 
     struct BM : RequiredFields<BM> {
-
         static constexpr std::string_view name = "Brownian Motion";
         static constexpr std::string_view acronym = "BM";
         static constexpr std::string_view description = "Standard brownian motion.";
-        static constexpr std::string_view definition = "dX = σdB";
-        static constexpr Constants muData{ {0,0},0,0.1 };
+        static constexpr std::string_view definition = "dX = μdt + σdB";
+        static constexpr Constants muData{ {-0.5,0.5},0,0.1 };
         static constexpr Constants sigmaData{ {0,1.2},0.2,0.1 };
         static constexpr Constants startValueData{ {-100,100},0,1 };
         static auto drift(const double _mu) -> Drift {
-            // _mu is unused but necessary for uniform lambda signature.
-            // Supress compiler warning.
-            (void)_mu;
-            return Drift(0, [](Time, State) -> StateDot { return 0.0; });
+            return Drift(_mu, [_mu](Time, State) { return _mu; });
         };
         static auto diffusion(const double _sigma) -> Diffusion {
             return Diffusion(_sigma, [_sigma](Time, State) { return _sigma; });
@@ -71,8 +68,6 @@ public:
     };
 
     struct GBM : RequiredFields<GBM> {
-
-
         static constexpr std::string_view name = "Geometric Brownian Motion";
         static constexpr std::string_view acronym = "GBM";
         static constexpr std::string_view description = "Geometric brownian motion.";
@@ -113,46 +108,6 @@ public:
             return PDF(EV, stddev, _pdf);
             };
     };
-
-    /*static auto GetDrift(ProcessType processType, const double _mu) -> Drift
-    {
-        switch (processType)
-        {
-            case ProcessType::NONE:
-                throw std::invalid_argument("Not implemented yet");
-                break;
-            case ProcessType::CUSTOM:
-                throw std::invalid_argument("Not implemented yet");
-            case ProcessType::BM:
-                return BM::GetDrift();
-                break;
-            case ProcessType::GBM:
-                return GBM::GetDrift(_mu);
-                break;
-            default:
-                throw std::invalid_argument("Not implemented yet");
-            }
-    }
-
-    static auto GetDiffusion(ProcessType processType, const double _sigma) -> Diffusion
-    {
-        switch (processType)
-        {
-        case ProcessType::NONE:
-            throw std::invalid_argument("Not implemented yet");
-            break;
-        case ProcessType::CUSTOM:
-            throw std::invalid_argument("Not implemented yet");
-        case ProcessType::BM:
-            return BM::Diffusion(_sigma);
-            break;
-        case ProcessType::GBM:
-            return GBM::GetDiffusion(_sigma);
-            break;
-        default:
-            throw std::invalid_argument("Not implemented yet");
-        }
-    }*/
 
 private:
     template <auto Field>
@@ -217,71 +172,3 @@ public:
 #undef GET_STATIC_FIELD
 
 };
-
-
-
-//static inline auto GetDrift() -> Drift {
-        //    return Drift(0, [](Time, State) -> StateDot { return 0.0; });
-        //}
-        //static inline auto GetDiffusion(const double _sigma) -> Diffusion {
-        //    return Diffusion(_sigma, [_sigma](Time, State) { return _sigma; });
-        //}
-        //// Theoretical solution for BM:
-        //// f(s)=\frac{1}{\sqrt{2 \pi \sigma^2 T}} \exp \left[-\frac{(s - S_0 - \mu T)^2}{2 \sigma^2 T}\right]
-        //static inline auto GetPDF(const State startValue, const Time time, const double _mu, const double _sigma) -> PDF {
-
-        //    //const double EV = startValue + _mu * time;
-        //    const double EV = startValue; // This error should be visible!
-        //    const double stddev = _sigma * std::sqrt(time);
-
-        //    // Pre computed constants
-        //    const double sqrt_2pi = std::sqrt(2.0 * PI);
-        //    const double sigma_t = _sigma * std::sqrt(time);
-        //    const double variance_t = _sigma * _sigma * time;
-        //    const double two_variance_t = 2.0 * variance_t;
-        //    const double drift_term = _mu * time;
-        //    const auto _pdf = [=](const State endValue) -> Density {
-        //        const double diff = endValue - startValue - drift_term;
-        //        const double diff_squared = diff * diff;
-        //        const double denominator = sigma_t * sqrt_2pi;
-        //        const double exponent = -diff_squared / two_variance_t;
-        //        return std::exp(exponent) / denominator;
-        //        };
-        //    return PDF(EV, stddev, _pdf);
-        //}
-
-
-//static inline auto GetDrift(const double _mu) -> Drift {
-//    return Drift(_mu, [_mu](Time, State s) { return _mu * s; });
-//}
-//static inline auto GetDiffusion(const double _sigma) -> Diffusion {
-//    return Diffusion(_sigma, [_sigma](Time, State s) { return _sigma * s; });
-//}
-//// Theoretical solution for GBM:
-//// f(s)=\frac{1}{s \sqrt{2 \pi \sigma^2 T}} \exp \left[-\frac{\left(\ln \left(\frac{s}{S_0}\right)-\left(\mu-\frac{\sigma^2}{2}\right) T\right)^2}{2 \sigma^2 T}\right]
-//static inline auto GetPDF(const State startValue, const Time time, const double _mu, const double _sigma) -> PDF {
-
-//    const double EV = startValue * std::exp(_mu * time);
-//    const double stddev = EV * sqrt(exp(_sigma * _sigma * time) - 1);
-
-//    // Pre computed constants
-//    const double sigma_squared = _sigma * _sigma;
-//    const double adjusted_drift = _mu - 0.5 * sigma_squared;
-//    const double sqrt_2pi = std::sqrt(2.0 * PI);
-//    const double sigma_t = _sigma * std::sqrt(time);
-//    const double variance_t = sigma_squared * time;
-//    const double two_variance_t = 2.0 * variance_t;
-//    const auto _pdf = [=](const State endValue) -> Density {
-//        if (endValue < 0.0) {
-//            throw std::invalid_argument("GBM cannot take negative value");
-//        }
-//        const double log_ratio = std::log(endValue / startValue);
-//        const double drift_term = adjusted_drift * time;
-//        const double diff = log_ratio - drift_term;
-//        const double diff_squared = diff * diff;
-//        const double denominator = endValue * sigma_t * sqrt_2pi;
-//        const double exponent = -diff_squared / two_variance_t;
-//        return std::exp(exponent) / denominator;
-//        };
-//    return PDF(EV, stddev, _pdf);
-//}

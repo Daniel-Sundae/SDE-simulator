@@ -23,7 +23,7 @@ public:
     auto OnProcessTypeModified(const ProcessType newType) const -> void;
     auto OnProcessDefinitionModified(const DefinitionWidget param, double userValue) const -> void;
     auto OnSolverTypeModified(const SolverType newType) const -> void;
-    template<UInt64OrDouble T>
+    template<IntOrDouble T>
     auto OnSimulationParametersModified(const SimulationWidget param, T userValue) const -> void {
         m_inputHandler->OnSimulationParametersModified(param, userValue);
     }
@@ -38,7 +38,7 @@ private:
 
 class InputManagerGroupBox : public QGroupBox {
 public:
-    InputManagerGroupBox(QWidget* parent = nullptr)
+    explicit InputManagerGroupBox(QWidget* parent = nullptr)
         : QGroupBox(parent)
     {}
 

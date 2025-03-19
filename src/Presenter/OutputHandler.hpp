@@ -11,7 +11,7 @@ public:
 	auto OnPathsReceived(const PathQuery& query, const Paths& paths) -> void;
 	auto OnDriftDataReceived(const Path& driftData) const -> void;
 	auto OnPDFReceived(const PDF& pdf) const -> void;
-	auto OnClear() const -> void;
+	auto OnClear() -> void;
 private:
 	Distribution m_distribution;
 };

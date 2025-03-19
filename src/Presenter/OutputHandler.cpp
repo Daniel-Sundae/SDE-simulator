@@ -31,13 +31,17 @@ auto OutputHandler::OnPDFReceived(const PDF& pdf) const -> void
 {
 	Listener()->ClearDistributionChart();
 	Listener()->SetXAxisRange(pdf.GetSupport());
-	Listener()->PlotPDF(pdf.GetPDFData());
+	if (!pdf.GetPDFData().has_value()) {
+		(void)pdf;
+	}
+	Listener()->PlotPDF(pdf.GetPDFData().value());
 	Listener()->PlotEV(pdf.EV());
 	Listener()->PlotDistribution(m_distribution); // Paths must have been sampled first
 }
 
-auto OutputHandler::OnClear() const -> void
+auto OutputHandler::OnClear() -> void
 {
+	m_distribution.clear();
 	Listener()->ClearPathChart();
 	Listener()->ClearDistributionChart();
 }

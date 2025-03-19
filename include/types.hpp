@@ -1,9 +1,11 @@
 #pragma once
 #include <vector>
+#include <optional>
 #include <stdexcept>
 #include <functional>
 #include <cstddef>
 #include <cassert>
+#include <cstdint>
 
 using Time = double;
 using State = double;
@@ -15,7 +17,7 @@ using PDFData = std::vector<Density>;
 using StateDot = double; // dX/dt
 using Range = std::pair<double, double>;
 template <typename T>
-concept UInt64OrDouble = std::same_as<T, uint64_t> || std::same_as<T, double>;
+concept IntOrDouble = std::same_as<T, int> || std::same_as<T, double>;
 
 class FunctionWrapper {
 protected:
@@ -72,7 +74,10 @@ public:
         return m_stddev;
     }
 
-    auto GetPDFData() const -> PDFData{
+    auto GetPDFData() const -> std::optional<const PDFData>{
+        if (m_data.empty()) {
+            return std::nullopt;
+        };
         return m_data;
     }
 
@@ -80,7 +85,9 @@ public:
         PDFData newData;
         newData.reserve(points);
         const auto [start, end] = GetSupport();
-        const double increment = (end - start)/points;
+        const double increment = (end - start)/static_cast<double>(points);
+
+        //for (int i = 0; i<points)
         for (State state = start; state < end; state += increment){
             newData.push_back(m_pdf(state));
         }
@@ -91,13 +98,13 @@ public:
     auto GetSupport() const -> Range{
         if(!(m_support.first == 0 && m_support.second == 0))
             return m_support;
-        
+
         std::size_t points = 1000;
         const State start = EV() - 5*StdDev();
         const State end = EV() + 5*StdDev();
         m_support.first = start;
         m_support.second = end;
-        const double increment = (end - start)/points;
+        const double increment = (end - start) / static_cast<double>(points);
         // Find lower bound
         for (State state = start; state < end; state += increment){
             if(m_pdf(state) > threshold){

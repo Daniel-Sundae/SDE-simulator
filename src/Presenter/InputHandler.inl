@@ -2,13 +2,14 @@
 #include "Types.hpp"
 #include <cassert>
 #include <type_traits>
+#include <cstdint>
 
-template <UInt64OrDouble T>
+template <IntOrDouble T>
 auto InputHandler::OnSimulationParametersModified(const SimulationWidget param, T userValue) -> void
 {
 	switch (param) {
 	case SimulationWidget::TIME:
-		if constexpr (std::is_same_v<T, uint64_t>)
+		if constexpr (std::is_same_v<T, std::uint64_t>)
 			m_simulationParameters->time = userValue;
 		else
 			assert(false && "'Time' parameter must be used with int type");

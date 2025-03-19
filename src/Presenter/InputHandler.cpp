@@ -63,7 +63,7 @@ auto InputHandler::SamplePaths() -> void
 {
 	if(!CanSample())
 		return;
-
+	Clear();
 	// Need to get drift and diffusion here since they are dependent on type
 	m_processDefinition = std::make_unique<ProcessDefinition>(
 		m_processDefinition->type,
