@@ -48,17 +48,23 @@ auto PathChart::ClearPathChart() -> void
             delete s;
         }
     }
+    m_zeroLine->clear();
 }
 
-auto PathChart::PlotDriftCurve(const Path& driftLine) -> void
+auto PathChart::PlotDriftCurve(const Path& driftCurve) -> void
 {
     QVector<QPointF> points;
-    points.reserve(static_cast<qsizetype>(driftLine.size()));
-    const double intervalWidth = (m_xAxisTime->max() - m_xAxisTime->min())/static_cast<qreal>(driftLine.size());
-    for (size_t i = 0; i < driftLine.size(); ++i) {
-        points.append(QPointF(static_cast<double>(i)*intervalWidth, driftLine[i]));
+    points.reserve(static_cast<qsizetype>(driftCurve.size()));
+    const double intervalWidth = (m_xAxisTime->max() - m_xAxisTime->min())/static_cast<qreal>(driftCurve.size());
+    State min_y = 0;
+    State max_y = 0;
+    for (size_t i = 0; i < driftCurve.size(); ++i) {
+        min_y = std::min(min_y, driftCurve[i]);
+        max_y = std::max(max_y, driftCurve[i]);
+        points.append(QPointF(static_cast<double>(i)*intervalWidth, driftCurve[i]));
     }
     m_driftCurve->replace(points);
+    UpdateYAxisIfNeeded(min_y, max_y);
 }
 
 auto PathChart::PlotPath(const Path& path) -> void
@@ -70,21 +76,24 @@ auto PathChart::PlotPath(const Path& path) -> void
     QVector<QPointF> points;
     points.reserve(static_cast<qsizetype>(path.size()));
     const double intervalWidth = (m_xAxisTime->max() - m_xAxisTime->min())/static_cast<qreal>(path.size());
+    State min_y = 0;
+    State max_y = 0;
     for (size_t i = 0; i < path.size(); ++i) {
+        min_y = std::min(min_y, path[i]);
+        max_y = std::max(max_y, path[i]);
         points.append(QPointF(static_cast<double>(i)*intervalWidth , path[i]));
     }
     series->replace(points);
     series->attachAxis(m_xAxisTime);
     series->attachAxis(m_yAxis);
-    auto [min_it, max_it] = std::minmax_element(path.begin(), path.end());
     GUI::SetPathStyle(series);
-    UpdateYAxisIfNeeded(*min_it, *max_it);
-    UpdateZeroLine();
+    //UpdateYAxisIfNeeded(min_y, max_y);
 }
 
 auto PathChart::SetMaxTime(const Time time) -> void
 {
     m_xAxisTime->setRange(0, time);
+    UpdateZeroLine();
 }
 
 auto PathChart::UpdateZeroLine() -> void

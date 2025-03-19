@@ -48,7 +48,6 @@ public:
         };
         static auto pdf(const State startValue, const Time time, const double _mu, const double _sigma) -> PDF {
             const double EV = startValue + _mu * time;
-            //const double EV = startValue; // This is incorrect EV
             const double stddev = _sigma * std::sqrt(time);
             // Pre computed constants
             const double sqrt_2pi = std::sqrt(2.0 * PI);

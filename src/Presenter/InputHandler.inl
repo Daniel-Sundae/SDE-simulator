@@ -9,7 +9,7 @@ auto InputHandler::OnSimulationParametersModified(const SimulationWidget param, 
 {
 	switch (param) {
 	case SimulationWidget::TIME:
-		if constexpr (std::is_same_v<T, std::uint64_t>)
+		if constexpr (std::is_same_v<T, int>)
 			m_simulationParameters->time = userValue;
 		else
 			assert(false && "'Time' parameter must be used with int type");
@@ -18,7 +18,7 @@ auto InputHandler::OnSimulationParametersModified(const SimulationWidget param, 
 		m_simulationParameters->dt = userValue;
 		break;
 	case SimulationWidget::SAMPLES:
-		if constexpr (std::is_same_v<T, uint64_t>)
+		if constexpr (std::is_same_v<T, int>)
 			m_simulationParameters->samples = userValue;
 		else
 			assert(false && "'Samples' parameter must be used with int type");

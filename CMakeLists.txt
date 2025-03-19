@@ -15,13 +15,10 @@ if(MSVC)
         /permissive- # Strict standards conformance
         /analyze # Enable code analysis
         /sdl    # Enable additional security checks
-        /Zi     # Generate debug info
+        #/Zi     # Generate debug info
         /guard:cf # Control Flow Guard
         /MP     # Multi-processor compilation
     )
-    if(CMAKE_BUILD_TYPE MATCHES Debug)
-        add_compile_options(/fsanitize=address)
-    endif()
 else()
     add_compile_options(
         -Wall
@@ -33,11 +30,6 @@ else()
         -Wnon-virtual-dtor # Warn about non-virtual destructors
         -pedantic-errors  # Strict ISO C++ compliance
     )
-    if(CMAKE_BUILD_TYPE MATCHES Debug)
-        add_compile_options(-fsanitize=address)
-        add_link_options(-fsanitize=address)
-    endif()
-
 endif()
 
 # Additional settings
@@ -103,7 +95,6 @@ target_link_libraries(StochasticSim PRIVATE
     Qt6::Charts
 )
 
-# Set bundle properties for macOS or properties for other platforms (e.g., Windows)
 if(APPLE)
     set_target_properties(StochasticSim PROPERTIES
         MACOSX_BUNDLE TRUE
@@ -115,7 +106,6 @@ if(APPLE)
         RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}"
     )
 else()
-    # Windows-specific properties
     set_target_properties(StochasticSim PROPERTIES
         WIN32_EXECUTABLE TRUE  # Indicates a Windows GUI application
         OUTPUT_NAME_DEBUG "StochasticSim_Debug"

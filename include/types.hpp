@@ -86,8 +86,6 @@ public:
         newData.reserve(points);
         const auto [start, end] = GetSupport();
         const double increment = (end - start)/static_cast<double>(points);
-
-        //for (int i = 0; i<points)
         for (State state = start; state < end; state += increment){
             newData.push_back(m_pdf(state));
         }

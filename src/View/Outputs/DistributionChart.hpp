@@ -13,9 +13,9 @@ public:
     auto UpdateTitle(const ProcessType type) -> void;
     auto PlotDistribution(const Distribution& results) -> void;
     auto ClearDistributionChart() -> void;
-    auto PlotPDF(const PDFData& pdfData) -> void;
+    auto UpdateDistributionChartPDF(const PDFData& pdfData) -> void;
     auto PlotExpValLine(const State EV) -> void;
-    auto SetXAxisRange(const Range range) -> void;
+    auto SetDistributionChartSupport(const Range range) -> void;
 private:
     auto SetMaxYAxisDensity(const Density yMax) -> void;
     auto InitializeAxis() -> void;

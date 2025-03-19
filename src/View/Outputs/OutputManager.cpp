@@ -7,7 +7,7 @@ OutputManager::OutputManager(QWidget *parent)
     , m_layout(new QVBoxLayout(this))
     , m_pathChartView(new QChartView(this))
     , m_distributionChartView(new QChartView(this))
-{   
+{
     auto* pathChart = new PathChart();
     m_pathChartView->setChart(pathChart);
     m_layout->addWidget(m_pathChartView);
@@ -62,17 +62,17 @@ auto OutputManager::PlotDistribution(const Distribution& distribution) const -> 
     GetDistributionChart()->PlotDistribution(distribution);
 }
 
-auto OutputManager::PlotPDF(const PDFData& pdfData) const -> void
+auto OutputManager::UpdateDistributionChartPDF(const PDFData& pdfData) const -> void
 {
-    GetDistributionChart()->PlotPDF(pdfData);
+    GetDistributionChart()->UpdateDistributionChartPDF(pdfData);
 }
 
-auto OutputManager::SetXAxisRange(const Range pdfDomain) const -> void
+auto OutputManager::SetDistributionChartSupport(const Range pdfDomain) const -> void
 {
-    GetDistributionChart()->SetXAxisRange(pdfDomain);
+    GetDistributionChart()->SetDistributionChartSupport(pdfDomain);
 }
 
-auto OutputManager::PlotEV(const State EV) const -> void
+auto OutputManager::UpdateDistributionChartEV(const State EV) const -> void
 {
     GetDistributionChart()->PlotExpValLine(EV);
 }

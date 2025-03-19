@@ -26,9 +26,9 @@ public:
     // DistributionChart
     auto UpdateDistributionChartTitle(const ProcessType t) const -> void;
     auto PlotDistribution(const Distribution& distribution) const -> void;
-    auto PlotPDF(const PDFData& pdfData) const -> void;
-    auto SetXAxisRange(const Range pdfDomain) const -> void;
-    auto PlotEV(const State EV) const -> void;
+    auto UpdateDistributionChartPDF(const PDFData& pdfData) const -> void;
+    auto SetDistributionChartSupport(const Range pdfDomain) const -> void;
+    auto UpdateDistributionChartEV(const State EV) const -> void;
     auto ClearDistributionChart() -> void;
 
 private:

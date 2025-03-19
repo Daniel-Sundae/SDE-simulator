@@ -45,7 +45,6 @@ auto InputHandler::OnProcessDefinitionModified(const DefinitionWidget param, dou
 	default:
 		assert(false);
 	}
-	SamplePaths();
 }
 
 auto InputHandler::CanSample() const -> bool
@@ -74,9 +73,9 @@ auto InputHandler::SamplePaths() -> void
 	const PathQuery pQuery = PathQuery{ *m_processDefinition, *m_simulationParameters };
 	const PathQuery deterministicQuery = CreateDriftQuery(pQuery);
 	const PDFQuery pdfQuery = CreatePDFQuery(pQuery);
-	Listener()->SamplePaths(pQuery);
-	Listener()->GetDrift(deterministicQuery);
 	Listener()->GeneratePDFData(pdfQuery);
+	Listener()->GetDrift(deterministicQuery);
+	Listener()->SamplePaths(pQuery);
 }
 
 auto InputHandler::CreateDriftQuery(const PathQuery& pQuery) const -> PathQuery {

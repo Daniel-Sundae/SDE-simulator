@@ -10,8 +10,9 @@ public:
 	explicit OutputHandler();
 	auto OnPathsReceived(const PathQuery& query, const Paths& paths) -> void;
 	auto OnDriftDataReceived(const Path& driftData) const -> void;
-	auto OnPDFReceived(const PDF& pdf) const -> void;
+	auto OnPDFReceived(const PDF& pdf) -> void;
 	auto OnClear() -> void;
 private:
-	Distribution m_distribution;
+	auto IsInSupport(const State s) const -> bool;
+	Range m_distributionSupport;
 };

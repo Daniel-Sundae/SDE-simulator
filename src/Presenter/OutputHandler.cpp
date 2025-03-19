@@ -4,7 +4,7 @@
 
 OutputHandler::OutputHandler()
 	: IPresenterComponent()
-	, m_distribution{}
+	, m_distributionSupport(std::make_pair<State>(0,0))
 { }
 
 auto OutputHandler::OnPathsReceived(const PathQuery& pQuery, const Paths& paths) -> void
@@ -17,9 +17,11 @@ auto OutputHandler::OnPathsReceived(const PathQuery& pQuery, const Paths& paths)
 	distribution.reserve(paths.size());
 	for (const auto& p : paths) {
 		Listener()->PlotPath(p);
-		distribution.push_back(p.back());
+		if(IsInSupport(p.back())) {
+			distribution.push_back(p.back());
+		}
 	}
-	m_distribution = std::move(distribution);
+	Listener()->PlotDistribution(distribution);
 }
 
 auto OutputHandler::OnDriftDataReceived(const Path& driftData) const -> void
@@ -27,21 +29,22 @@ auto OutputHandler::OnDriftDataReceived(const Path& driftData) const -> void
 	Listener()->PlotPathChartDriftData(driftData);
 }
 
-auto OutputHandler::OnPDFReceived(const PDF& pdf) const -> void
+auto OutputHandler::OnPDFReceived(const PDF& pdf) -> void
 {
 	Listener()->ClearDistributionChart();
-	Listener()->SetXAxisRange(pdf.GetSupport());
-	if (!pdf.GetPDFData().has_value()) {
-		(void)pdf;
-	}
-	Listener()->PlotPDF(pdf.GetPDFData().value());
-	Listener()->PlotEV(pdf.EV());
-	Listener()->PlotDistribution(m_distribution); // Paths must have been sampled first
+	m_distributionSupport = pdf.GetSupport();
+	Listener()->SetDistributionChartSupport(m_distributionSupport);
+	Listener()->UpdateDistributionChartPDF(pdf.GetPDFData().value());
+	Listener()->UpdateDistributionChartEV(pdf.EV());
 }
 
 auto OutputHandler::OnClear() -> void
 {
-	m_distribution.clear();
 	Listener()->ClearPathChart();
 	Listener()->ClearDistributionChart();
+}
+
+auto OutputHandler::IsInSupport(const State s) const -> bool
+{
+	return m_distributionSupport.first < s && s < m_distributionSupport.second ? true : false;
 }
