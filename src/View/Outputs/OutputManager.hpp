@@ -20,7 +20,7 @@ public:
     auto UpdatePathChartTitle(const PathQuery& pQuery) const -> void;
     auto PlotPath(const Path& path) const -> void;
     auto PlotPathChartDriftData(const Path& driftLine) const -> void;
-    auto ClearPathChart() -> void;
+    auto ClearPathChart(bool clearDrift = true) -> void;
     auto SetPathChartMaxTime(const Time time) -> void;
 
     // DistributionChart

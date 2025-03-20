@@ -9,7 +9,7 @@ OutputHandler::OutputHandler()
 
 auto OutputHandler::OnPathsReceived(const PathQuery& pQuery, const Paths& paths) -> void
 {
-	Listener()->ClearPathChart();
+	Listener()->ClearPathChart(false);
 	Listener()->SetPathChartMaxTime(pQuery.simulationParameters.time);
 	Listener()->UpdatePathChartTitle(pQuery);
 	Listener()->UpdateDistributionChartTitle(pQuery.processDefinition.type);

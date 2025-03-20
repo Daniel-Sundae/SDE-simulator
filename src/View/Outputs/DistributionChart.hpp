@@ -4,6 +4,8 @@
 
 class QValueAxis;
 class QLineSeries;
+class QBarSeries;
+class QBarSet;
 
 class DistributionChart : public QChart {
     Q_OBJECT
@@ -17,7 +19,7 @@ public:
     auto PlotExpValLine(const State EV) -> void;
     auto SetDistributionChartSupport(const Range range) -> void;
 private:
-    auto SetMaxYAxisDensity(const Density yMax) -> void;
+    auto DistributionSet() const -> QBarSet*;
     auto InitializeAxis() -> void;
     auto InitializeDistributionChart() -> void;
 private:
@@ -25,5 +27,6 @@ private:
     QValueAxis* m_yAxisRelativeCount;
     QValueAxis* m_yAxisDensity;
     QLineSeries* m_expValLine;
-    QLineSeries* m_theoreticalPDF;
+    QLineSeries* m_pdf;
+    QBarSeries* m_distribution;
 };

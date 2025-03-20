@@ -40,7 +40,7 @@ auto PathChart::UpdateTitle(const PathQuery& pQuery) -> void
     setTitle(title);
 }
 
-auto PathChart::ClearPathChart() -> void
+auto PathChart::ClearPathChart(bool clearDrift) -> void
 {
     for (QAbstractSeries* s : series()) {
         if (s != m_zeroLine && s != m_driftCurve) {
@@ -48,7 +48,9 @@ auto PathChart::ClearPathChart() -> void
             delete s;
         }
     }
-    m_zeroLine->clear();
+    if (clearDrift) {
+        m_driftCurve->clear();
+    }
 }
 
 auto PathChart::PlotDriftCurve(const Path& driftCurve) -> void
@@ -87,7 +89,6 @@ auto PathChart::PlotPath(const Path& path) -> void
     series->attachAxis(m_xAxisTime);
     series->attachAxis(m_yAxis);
     GUI::SetPathStyle(series);
-    //UpdateYAxisIfNeeded(min_y, max_y);
 }
 
 auto PathChart::SetMaxTime(const Time time) -> void

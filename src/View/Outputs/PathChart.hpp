@@ -13,7 +13,7 @@ public:
     explicit PathChart();
     auto UpdateTitle(const PathQuery& pQuery) -> void;
     auto PlotPath(const Path& sampleData) -> void;
-    auto ClearPathChart() -> void;
+    auto ClearPathChart(bool clearDrift = true) -> void;
     auto PlotDriftCurve(const Path& driftLine) -> void;
     auto SetMaxTime(const Time time) -> void;
 private:

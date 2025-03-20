@@ -38,9 +38,9 @@ auto OutputManager::PlotPath(const Path& path) const -> void
     GetPathChart()->PlotPath(path);
 }
 
-auto OutputManager::ClearPathChart() -> void
+auto OutputManager::ClearPathChart(bool clearDrift) -> void
 {
-    GetPathChart()->ClearPathChart();
+    GetPathChart()->ClearPathChart(clearDrift);
 }
 
 auto OutputManager::SetPathChartMaxTime(const Time time) -> void
