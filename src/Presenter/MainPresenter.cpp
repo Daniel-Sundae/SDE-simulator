@@ -12,8 +12,10 @@ MainPresenter::MainPresenter()
 
 auto MainPresenter::SamplePaths(const PathQuery& pQuery) const -> void
 {
+	Listener()->SamplingStarted();
 	PathEngine engine{};
 	Listener()->OnPathsReceived(pQuery, engine.SamplePaths(pQuery));
+	Listener()->SamplingEnded();
 }
 
 auto MainPresenter::GetDrift(const PathQuery& pQuery) const -> void

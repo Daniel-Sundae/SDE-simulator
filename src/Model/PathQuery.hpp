@@ -29,9 +29,7 @@ struct SimulationParameters {
 };
 
 struct ProcessDefinition {
-private:
     static constexpr ProcessType defaultProcess = ProcessType::BM;
-public:
     ProcessType type = defaultProcess;
     Drift drift = ProcessData::GetDrift(defaultProcess, ProcessData::GetMuData(defaultProcess).defaultValue);
     Diffusion diffusion = ProcessData::GetDiffusion(defaultProcess, ProcessData::GetSigmaData(defaultProcess).defaultValue);

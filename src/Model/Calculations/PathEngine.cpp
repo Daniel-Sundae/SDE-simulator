@@ -2,6 +2,7 @@
 #include "Utils.hpp"
 #include "PathQuery.hpp"
 #include "PDFQuery.hpp"
+#include <thread>
 #include "assert.h"
 
 auto PathEngine::SamplePaths(const PathQuery& pathQuery) const -> Paths
@@ -23,8 +24,11 @@ auto PathEngine::SamplePaths(const PathQuery& pathQuery) const -> Paths
     Paths paths;
     const std::size_t samples = pathQuery.simulationParameters.samples;
     paths.reserve(samples);
+    std::vector<std::jthread> threads;
+    threads.reserve(samples);
     for (std::size_t i = 0; i<samples; ++i)
-        paths.push_back(samplePath());
+        Path p = std::jthread(samplePath);
+        paths.push_back(
     return paths;
 }
 

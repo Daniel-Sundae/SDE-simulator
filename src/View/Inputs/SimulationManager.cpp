@@ -62,7 +62,7 @@ auto SimulationManager::AddSpinBoxes() -> void
     auto* samplesWidget = new QSpinBox(this);
     samplesWidget->setValue(1);
     samplesWidget->setMinimum(1);
-    samplesWidget->setMaximum(1000);
+    samplesWidget->setMaximum(10000);
     samplesWidget->setSingleStep(1);
     m_widgets[SimulationWidget::SAMPLES] = samplesWidget;
 

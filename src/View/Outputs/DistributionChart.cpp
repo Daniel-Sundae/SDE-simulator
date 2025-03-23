@@ -1,19 +1,25 @@
 ﻿#include "DistributionChart.hpp"
 #include "ViewUtils.hpp"
+#include "PathQuery.hpp"
 #include <algorithm>
 #include <QtCharts/qbarset.h>
 #include <QtCharts/qbarseries.h>
 #include <QtCharts/qvalueaxis.h>
 #include <QtCharts/qlineseries.h>
+#include <QtCharts/qbarcategoryaxis.h>
+
+static std::size_t nrBins = 50;
 
 DistributionChart::DistributionChart()
 	: QChart()
 	, m_xAxis(new QValueAxis(this))
+	, m_categoryAxis(new QBarCategoryAxis(this))
 	, m_yAxisRelativeCount(new QValueAxis(this))
 	, m_yAxisDensity(new QValueAxis(this))
-	, m_expValLine(nullptr)
+	, m_expValLine(new QLineSeries(this))
 	, m_pdf(new QLineSeries(this))
-	, m_distribution(new QBarSeries(this))
+	, m_distributionSet(new QBarSet("Distribution", this))
+	, m_distributionSeries(new QBarSeries(this))
 {
 	InitializeAxis();
 	InitializeDistributionChart();
@@ -32,32 +38,28 @@ auto DistributionChart::UpdateTitle(const ProcessType type) -> void
 
 auto DistributionChart::PlotDistribution(const Distribution& results) -> void
 {
-	assert(m_distribution->count() == 1);
-	const std::size_t numBins = 2;
-	const double binWidth = (m_xAxis->max() - m_xAxis->min()) / static_cast<qreal>(numBins);
-	std::vector<std::size_t> histogram(numBins, 0);
+	assert(m_distributionSet->count() == 0);
+	const State binWidth = (m_xAxis->max() - m_xAxis->min()) / static_cast<qreal>(nrBins);
+	std::vector<std::size_t> histogram(nrBins, 0);
 	for (double res : results) {
 		std::size_t binIndex = static_cast<std::size_t>((res - m_xAxis->min()) / static_cast<qreal>(binWidth));
 		histogram[binIndex]++;
 	}
-	double maxCount = 0.0;
-	for (std::size_t count : histogram) {
-		double relCount = static_cast<double>(count) / static_cast<double>(results.size());
-		*DistributionSet() << relCount;
-		maxCount = std::max(maxCount, relCount);
+	double maxHeight = 0.0;
+	for (std::size_t bin = 0; bin < histogram.size(); ++bin) {
+		std::size_t count = histogram[bin];
+		double binHeight = static_cast<double>(count) / results.size();
+		m_distributionSet->append(binHeight);
+		maxHeight = std::max(maxHeight, binHeight);
 	}
-	m_yAxisRelativeCount->setRange(0, maxCount * 1.1);
-}
-
-auto DistributionChart::DistributionSet() const -> QBarSet*
-{
-	return m_distribution->barSets().at(0);
+	m_yAxisRelativeCount->setRange(0, maxHeight * 1.1);
 }
 
 auto DistributionChart::ClearDistributionChart() -> void
 {
-	DistributionSet()->remove(0, DistributionSet()->count());
 	m_pdf->clear();
+	m_expValLine->clear();
+	m_distributionSet->remove(0, m_distributionSet->count());
 }
 
 auto DistributionChart::UpdateDistributionChartPDF(const PDFData& pdfData) -> void
@@ -93,6 +95,7 @@ auto DistributionChart::InitializeAxis() -> void
 	addAxis(m_xAxis, Qt::AlignBottom);
 	addAxis(m_yAxisRelativeCount, Qt::AlignLeft);
 	addAxis(m_yAxisDensity, Qt::AlignRight);
+	addAxis(m_categoryAxis, Qt::AlignBottom);
 	m_yAxisDensity->setVisible(false);
 	m_xAxis->setTitleText("X<sub>T</sub>");
 	m_yAxisRelativeCount->setTitleText("Count (%)");
@@ -102,20 +105,28 @@ auto DistributionChart::InitializeAxis() -> void
 	m_xAxis->setRange(-10, 10);
 	m_yAxisRelativeCount->setRange(0, 1);
 	m_yAxisDensity->setRange(0, 1);
+	for (int i = 0; i < nrBins; ++i) {
+		m_categoryAxis->append(QString::number(i));
+	}
+	m_categoryAxis->setVisible(false);
 }
 
 auto DistributionChart::InitializeDistributionChart() -> void
 {
 	GUI::SetChartStyle(this);
 	addSeries(m_pdf);
+	addSeries(m_expValLine);
+	addSeries(m_distributionSeries);
 	m_pdf->attachAxis(m_xAxis);
 	m_pdf->attachAxis(m_yAxisDensity);
 	m_pdf->setName("Probability Density Function");
-	addSeries(m_distribution);
-	m_distribution->attachAxis(m_xAxis);
-	m_distribution->attachAxis(m_yAxisRelativeCount);
-	QBarSet* set = new QBarSet("Distribution");
-	m_distribution->append(set);
+	m_expValLine->attachAxis(m_xAxis);
+	m_expValLine->attachAxis(m_yAxisDensity);
+	m_expValLine->setName("Expected Value");
+	m_distributionSeries->attachAxis(m_categoryAxis);
+	m_distributionSeries->attachAxis(m_yAxisRelativeCount);
+	m_distributionSeries->append(m_distributionSet);
+	m_distributionSeries->setBarWidth(1);
 	GUI::SetPDFStyle(m_pdf);
 }
 
