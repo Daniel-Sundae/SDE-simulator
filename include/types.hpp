@@ -132,6 +132,11 @@ enum class ProcessType{
     BB,
 };
 
+enum class TaskPriority {
+    HIGH = 0,
+    LOW
+};
+
 enum class SolverType {
     EULER_MARUYAMA = 0,
     RUNGE_KUTTA,

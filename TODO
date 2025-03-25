@@ -5,23 +5,19 @@ MATH TODO:
 
 FUNCTIONALITY TODO:
 - loading symbol for simulation taking time
-- Make sure driftline is present immediately.
 - Add dot showing the final result of sim in chart graph.
-- Better to have a "GO" button for starting the sample. The settings must be clearly visible then somehow.
-- add fix seed button. when enabled samplespinbox should be not enabled and hardcoded set to 1. Doesn't make sense to repeat simulations when each simulation is equivalent.
-- Introduce SamplerMethod to SimulationParameter type. Euler–Maruyama is standard. Implement template specializations on Increment (current i euler maruyama).
-	E.g. rungekutta adds this term to increment: \frac{1}{2}\left(b\left(\hat{\Upsilon}_n\right)-b\left(Y_n\right)\right)\left(\left(\Delta W_n\right)^2-\delta\right) \delta^{-1 / 2}
-- inputhandler must check some logic of the query before sending it to pathengine. For instance, a mue of around 1 is crazy since that mean jumping the entire Xt each dt.
-
+- Implement:
+	seed
+	sample
+	rk/other solvers
+	other processes
 
 CODE DESIGN TODO:
 - Stresstest to check if inputhandler can get into broken state
 - Use valgrind
-- Use static analyser tool (runcppcheck alias in arch wsl)
 - Use sub cmakeprojects
 
 TECH DETAILS TODO:
-- Make sure old data is not leaking. Either outputmanager deletes or data saved to disc. Valgrind investigate
 - use async. Transmit loading signal to OutputManager
 - swap out std::function to something more performant
 - use threads for many paths.
