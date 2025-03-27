@@ -8,14 +8,14 @@ MainPresenter::MainPresenter()
 	: IPresenterComponent()
 	, m_inputHandler(std::make_unique<InputHandler>())
 	, m_outputHandler(std::make_unique<OutputHandler>())
+	, m_engine(std::make_unique<PathEngine>())
 {}
 
 auto MainPresenter::SamplePaths(const PathQuery& pQuery) const -> void
 {
-	Listener()->SamplingStarted();
-	PathEngine engine{};
-	Listener()->OnPathsReceived(pQuery, engine.SamplePaths(pQuery));
-	Listener()->SamplingEnded();
+	//Listener()->SamplingStarted();
+	Listener()->OnPathsReceived(pQuery, m_engine.SamplePaths(pQuery));
+	//Listener()->SamplingEnded();
 }
 
 auto MainPresenter::GetDrift(const PathQuery& pQuery) const -> void
