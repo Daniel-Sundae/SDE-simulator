@@ -1,38 +1,63 @@
 #include "PathEngine.hpp"
+#include "EngineThreadPool.hpp"
 #include "Utils.hpp"
 #include "PathQuery.hpp"
 #include "PDFQuery.hpp"
 #include <thread>
+#include <future>
 #include "assert.h"
 
-PathEngine::PathEngine(std::unique_ptr<EngineThreadPool> tp)
-    : std::move(tp)
-    , m_isBusy(false)
+PathEngine::PathEngine()
+    : m_tp(std::make_unique<EngineThreadPool>())
 { }
 
 auto PathEngine::SamplePaths(const PathQuery& pathQuery) const -> Paths
 {
+    auto samplePath = [this, pathQuery]() -> Path {
+        const std::size_t points = pathQuery.simulationParameters.Points();
+        const auto& drift = pathQuery.processDefinition.drift;
+        const auto& diffusion = pathQuery.processDefinition.diffusion;
+        const Time dt = pathQuery.simulationParameters.dt;
+        const State startValueData = pathQuery.processDefinition.startValueData;
+        Path path = {};
+        assert(points != 0);
+        path.reserve(points);
+        path.push_back(startValueData);
+        for (std::size_t i = 1; i < points; ++i)
+            path.push_back(path.back() + this->Increment(drift, diffusion, static_cast<Time>(i) * dt, path.back(), dt));
+        return path;
+    };
+
     Paths paths;
-    const std::size_t samples = pathQuery.simulationParameters.samples;
-    paths.reserve(samples);
-    for (std::size_t i = 0; i < samples; ++i)
-        paths.push_back(SamplePath(pathQuery));
+    std::vector< std::future<Path> > futures;
+    const std::size_t nrSamples = pathQuery.simulationParameters.samples;
+    paths.reserve(nrSamples);
+    futures.reserve(nrSamples);
+    for (std::size_t i = 0; i < nrSamples; ++i) {
+        futures.emplace_back(m_tp->Enqueue(samplePath, TaskPriority::LOW));
+    }
+    for (auto& future : futures) {
+        paths.push_back(future.get());
+    }
     return paths;
 }
 
-auto PathEngine::SamplePath(const PathQuery& pathQuery) const -> Path {
-    const std::size_t points = pathQuery.simulationParameters.Points();
-    const auto& drift = pathQuery.processDefinition.drift;
-    const auto& diffusion = pathQuery.processDefinition.diffusion;
-    const Time dt = pathQuery.simulationParameters.dt;
-    const State startValueData = pathQuery.processDefinition.startValueData;
-    Path path = {};
-    assert(points != 0);
-    path.reserve(points);
-    path.push_back(startValueData);
-    for (std::size_t i = 1; i < points; ++i)
-        path.push_back(path.back() + Increment(drift, diffusion, static_cast<Time>(i) * dt, path.back(), dt));
-    return path;
+
+auto PathEngine::SamplePath(const PathQuery& pathQuery) const -> Path
+{
+    return {};
+    //const std::size_t points = pathQuery.simulationParameters.Points();
+    //const auto& drift = pathQuery.processDefinition.drift;
+    //const auto& diffusion = pathQuery.processDefinition.diffusion;
+    //const Time dt = pathQuery.simulationParameters.dt;
+    //const State startValueData = pathQuery.processDefinition.startValueData;
+    //Path path = {};
+    //assert(points != 0);
+    //path.reserve(points);
+    //path.push_back(startValueData);
+    //for (std::size_t i = 1; i < points; ++i)
+    //    path.push_back(path.back() + Increment(drift, diffusion, static_cast<Time>(i) * dt, path.back(), dt));
+    //return path;
 };
 
 auto PathEngine::GeneratePDFData(const PDFQuery& pdfQuery) const -> PDFData

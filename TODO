@@ -20,9 +20,10 @@ CODE DESIGN TODO:
 TECH DETAILS TODO:
 - use async. Transmit loading signal to OutputManager
 - swap out std::function to something more performant
-- use threads for many paths.
-- Use threadpool to avoid spinning up threads
-- Maybe use more than one thread per path (for simple paths like BM). Could write function sampleRange() andattach offset to each range, where offset is previous range's last value.
+- move std::function into taskqueue instead of copying it
+- use condition variable isntead of busy waiting for threads
+- do non blocking instead of gathering the futures immediately
+- Remove copying and instead move ownership of PathQuery from inputhandler to PathEngine. (Maybe forwarding?)
 
 DESIGN CHOICES MADE:
 - Every query is self contained, meaning chart is always cleared when doing a new sample
