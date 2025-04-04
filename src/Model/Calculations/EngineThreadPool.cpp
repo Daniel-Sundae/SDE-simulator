@@ -10,21 +10,21 @@ EngineThreadPool::EngineThreadPool(unsigned int nrThreads)
 		nrThreads = std::thread::hardware_concurrency();
 	}
 	m_threads.reserve(nrThreads);
+	std::stop_token st = m_stopSource.get_token();
 	for (unsigned int i = 0; i < nrThreads; ++i) {
-		m_threads.emplace_back(&DoWork, this, m_stopSource.get_token());
+		m_threads.emplace_back([this, st](std::stop_token) {this->DoTasks(st);}); // Do not let jthread create stoptoken.
+		//m_threads.emplace_back([this](std::stop_token st) {this->DoTasks(st);}); // Let jthread create stoptoken.
 	}
 }
 
-auto EngineThreadPool::Enqueue(std::function<Path()> f, TaskPriority prio) -> std::future<Path>
+auto EngineThreadPool::Enqueue(std::function<Path()> f, Priority prio) -> std::future<Path>
 {
 	std::promise<Path> promise;
-
 	std::future<Path> future = promise.get_future();
-	auto task = [callable = std::move(f),
-		promise = std::move(promise)]() mutable {
-		promise.set_value(f());
+	auto task = [callable = std::move(f), promise = std::move(promise)]() mutable {
+		promise.set_value(callable());
 	};
-	if(prio == TaskPriority::HIGH){
+	if(prio == Priority::HIGH){
 		m_tasks->PushFront(task);
 	}
 	else {
@@ -35,16 +35,20 @@ auto EngineThreadPool::Enqueue(std::function<Path()> f, TaskPriority prio) -> st
 
 void EngineThreadPool::Stop()
 {
-	int dummy = 0;
-	(void)dummy;
+	m_stopSource.request_stop();
+	// Alternatively, if jthreads have their own stopsource
+	/*for (auto& t : m_threads) {
+		t.request_stop();
+	}*/
 }
 
-void EngineThreadPool::DoWork(std::stop_token st)
+void EngineThreadPool::DoTasks(std::stop_token st)
 {
 	while (!st.stop_requested()) {
 		/*m_condition.wait*/
-		while (!m_tasks->Empty()) {
-			m_tasks->Pop();
+		auto task = m_tasks->Pop();
+		if (task.has_value()) {
+			task.value()(); // Execute task
 		}
 	}
 }

@@ -1,6 +1,6 @@
 #pragma once
 #include "ProcessData.hpp"
-#include "DefaultConstants.hpp"
+#include "Constants.hpp"
 
 struct SimulationParameters {
     explicit SimulationParameters() = default;
@@ -22,10 +22,10 @@ struct SimulationParameters {
     {
         return static_cast<std::size_t>(std::ceil(time / dt));
     }
-    SolverType solver = SimulationDefault::solver;
-    Time time = SimulationDefault::time;
-    Time dt = SimulationDefault::dt;
-    std::size_t samples = SimulationDefault::samples;
+    SolverType solver = DefaultConstants::Simulation::solver;
+    Time time = DefaultConstants::Simulation::time;
+    Time dt = DefaultConstants::Simulation::dt;
+    std::size_t samples = DefaultConstants::Simulation::samples;
 };
 
 struct ProcessDefinition {
@@ -55,9 +55,11 @@ struct ProcessDefinition {
 struct PathQuery {
     const ProcessDefinition processDefinition;
     const SimulationParameters simulationParameters;
-    PathQuery(const ProcessDefinition& def, const SimulationParameters& simParam)
+    const Priority prio;
+    PathQuery(const ProcessDefinition& def, const SimulationParameters& simParam, const Priority _prio)
         : processDefinition(def)
         , simulationParameters(simParam)
+        , prio(_prio)
     {
     }
 };

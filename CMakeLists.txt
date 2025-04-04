@@ -9,29 +9,29 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Add strict compiler options based on compiler type
 
-# if(MSVC)
-#     add_compile_options(
-#         /W4     # Warning level 4
-#         /WX     # Treat warnings as errors
-#         /permissive- # Strict standards conformance
-#         /analyze # Enable code analysis
-#         /sdl    # Enable additional security checks
-#         /Zi     # Generate debug info
-#         /guard:cf # Control Flow Guard
-#         /MP     # Multi-processor compilation
-#     )
-# else()
-#     add_compile_options(
-#         -Wall
-#         -Wextra
-#         -Wpedantic
-#         -Werror     # Treat warnings as errors
-#         -Wconversion # Warn about implicit conversions
-#         -Wshadow    # Warn about shadowed variables
-#         -Wnon-virtual-dtor # Warn about non-virtual destructors
-#         -pedantic-errors  # Strict ISO C++ compliance
-#     )
-# endif()
+ if(MSVC)
+     add_compile_options(
+         /W4     # Warning level 4
+         /WX     # Treat warnings as errors
+         /permissive- # Strict standards conformance
+         /analyze # Enable code analysis
+         /sdl    # Enable additional security checks
+         /Zi     # Generate debug info
+         /guard:cf # Control Flow Guard
+         /MP     # Multi-processor compilation
+     )
+ else()
+     add_compile_options(
+         -Wall
+         -Wextra
+         -Wpedantic
+         -Werror     # Treat warnings as errors
+         -Wconversion # Warn about implicit conversions
+         -Wshadow    # Warn about shadowed variables
+         -Wnon-virtual-dtor # Warn about non-virtual destructors
+         -pedantic-errors  # Strict ISO C++ compliance
+     )
+ endif()
 
 
 # Additional settings

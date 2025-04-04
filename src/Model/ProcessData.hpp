@@ -1,12 +1,13 @@
 #pragma once
 #include "Types.hpp"
-#include "DefaultConstants.hpp"
+#include "PDF.hpp"
+#include "DriftDiffusion.hpp"
+#include "Constants.hpp"
 #include <stdexcept>
 #include <concepts>
 #include <string_view>
 #include <cmath>
 
-// TODO: Make all these namespaces
 class ProcessData {
 public:
 
@@ -50,7 +51,7 @@ public:
             const double EV = startValue + _mu * time;
             const double stddev = _sigma * std::sqrt(time);
             // Pre computed constants
-            const double sqrt_2pi = std::sqrt(2.0 * PI);
+            const double sqrt_2pi = std::sqrt(2.0 * DefaultConstants::PI);
             const double sigma_t = _sigma * std::sqrt(time);
             const double variance_t = _sigma * _sigma * time;
             const double two_variance_t = 2.0 * variance_t;
@@ -88,7 +89,7 @@ public:
             // Pre computed constants
             const double sigma_squared = _sigma * _sigma;
             const double adjusted_drift = _mu - 0.5 * sigma_squared;
-            const double sqrt_2pi = std::sqrt(2.0 * PI);
+            const double sqrt_2pi = std::sqrt(2.0 * DefaultConstants::PI);
             const double sigma_t = _sigma * std::sqrt(time);
             const double variance_t = sigma_squared * time;
             const double two_variance_t = 2.0 * variance_t;

@@ -7,11 +7,12 @@
 // Thread safe priority based queue implemented with deque
 class TaskQueue {
 public:
-	auto Pop() -> std::function<void()>;
-	auto PushBack(std::function <void()>) -> void;
-	auto PushFront(std::function <void()>) -> void;
+	explicit TaskQueue();
+	[[nodiscard]] auto Pop() -> std::optional< std::function<void()> >;
+	auto PushBack(std::function <void()>&& task) -> void;
+	auto PushFront(std::function <void()>&& task) -> void;
 	auto Empty() const -> bool;
 private:
 	std::deque< std::function <void()> > m_tasks;
-	std::mutex m;
+	mutable std::mutex m_qMutex;
 };

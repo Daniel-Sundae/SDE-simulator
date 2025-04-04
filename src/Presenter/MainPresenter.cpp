@@ -14,7 +14,7 @@ MainPresenter::MainPresenter()
 auto MainPresenter::SamplePaths(const PathQuery& pQuery) const -> void
 {
 	//Listener()->SamplingStarted();
-	Listener()->OnPathsReceived(pQuery, m_engine.SamplePaths(pQuery));
+	Listener()->OnPathsReceived(pQuery, m_engine->SamplePaths(pQuery));
 	//Listener()->SamplingEnded();
 }
 

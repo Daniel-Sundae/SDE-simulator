@@ -1,5 +1,5 @@
 ﻿#include "DefinitionManager.hpp"
-#include "DefaultConstants.hpp"
+#include "Constants.hpp"
 #include "InputManager.hpp"
 #include "ViewUtils.hpp"
 #include <QtWidgets/qdoublespinbox>

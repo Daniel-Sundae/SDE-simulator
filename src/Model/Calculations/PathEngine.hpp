@@ -1,10 +1,10 @@
 #pragma once
 #include "Types.hpp"
+#include "EngineThreadPool.hpp"
 #include <memory>
 
 struct PathQuery;
 struct PDFQuery;
-class EngineThreadPool;
 
 class PathEngine{
 public:
@@ -20,6 +20,5 @@ private:
 		const Time t,
 		const State Xt,
 		const Time dt) const -> State;
-	//bool m_isBusy;
 	std::unique_ptr<EngineThreadPool> m_tp;
 };

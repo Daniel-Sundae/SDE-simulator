@@ -1,5 +1,4 @@
 #include "PathEngine.hpp"
-#include "EngineThreadPool.hpp"
 #include "Utils.hpp"
 #include "PathQuery.hpp"
 #include "PDFQuery.hpp"
@@ -34,7 +33,7 @@ auto PathEngine::SamplePaths(const PathQuery& pathQuery) const -> Paths
     paths.reserve(nrSamples);
     futures.reserve(nrSamples);
     for (std::size_t i = 0; i < nrSamples; ++i) {
-        futures.emplace_back(m_tp->Enqueue(samplePath, TaskPriority::LOW));
+        futures.emplace_back(m_tp->Enqueue(samplePath, Priority::LOW));
     }
     for (auto& future : futures) {
         paths.push_back(future.get());
