@@ -6,7 +6,7 @@ TaskQueue::TaskQueue()
 {
 }
 
-[[nodiscard]] auto TaskQueue::Pop() -> std::optional< std::function<void()> >
+[[nodiscard]] auto TaskQueue::Pop() -> std::optional<Task>
 {
 	std::scoped_lock sl(m_qMutex);
 	if (m_tasks.empty()) {
@@ -17,13 +17,13 @@ TaskQueue::TaskQueue()
 	return task;
 }
 
-auto TaskQueue::PushBack(std::function<void()>&& task) -> void
+auto TaskQueue::PushBack(Task&& task) -> void
 {
 	std::scoped_lock sl(m_qMutex);
 	m_tasks.push_back(std::move(task));
 }
 
-auto TaskQueue::PushFront(std::function<void()>&& task) -> void
+auto TaskQueue::PushFront(Task&& task) -> void
 {
 	std::scoped_lock sl(m_qMutex);
 	m_tasks.push_front(std::move(task));

@@ -1,7 +1,7 @@
 #include "AppInitializer.hpp"
 #include "InputHandler.hpp"
 #include "OutputHandler.hpp"
-#include "InputManager.hpp"
+#include "InputDispatcher.hpp"
 #include "MainPresenter.hpp"
 #include "MainWindow.hpp"
 
@@ -18,10 +18,10 @@ AppInitializer::~AppInitializer() = default;
 
 auto AppInitializer::InitializeComponents() -> void
 {
-	m_mainPresenter->GetOutputHandler()->SetListener(m_mainWindow->GetOutputManager());
+	m_mainPresenter->GetOutputHandler()->SetListener(m_mainWindow->GetOutputDispatcher());
 	m_mainPresenter->SetListener(m_mainPresenter->GetOutputHandler());
 	m_mainPresenter->GetInputHandler()->SetListener(m_mainPresenter.get());
-	m_mainWindow->GetInputManager()->SetInputHandler(m_mainPresenter->GetInputHandler());
+	m_mainWindow->GetInputDispatcher()->SetInputHandler(m_mainPresenter->GetInputHandler());
 }
 
 auto AppInitializer::SetStyle() -> void

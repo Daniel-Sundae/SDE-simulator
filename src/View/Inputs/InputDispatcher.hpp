@@ -11,12 +11,12 @@ class SimulationManager;
 class SettingsManager;
 class InputHandler;
 
-class InputManager : public QWidget
+class InputDispatcher : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit InputManager(QWidget* parent = nullptr);
+    explicit InputDispatcher(QWidget* parent = nullptr);
     auto SetInputHandler(InputHandler* inputHandler) -> void;
     auto OnGoButtonClicked() const -> void;
     auto OnClearButtonClicked() const -> void;
@@ -36,13 +36,13 @@ private:
     InputHandler* m_inputHandler;
 };
 
-class InputManagerGroupBox : public QGroupBox {
+class InputDispatcherGroupBox : public QGroupBox {
 public:
-    explicit InputManagerGroupBox(QWidget* parent = nullptr)
+    explicit InputDispatcherGroupBox(QWidget* parent = nullptr)
         : QGroupBox(parent)
     {}
 
-    InputManager* Parent() const {
-        return qobject_cast<InputManager*>(parent());
+    InputDispatcher* Parent() const {
+        return qobject_cast<InputDispatcher*>(parent());
     }
 };

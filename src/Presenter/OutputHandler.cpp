@@ -1,6 +1,7 @@
 #include "OutputHandler.hpp"
-#include "OutputManager.hpp"
+#include "OutputDispatcher.hpp"
 #include "PathQuery.hpp"
+#include "PDF.hpp"
 
 OutputHandler::OutputHandler()
 	: IPresenterComponent()
@@ -22,6 +23,7 @@ auto OutputHandler::OnPathsReceived(const PathQuery& pQuery, const Paths& paths)
 		}
 	}
 	Listener()->PlotDistribution(distribution);
+	// Remove loading symbol if there currently is one
 }
 
 auto OutputHandler::OnDriftDataReceived(const Path& driftData) const -> void

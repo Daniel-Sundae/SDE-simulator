@@ -1,12 +1,13 @@
 ﻿#include "SimulationManager.hpp"
+#include "Constants.hpp"
 #include "ViewUtils.hpp"
 #include <QtWidgets/qcombobox.h>
 #include <QtWidgets/qformlayout.h>
 #include <QtWidgets/qlabel.h>
 
 
-SimulationManager::SimulationManager(InputManager* parent)
-	: InputManagerGroupBox(parent)
+SimulationManager::SimulationManager(InputDispatcher* parent)
+	: InputDispatcherGroupBox(parent)
 {
     AddComboBoxes();
     AddSpinBoxes();
@@ -48,13 +49,13 @@ auto SimulationManager::SimulationModifiedCb(SimulationWidget param) const{
 auto SimulationManager::AddSpinBoxes() -> void
 {
     auto* timeWidget = new QSpinBox(this);
-    timeWidget->setValue(static_cast<uint64_t>(SimulationDefault::time));
+    timeWidget->setValue(static_cast<uint64_t>(DefaultConstants::Simulation::time));
     timeWidget->setMinimum(0);
     timeWidget->setMaximum(100);
     timeWidget->setSingleStep(10);
     m_widgets[SimulationWidget::TIME] = timeWidget;
     auto* dtWidget = new QDoubleSpinBox(this);
-    dtWidget->setValue(SimulationDefault::dt);
+    dtWidget->setValue(DefaultConstants::Simulation::dt);
     dtWidget->setMinimum(0);
     dtWidget->setMaximum(1);
     dtWidget->setSingleStep(0.1);

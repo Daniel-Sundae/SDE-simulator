@@ -2,10 +2,11 @@
 #include "IPresenterComponent.hpp"
 #include "Types.hpp"
 
-class OutputManager;
+class OutputDispatcher;
 struct PathQuery;
+class PDF;
 
-class OutputHandler final : public IPresenterComponent<OutputManager> {
+class OutputHandler final : public IPresenterComponent<OutputDispatcher> {
 public:
 	explicit OutputHandler();
 	auto OnPathsReceived(const PathQuery& query, const Paths& paths) -> void;

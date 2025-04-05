@@ -1,15 +1,15 @@
 #pragma once
 
 #include "Types.hpp"
-#include "InputManager.hpp"
+#include "InputDispatcher.hpp"
 #include <unordered_map>
 #include <QtWidgets/qgroupbox.h>
 
-class DefinitionManager : public InputManagerGroupBox
+class DefinitionManager : public InputDispatcherGroupBox
 {
 	Q_OBJECT
 public:
-	explicit DefinitionManager(InputManager* parent);
+	explicit DefinitionManager(InputDispatcher* parent);
 private:
 	auto UpdateWidgetProperties(ProcessType process, bool initialize = false) -> void;
 	auto AddDefinitionWidgets() -> void;

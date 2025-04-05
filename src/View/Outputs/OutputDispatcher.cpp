@@ -1,8 +1,8 @@
 #include "PathChart.hpp"
 #include "DistributionChart.hpp"
-#include "OutputManager.hpp"
+#include "OutputDispatcher.hpp"
 
-OutputManager::OutputManager(QWidget *parent)
+OutputDispatcher::OutputDispatcher(QWidget *parent)
     : QWidget(parent)
     , m_layout(new QVBoxLayout(this))
     , m_pathChartView(new QChartView(this))
@@ -23,27 +23,27 @@ OutputManager::OutputManager(QWidget *parent)
 ////////////////////////////////////////
 
 
-auto OutputManager::UpdatePathChartTitle(const PathQuery& pQuery) const -> void
+auto OutputDispatcher::UpdatePathChartTitle(const PathQuery& pQuery) const -> void
 {
     GetPathChart()->UpdateTitle(pQuery);
 }
 
-auto OutputManager::PlotPathChartDriftData(const Path& driftLine) const -> void
+auto OutputDispatcher::PlotPathChartDriftData(const Path& driftLine) const -> void
 {
     GetPathChart()->PlotDriftCurve(driftLine);
 }
 
-auto OutputManager::PlotPath(const Path& path) const -> void
+auto OutputDispatcher::PlotPath(const Path& path) const -> void
 {
     GetPathChart()->PlotPath(path);
 }
 
-auto OutputManager::ClearPathChart(bool clearDrift) -> void
+auto OutputDispatcher::ClearPathChart(bool clearDrift) -> void
 {
     GetPathChart()->ClearPathChart(clearDrift);
 }
 
-auto OutputManager::SetPathChartMaxTime(const Time time) -> void
+auto OutputDispatcher::SetPathChartMaxTime(const Time time) -> void
 {
     GetPathChart()->SetMaxTime(time);
 }
@@ -52,32 +52,32 @@ auto OutputManager::SetPathChartMaxTime(const Time time) -> void
 //// DISTRIBUTION CHART
 ////////////////////////////////////////
 
-auto OutputManager::UpdateDistributionChartTitle(const ProcessType type) const -> void
+auto OutputDispatcher::UpdateDistributionChartTitle(const ProcessType type) const -> void
 {
     GetDistributionChart()->UpdateTitle(type);
 }
 
-auto OutputManager::PlotDistribution(const Distribution& distribution) const -> void
+auto OutputDispatcher::PlotDistribution(const Distribution& distribution) const -> void
 {
     GetDistributionChart()->PlotDistribution(distribution);
 }
 
-auto OutputManager::UpdateDistributionChartPDF(const PDFData& pdfData) const -> void
+auto OutputDispatcher::UpdateDistributionChartPDF(const PDFData& pdfData) const -> void
 {
     GetDistributionChart()->UpdateDistributionChartPDF(pdfData);
 }
 
-auto OutputManager::SetDistributionChartSupport(const Range pdfDomain) const -> void
+auto OutputDispatcher::SetDistributionChartSupport(const Range pdfDomain) const -> void
 {
     GetDistributionChart()->SetDistributionChartSupport(pdfDomain);
 }
 
-auto OutputManager::UpdateDistributionChartEV(const State EV) const -> void
+auto OutputDispatcher::UpdateDistributionChartEV(const State EV) const -> void
 {
     GetDistributionChart()->PlotExpValLine(EV);
 }
 
-auto OutputManager::ClearDistributionChart() -> void
+auto OutputDispatcher::ClearDistributionChart() -> void
 {
     GetDistributionChart()->ClearDistributionChart();
 }
@@ -86,12 +86,12 @@ auto OutputManager::ClearDistributionChart() -> void
 //// ACCESSORS
 ////////////////////////////////////////
 
-auto OutputManager::GetPathChart() const -> PathChart*
+auto OutputDispatcher::GetPathChart() const -> PathChart*
 {
     return static_cast<PathChart*>(m_pathChartView->chart());
 }
 
-auto OutputManager::GetDistributionChart() const -> DistributionChart*
+auto OutputDispatcher::GetDistributionChart() const -> DistributionChart*
 {
     return static_cast<DistributionChart*>(m_distributionChartView->chart());
 }

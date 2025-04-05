@@ -9,6 +9,7 @@ EngineThreadPool::EngineThreadPool(unsigned int nrThreads)
 	if (!nrThreads) {
 		nrThreads = std::thread::hardware_concurrency();
 	}
+	nrThreads = 1;
 	m_threads.reserve(nrThreads);
 	std::stop_token st = m_stopSource.get_token();
 	for (unsigned int i = 0; i < nrThreads; ++i) {
@@ -19,16 +20,16 @@ EngineThreadPool::EngineThreadPool(unsigned int nrThreads)
 
 auto EngineThreadPool::Enqueue(std::function<Path()> f, Priority prio) -> std::future<Path>
 {
-	std::promise<Path> promise;
-	std::future<Path> future = promise.get_future();
-	auto task = [callable = std::move(f), promise = std::move(promise)]() mutable {
-		promise.set_value(callable());
-	};
+	std::packaged_task<Path()> task(std::move(f));
+	std::future<Path> future = task.get_future();
 	if(prio == Priority::HIGH){
-		m_tasks->PushFront(task);
+		m_tasks->PushFront(std::move(task));
 	}
-	else {
-		m_tasks->PushBack(task);
+	else if(prio == Priority::LOW){
+		m_tasks->PushBack(std::move(task));
+	}
+	else{
+		throw std::runtime_error("Priority not implemented");
 	}
 	return future;
 }

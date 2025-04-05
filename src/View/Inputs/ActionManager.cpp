@@ -1,9 +1,9 @@
 ﻿#include "ActionManager.hpp"
-#include "InputManager.hpp"
+#include "InputDispatcher.hpp"
 #include "ViewUtils.hpp"
 
-ActionManager::ActionManager(InputManager *parent)
-    : InputManagerGroupBox(parent)
+ActionManager::ActionManager(InputDispatcher *parent)
+    : InputDispatcherGroupBox(parent)
 {
     AddActionWidgets();
 }

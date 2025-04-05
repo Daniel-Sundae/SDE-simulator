@@ -1,13 +1,13 @@
 #include "MainWindow.hpp"
-#include "InputManager.hpp"
-#include "OutputManager.hpp"
+#include "InputDispatcher.hpp"
+#include "OutputDispatcher.hpp"
 
 MainWindow::MainWindow()
     : QMainWindow()
     , m_centralWidget(new QWidget(this))
     , m_mainWindowLayout(new QHBoxLayout(m_centralWidget))
-    , m_outputManager(new OutputManager(m_centralWidget))
-    , m_inputManager(new InputManager(m_centralWidget))
+    , m_outputDispatcher(new OutputDispatcher(m_centralWidget))
+    , m_inputDispatcher(new InputDispatcher(m_centralWidget))
 {
     setCentralWidget(m_centralWidget);
     setWindowTitle("SDE Simulator");
@@ -18,16 +18,16 @@ MainWindow::MainWindow()
 
 auto MainWindow::AddWidgets() -> void
 {
-    m_mainWindowLayout->addWidget(m_outputManager, 5);
-    m_mainWindowLayout->addWidget(m_inputManager, 1);
+    m_mainWindowLayout->addWidget(m_outputDispatcher, 5);
+    m_mainWindowLayout->addWidget(m_inputDispatcher, 1);
 }
 
-auto MainWindow::GetInputManager() const -> InputManager*
+auto MainWindow::GetInputDispatcher() const -> InputDispatcher*
 {
-    return m_inputManager;
+    return m_inputDispatcher;
 }
 
-auto MainWindow::GetOutputManager() const -> OutputManager*
+auto MainWindow::GetOutputDispatcher() const -> OutputDispatcher*
 {
-    return m_outputManager;
+    return m_outputDispatcher;
 }

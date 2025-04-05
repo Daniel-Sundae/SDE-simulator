@@ -44,6 +44,7 @@ auto PathEngine::SamplePaths(const PathQuery& pathQuery) const -> Paths
 
 auto PathEngine::SamplePath(const PathQuery& pathQuery) const -> Path
 {
+    (void)pathQuery;
     return {};
     //const std::size_t points = pathQuery.simulationParameters.Points();
     //const auto& drift = pathQuery.processDefinition.drift;
@@ -76,7 +77,6 @@ auto PathEngine::Increment(
 
 auto PathEngine::Stop() const -> void
 {
-    if (m_isBusy) { // Probably do not need this variable
-        // Stop threadpool
-    }
+    int dummy;
+    (void)dummy;
 }

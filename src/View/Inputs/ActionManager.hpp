@@ -2,17 +2,17 @@
 
 #include "Types.hpp"
 #include "InputHandler.hpp"
-#include "InputManager.hpp"
+#include "InputDispatcher.hpp"
 #include <unordered_map>
 
 class QPushButton;
 class QDoubleSpinBox;
 
-class ActionManager : public InputManagerGroupBox
+class ActionManager : public InputDispatcherGroupBox
 {
 	Q_OBJECT
 public:
-	explicit ActionManager(InputManager* parent);
+	explicit ActionManager(InputDispatcher* parent);
 private:
 	auto AddActionWidgets() -> void;
 private:

@@ -18,7 +18,7 @@ CODE DESIGN TODO:
 - Use sub cmakeprojects
 
 TECH DETAILS TODO:
-- use async. Transmit loading signal to OutputManager
+- use async. Transmit loading signal to OutputDispatcher
 - swap out std::function to something more performant
 - move std::function into taskqueue instead of copying it
 - use condition variable isntead of busy waiting for threads

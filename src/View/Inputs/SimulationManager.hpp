@@ -1,12 +1,12 @@
 #pragma once
 #include "Types.hpp"
-#include "InputManager.hpp"
+#include "InputDispatcher.hpp"
 
-class SimulationManager : public InputManagerGroupBox
+class SimulationManager : public InputDispatcherGroupBox
 {
 	Q_OBJECT
 public:
-	explicit SimulationManager(InputManager* parent);
+	explicit SimulationManager(InputDispatcher* parent);
 private:
 	auto AddComboBoxes() -> void;
 	auto AddSpinBoxes() -> void;

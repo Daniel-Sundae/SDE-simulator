@@ -1,14 +1,14 @@
 ﻿#include "DefinitionManager.hpp"
 #include "Constants.hpp"
-#include "InputManager.hpp"
+#include "InputDispatcher.hpp"
 #include "ViewUtils.hpp"
 #include <QtWidgets/qdoublespinbox>
 #include <QtWidgets/qcombobox>
 #include <QtWidgets/qformlayout.h>
 #include <QtWidgets/qlabel.h>
 
-DefinitionManager::DefinitionManager(InputManager *parent)
-    : InputManagerGroupBox(parent)
+DefinitionManager::DefinitionManager(InputDispatcher *parent)
+    : InputDispatcherGroupBox(parent)
 {
     AddDefinitionWidgets();
     InitializeDesign();

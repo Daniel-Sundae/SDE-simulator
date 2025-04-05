@@ -1,4 +1,4 @@
-#include "InputManager.hpp"
+#include "InputDispatcher.hpp"
 #include "ActionManager.hpp"
 #include "DefinitionManager.hpp"
 #include "SimulationManager.hpp"
@@ -8,7 +8,7 @@
 #include <QtWidgets/qboxlayout.h>
 
 
-InputManager::InputManager(QWidget* parent)
+InputDispatcher::InputDispatcher(QWidget* parent)
     : QWidget(parent)
     , m_actionManager(new ActionManager(this))
     , m_definitionManager(new DefinitionManager(this))
@@ -23,32 +23,32 @@ InputManager::InputManager(QWidget* parent)
     layout->addWidget(m_settingsManager);
 }
 
-auto InputManager::SetInputHandler(InputHandler* inputHandler) -> void
+auto InputDispatcher::SetInputHandler(InputHandler* inputHandler) -> void
 {
     m_inputHandler = inputHandler;
 }
 
-auto InputManager::OnGoButtonClicked() const -> void
+auto InputDispatcher::OnGoButtonClicked() const -> void
 {
     m_inputHandler->SamplePaths();
 }
 
-auto InputManager::OnClearButtonClicked() const -> void
+auto InputDispatcher::OnClearButtonClicked() const -> void
 {
     m_inputHandler->Clear();
 }
 
-auto InputManager::OnProcessTypeModified(const ProcessType newType) const -> void
+auto InputDispatcher::OnProcessTypeModified(const ProcessType newType) const -> void
 {
     m_inputHandler->OnProcessTypeModified(newType);
 }
 
-auto InputManager::OnProcessDefinitionModified(const DefinitionWidget param, double userValue) const -> void
+auto InputDispatcher::OnProcessDefinitionModified(const DefinitionWidget param, double userValue) const -> void
 {
     m_inputHandler->OnProcessDefinitionModified(param, userValue);
 }
 
-auto InputManager::OnSolverTypeModified(const SolverType newType) const -> void
+auto InputDispatcher::OnSolverTypeModified(const SolverType newType) const -> void
 {
     m_inputHandler->OnSolverTypeModified(newType);
 }

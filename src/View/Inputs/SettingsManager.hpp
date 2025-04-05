@@ -1,13 +1,13 @@
 #pragma once
 #include "Types.hpp"
-#include "InputManager.hpp"
+#include "InputDispatcher.hpp"
 #include <QtWidgets/qgroupbox.h>
 
-class SettingsManager : public InputManagerGroupBox
+class SettingsManager : public InputDispatcherGroupBox
 {
 	Q_OBJECT
 public:
-	explicit SettingsManager(InputManager* parent);
+	explicit SettingsManager(InputDispatcher* parent);
 private:
 	auto AddCheckBoxes() -> void;
 	auto AddSeedWidget() -> void;

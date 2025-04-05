@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <optional>
+#include <future>
 #include <stdexcept>
 #include <cstddef>
 #include <cassert>
@@ -15,6 +16,7 @@ using Distribution = std::vector<State>;
 using PDFData = std::vector<Density>;
 using StateDot = double; // dX/dt
 using Range = std::pair<double, double>;
+using Task = std::packaged_task<Path()>;
 template <typename T>
 concept IntOrDouble = std::same_as<T, int> || std::same_as<T, double>;
 

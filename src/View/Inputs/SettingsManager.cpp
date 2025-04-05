@@ -1,13 +1,13 @@
 ﻿#include "SettingsManager.hpp"
-#include "InputManager.hpp"
+#include "InputDispatcher.hpp"
 #include "ViewUtils.hpp"
 #include <QtWidgets/qcheckbox.h>
 #include <QtWidgets/qformlayout.h>
 #include <QtWidgets/qlabel.h>
 
 
-SettingsManager::SettingsManager(InputManager* parent)
-	: InputManagerGroupBox(parent)
+SettingsManager::SettingsManager(InputDispatcher* parent)
+	: InputDispatcherGroupBox(parent)
 {
     AddCheckBoxes();
     AddSeedWidget();

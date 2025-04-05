@@ -2,11 +2,11 @@
 
 #include <memory>
 #include "OutputHandler.hpp"
+#include "PathEngine.hpp"
 
 struct PathQuery;
 struct PDFQuery;
 class InputHandler;
-class PathEngine;
 
 class MainPresenter final : public IPresenterComponent<OutputHandler> {
 public:

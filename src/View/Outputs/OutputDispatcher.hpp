@@ -10,11 +10,11 @@ struct PathQuery;
 class PathChart;
 class DistributionChart;
 
-class OutputManager : public QWidget{
+class OutputDispatcher : public QWidget{
     Q_OBJECT
 
 public:
-    explicit OutputManager(QWidget* parent = nullptr);
+    explicit OutputDispatcher(QWidget* parent = nullptr);
 
     // PathChart
     auto UpdatePathChartTitle(const PathQuery& pQuery) const -> void;
