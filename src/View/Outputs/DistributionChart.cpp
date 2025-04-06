@@ -105,7 +105,7 @@ auto DistributionChart::InitializeAxis() -> void
 	m_xAxis->setRange(-10, 10);
 	m_yAxisRelativeCount->setRange(0, 1);
 	m_yAxisDensity->setRange(0, 1);
-	for (int i = 0; i < nrBins; ++i) {
+	for (std::size_t i = 0; i < nrBins; ++i) {
 		m_categoryAxis->append(QString::number(i));
 	}
 	m_categoryAxis->setVisible(false);

@@ -24,7 +24,7 @@
             "displayName": "Debug with MinGW Qt Compiler",
             "description": "Build configuration for Debug using MinGW compiler from Qt",
             "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/Debug",
+            "binaryDir": "${sourceDir}/build/Debug-MinGW",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_PREFIX_PATH": "C:/Qt/6.8.2/mingw_64/lib/cmake",

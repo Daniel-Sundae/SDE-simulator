@@ -20,7 +20,7 @@ namespace GUI
                 subcontrol-origin: margin;
                 subcontrol-position: top center;
                 padding: 0 3px;
-                top: 0em; 
+                top: 0em;
             })";
     }
 
