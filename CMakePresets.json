@@ -9,7 +9,7 @@
             "binaryDir": "${sourceDir}/build/Debug-MSVC",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_PREFIX_PATH": "C:/Qt/6.8.2/msvc2022_64/lib/cmake",
+                "CMAKE_PREFIX_PATH": "C:/Qt/6.8.3/msvc2022_64/lib/cmake",
                 "CMAKE_C_COMPILER": "cl.exe",
                 "CMAKE_CXX_COMPILER": "cl.exe"
             },
@@ -27,9 +27,38 @@
             "binaryDir": "${sourceDir}/build/Debug-MinGW",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_PREFIX_PATH": "C:/Qt/6.8.2/mingw_64/lib/cmake",
+                "CMAKE_PREFIX_PATH": "C:/Qt/6.8.3/mingw_64/lib/cmake",
                 "CMAKE_C_COMPILER": "gcc",
                 "CMAKE_CXX_COMPILER": "g++"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "wasm-release",
+            "displayName": "WebAssembly Release Build (Qt 6.8 MultiThread)",
+            "description": "Build configuration for WebAssembly using Emscripten 3.1.56",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/wasm-release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_TOOLCHAIN_FILE": "C:/Program Files/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake",
+                "CMAKE_PREFIX_PATH": "C:/Qt/6.8.3/wasm_multithread/lib/cmake",
+                "QT_HOST_PATH": "C:/Qt/6.8.3/mingw_64",
+                "Qt6_DIR": "C:/Qt/6.8.3/wasm_multithread/lib/cmake/Qt6",
+                "CMAKE_C_COMPILER": "emcc",
+                "CMAKE_CXX_COMPILER": "em++",
+                "CMAKE_CXX_STANDARD": "20",
+                "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+
+                "CMAKE_FIND_ROOT_PATH": "C:/Program Files/emsdk/upstream/emscripten/cache/sysroot;C:/Qt/6.8.3/wasm_multithread",
+                "CMAKE_FIND_ROOT_PATH_MODE_PACKAGE": "BOTH",
+                "CMAKE_FIND_ROOT_PATH_MODE_LIBRARY": "BOTH",
+                "CMAKE_FIND_ROOT_PATH_MODE_INCLUDE": "BOTH",
+                "CMAKE_FIND_ROOT_PATH_MODE_PROGRAM": "NEVER"
             },
             "condition": {
                 "type": "equals",
@@ -62,7 +91,7 @@
             "binaryDir": "${sourceDir}/build/Release-MSVC",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_PREFIX_PATH": "C:/Qt/6.8.2/msvc2022_64/lib/cmake",
+                "CMAKE_PREFIX_PATH": "C:/Qt/6.8.3/msvc2022_64/lib/cmake",
                 "CMAKE_C_COMPILER": "cl.exe",
                 "CMAKE_CXX_COMPILER": "cl.exe"
             },
@@ -80,7 +109,7 @@
             "binaryDir": "${sourceDir}/build/Release",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_PREFIX_PATH": "C:/Qt/6.8.2/mingw_64/lib/cmake",
+                "CMAKE_PREFIX_PATH": "C:/Qt/6.8.3/mingw_64/lib/cmake",
                 "CMAKE_C_COMPILER": "gcc",
                 "CMAKE_CXX_COMPILER": "g++"
             },
