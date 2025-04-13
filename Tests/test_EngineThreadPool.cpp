@@ -9,91 +9,159 @@ protected:
     std::unique_ptr<EngineThreadPool> m_tp;
     Paths m_results;
     std::mutex m_resultMtx;
+    std::vector< std::future<Path> > m_futures;
 
     void SetUp() override {
         SetUp(0);
     }
 
     void SetUp(unsigned int nrThreads) {
+        TearDown();
         m_tp = std::make_unique<EngineThreadPool>(nrThreads);
     }
 
     void TearDown() {
+        WaitForResults();
         m_tp.reset();
+        {
+           std::unique_lock lock(m_resultMtx, std::try_to_lock);
+           ASSERT_TRUE(lock.owns_lock())
+            << "No thread should be writing to results when tearing down.";
+            m_results.clear();
+        }
+        m_futures.clear();
     }
 
-    auto GenerateTaskFunction(const unsigned int taskTimeMs, const State dummyState) -> std::function<Path()>
+    auto GenerateTaskFunction(const unsigned int taskTimeMs, const State resultState) -> std::function<Path()>
     {
-        return [this, taskTimeMs, dummyState]() -> Path {
+        return [this, taskTimeMs, resultState]() -> Path {
             std::this_thread::sleep_for(std::chrono::milliseconds(taskTimeMs));
             {
                 std::scoped_lock sl(m_resultMtx);
-                m_results.push_back({ dummyState });
+                m_results.push_back({ resultState });
             }
-            return {}; // This path is completely ignored by tests. Needed for EngineThreadPool::Enqueue interface.
+            // This returned empty path is completely ignored by tests.
+            // Needed for EngineThreadPool::Enqueue interface.
+            return {};
         };
     }
 
     auto DoEnqueue(
         std::function<Path()> f,
-        std::size_t nrTasks,
-        Priority prio) -> std::vector< std::future<Path> >
+        std::size_t nrTasks = 1) -> void
     {
-        std::vector< std::future<Path> > futures;
-        futures.reserve(nrTasks);
         for (std::size_t i = 0; i < nrTasks; ++i) {
-            futures.emplace_back(m_tp->Enqueue(f, prio));
+            m_futures.emplace_back(m_tp->Enqueue(f));
         }
-        return futures;
     }
 
-    auto WaitForResults(std::vector< std::future<Path> >& futures) -> void {
-        for (auto& future : futures) {
+    auto WaitForResults() -> void
+    {
+        for (auto& future : m_futures) {
             future.get();
         }
+        m_futures.clear();
     };
 
 };
 
 TEST_F(EngineThreadPoolTest, TestTpSimpleTasks) {
-    int taskDuration = GetRandomInt(100, 300);
-    auto task = GenerateTaskFunction(taskDuration, 1.0);
-    std::vector < std::future<Path> > futures = DoEnqueue(task, 10, Priority::HIGH);
-    EngineThreadPoolTest::WaitForResults(futures);
+    SetUp(1);
+    auto task1 = GenerateTaskFunction(GetRandomInt(1, 300), 0.1);
+    auto task2 = GenerateTaskFunction(GetRandomInt(1, 300), 0.2);
+    auto task3 = GenerateTaskFunction(GetRandomInt(1, 300), 0.3);
+    auto task4 = GenerateTaskFunction(GetRandomInt(1, 300), 0.4);
 
-    std::cout << "In TestTpSimpleTasks" << std::endl;
-    for (auto& p : m_results) {
-        std::cout << p[0];
-    }
+    DoEnqueue(task1);
+    DoEnqueue(task2);
+    DoEnqueue(task3);
+    DoEnqueue(task4);
+    WaitForResults();
+
+    std::vector<Path> expected = { {0.1}, {0.2}, {0.3}, {0.4} };
+    ASSERT_EQ(expected, m_results);
 }
 
-TEST_F(EngineThreadPoolTest, TestTpPriority) {
-    std::cout << "TestTpPriority 0" << std::endl;
-    TearDown();
-    SetUp(1); // Use only one thread for simplicity
-    int lowPrioTaskDuration = 100;
-    State lowPrioPathState = 0.1;
-    int highPrioTaskDuration = 0;
-    State highPrioPathState = 0.2;
-    auto lowPrioTask = GenerateTaskFunction(lowPrioTaskDuration, lowPrioPathState);
-    auto highPrioTask = GenerateTaskFunction(highPrioTaskDuration, highPrioPathState);
-    std::vector < std::future<Path> > futuresLowPrio = DoEnqueue(lowPrioTask, 20, Priority::LOW);
-    std::vector < std::future<Path> > futuresHighPrio = DoEnqueue(highPrioTask, 20, Priority::HIGH);
-    EngineThreadPoolTest::WaitForResults(futuresLowPrio);
-    EngineThreadPoolTest::WaitForResults(futuresHighPrio);
+TEST_F(EngineThreadPoolTest, TestTpOrder) {
+    SetUp(2);
+    auto slowTask = GenerateTaskFunction(200, 0.2);
+    auto fastTask = GenerateTaskFunction(0, 0.1);
+    DoEnqueue(slowTask);
+    DoEnqueue(fastTask);
+    WaitForResults();
 
-    //Expect that all low prio tasks are first entered into the queue and that the waiting thread will start working on one of them immediately.
-    //Then, the high prio tasks are entered into the front of the queue so the next tasks the thread will work on are the high prio task.
-    //Finally, the thread starts finishing the low prio tasks.
+    // Expect that fast task is done first since there are two threads working on them simultaneously
+    std::vector<Path> expected = { {0.1}, {0.2} };
+    ASSERT_EQ(expected, m_results);
 
-    for (auto& p : m_results) {
-        std::cout << p[0] << std::endl;
-    }
+    SetUp(1);
+    DoEnqueue(slowTask);
+    DoEnqueue(fastTask);
+    WaitForResults();
 
+    // Expect slow task is done first since it was enqueued first and only one working thread
+    expected = { {0.2}, {0.1} };
+    ASSERT_EQ(expected, m_results);
 }
 
+TEST_F(EngineThreadPoolTest, TestTpMultiThreadIsFaster) {
+    unsigned int maxThreads = 4; // Increase or decrease depending on machine. Higher nr means more flaky test.
+    unsigned int nrTasks = 20;
+    using Duration = std::chrono::steady_clock::duration;
+    std::vector<Duration> durations = {};
+    durations.reserve(maxThreads);
+    auto task = GenerateTaskFunction(50, 0.1);
+    for (unsigned int i = 1; i <= maxThreads; ++i) {
+        SetUp(i);
+        auto startTime = std::chrono::steady_clock::now();
+        DoEnqueue(task, nrTasks);
+        WaitForResults();
+        durations.push_back(std::chrono::steady_clock::now() - startTime);
+        ASSERT_EQ(m_results.size(), nrTasks);
+    }
+    ASSERT_TRUE(std::is_sorted(durations.begin(), durations.end(), std::greater<Duration>()));
+}
 
+TEST_F(EngineThreadPoolTest, TestTpClearTasks) {
+    SetUp(1);
+    unsigned int taskTime = 100;
+    unsigned int nrTasks = 10;
+    auto task = GenerateTaskFunction(taskTime, 0.1);
+    DoEnqueue(task, nrTasks);
+    // Ensures thread picks up task before we clear tasks
+    std::this_thread::sleep_for(std::chrono::milliseconds(taskTime/10));
+    std::cout << m_tp->NrTasks() << std::endl;
+    std::cout << m_futures.size() << std::endl;
+    m_tp->ClearTasks();
+    std::cout << m_tp->NrTasks() << std::endl;
+    std::cout << m_futures.size() << std::endl;
 
-TEST_F(EngineThreadPoolTest, TestTpStop) {
-    GTEST_SKIP() << "TestPriorityTP not implemented yet.";
+    try {
+        WaitForResults(); // Call the function expected to throw
+
+        // If it didn't throw, something is wrong with the test setup
+        FAIL() << "WaitForResults() did not throw any exception.";
+
+    }
+    catch (const std::future_error& e) {
+        // This would catch the broken_promise if it occurred
+        FAIL() << "Caught std::future_error with code " << e.code().message()
+            << ". Expected a different exception type based on debugger break.";
+
+    }
+    catch (const std::exception& e) {
+        // Catch any standard exception (most exceptions derive from this)
+        // THIS IS LIKELY THE BLOCK THAT WILL EXECUTE
+        std::cerr << "Caught std::exception-derived type: " << typeid(e).name() << std::endl;
+        std::cerr << "what(): " << e.what() << std::endl;
+        FAIL() << "Caught unexpected std::exception: " << typeid(e).name() << " - " << e.what();
+
+    }
+    catch (...) {
+        // Catch anything else that doesn't derive from std::exception
+        std::cerr << "Caught a non-standard exception type." << std::endl;
+        FAIL() << "Caught a non-standard exception type.";
+    }
+    ASSERT_EQ(m_tp->NrTasks(), 0);
+    ASSERT_EQ(m_results.size(), 1);
 }

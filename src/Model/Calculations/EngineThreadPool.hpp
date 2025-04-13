@@ -1,7 +1,8 @@
 #pragma once
 #include "Types.hpp"
 #include "PathQuery.hpp"
-#include "TaskQueue.hpp"
+//#include "TaskQueue.hpp"
+#include <queue>
 #include <future>
 #include <thread>
 
@@ -9,8 +10,9 @@ class EngineThreadPool {
 public:
 	explicit EngineThreadPool(unsigned int nrThreads = 0);
 	~EngineThreadPool();
-	auto Enqueue(const std::function<Path()> f, Priority prio) -> std::future<Path>;
+	auto Enqueue(const std::function<Path()> f) -> std::future<Path>;
 	auto ClearTasks() -> void;
+	auto NrTasks() const -> std::size_t;
 private:
 	// Only allow moving object to engine
 	EngineThreadPool(const EngineThreadPool&) = delete;
@@ -18,8 +20,8 @@ private:
 	auto DoTasks(std::stop_token st) -> void;
 private:
 	std::vector<std::jthread> m_threads;
-	std::unique_ptr<TaskQueue> m_tasks;
+	std::queue<Task> m_tasks;
 	std::stop_source m_stopSource;
 	std::condition_variable m_cv;
-	std::mutex m_taskMtx;
+	mutable std::mutex m_taskMtx;
 };

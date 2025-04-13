@@ -70,7 +70,7 @@ auto InputHandler::SamplePaths() -> void
 		ProcessData::GetDiffusion(m_processDefinition->type, m_inputSigma),
 		m_processDefinition->startValueData);
 
-	const PathQuery pQuery = PathQuery{ *m_processDefinition, *m_simulationParameters, Priority::LOW };
+	const PathQuery pQuery = PathQuery{ *m_processDefinition, *m_simulationParameters};
 	const PathQuery deterministicQuery = CreateDriftQuery(pQuery);
 	const PDFQuery pdfQuery = CreatePDFQuery(pQuery);
 	Listener()->GeneratePDFData(pdfQuery);
@@ -90,7 +90,7 @@ auto InputHandler::CreateDriftQuery(const PathQuery& pQuery) const -> PathQuery 
 		pQuery.simulationParameters.time,
 		pQuery.simulationParameters.dt,
 		1);
-	return PathQuery( definition, simulationParams, Priority::HIGH);
+	return PathQuery( definition, simulationParams);
 }
 
 auto InputHandler::CreatePDFQuery(const PathQuery& pQuery) const -> PDFQuery {

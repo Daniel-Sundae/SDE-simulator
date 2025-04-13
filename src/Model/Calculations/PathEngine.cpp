@@ -33,7 +33,7 @@ auto PathEngine::SamplePaths(const PathQuery& pathQuery) const -> Paths
     paths.reserve(nrSamples);
     futures.reserve(nrSamples);
     for (std::size_t i = 0; i < nrSamples; ++i) {
-        futures.emplace_back(m_tp->Enqueue(samplePath, Priority::LOW));
+        futures.emplace_back(m_tp->Enqueue(samplePath));
     }
     for (auto& future : futures) {
         paths.push_back(future.get());

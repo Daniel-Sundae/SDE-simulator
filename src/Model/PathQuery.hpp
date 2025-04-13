@@ -55,11 +55,9 @@ struct ProcessDefinition {
 struct PathQuery {
     const ProcessDefinition processDefinition;
     const SimulationParameters simulationParameters;
-    const Priority prio;
-    PathQuery(const ProcessDefinition& def, const SimulationParameters& simParam, const Priority _prio)
+    PathQuery(const ProcessDefinition& def, const SimulationParameters& simParam)
         : processDefinition(def)
         , simulationParameters(simParam)
-        , prio(_prio)
     {
     }
 };
