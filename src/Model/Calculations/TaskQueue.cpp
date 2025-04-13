@@ -6,6 +6,12 @@ TaskQueue::TaskQueue()
 {
 }
 
+auto TaskQueue::Clear() -> void
+{
+	std::scoped_lock sl(m_qMtx);
+	m_tasks.clear();
+}
+
 auto TaskQueue::Pop() -> std::optional<Task>
 {
 	std::scoped_lock sl(m_qMtx);

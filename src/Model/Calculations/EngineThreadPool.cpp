@@ -5,7 +5,7 @@ EngineThreadPool::EngineThreadPool(unsigned int nrThreads)
 	, m_tasks(std::make_unique<TaskQueue>())
 	, m_stopSource()
 	, m_cv()
-	, m_cvMtx()
+	, m_taskMtx()
 {
 	if (!nrThreads) {
 		nrThreads = std::thread::hardware_concurrency();
@@ -21,16 +21,19 @@ EngineThreadPool::EngineThreadPool(unsigned int nrThreads)
 
 EngineThreadPool::~EngineThreadPool()
 {
-	Stop();
-
-	for (auto& thread : m_threads) {
-		if (thread.joinable()) {
-			thread.join();
-		}
+	ClearTasks();
+	{
+		std::unique_lock<std::mutex> lock(m_taskMtx);
+		m_stopSource.request_stop();
 	}
+	m_cv.notify_all(); // Kills threads
+}
 
-	while (!m_tasks->Empty()) {
-		m_tasks->Pop();
+auto EngineThreadPool::ClearTasks() -> void
+{
+	{
+		std::unique_lock<std::mutex> lock(m_taskMtx);
+		m_tasks->Clear(); // Perhaps not needed? std::deque<std::packaged_task> will probably be cleared automatically
 	}
 }
 
@@ -39,7 +42,7 @@ auto EngineThreadPool::Enqueue(std::function<Path()> f, Priority prio) -> std::f
 	std::packaged_task<Path()> task(std::move(f));
 	std::future<Path> future = task.get_future();
 	{
-		std::unique_lock<std::mutex> lock(m_cvMtx);
+		std::unique_lock<std::mutex> lock(m_taskMtx);
 		if(prio == Priority::HIGH){
 			m_tasks->PushFront(std::move(task));
 		}
@@ -54,39 +57,21 @@ auto EngineThreadPool::Enqueue(std::function<Path()> f, Priority prio) -> std::f
 	return future;
 }
 
-void EngineThreadPool::Stop()
-{
-	{
-		std::unique_lock<std::mutex> lock(m_cvMtx);
-		m_stopSource.request_stop();
-	}
-	// Alternatively, if jthreads have their own stopsource
-	/*for (auto& t : m_threads) {
-		t.request_stop();
-	}*/
-	m_cv.notify_all();
-}
-
 void EngineThreadPool::DoTasks(std::stop_token st)
 {
 	std::optional<Task> task;
-	while (true) {
-		if (!st.stop_requested()) {
-			{
-				std::unique_lock<std::mutex> lock(m_cvMtx);
-				m_cv.wait(lock, [this, &st]() { return st.stop_requested() || !m_tasks->Empty(); });
-				if (st.stop_requested()) {
-					break;
-				}
-				task = m_tasks->Pop();
+	while (!st.stop_requested()) {
+		{
+			std::unique_lock<std::mutex> lock(m_taskMtx);
+			m_cv.wait(lock, [this, &st]() { return st.stop_requested() || !m_tasks->Empty(); });
+			if (st.stop_requested()) {
+				return; // Kill this thread
 			}
-			if (!task.has_value()) {
-				throw std::logic_error("Task queue invariant violated: Pop returned empty after non-empty check");
-			}
-			task.value()(); // Execute task
+			task = m_tasks->Pop();
 		}
-		else {
-			//CollectThreads();
+		if (!task.has_value()) {
+			throw std::logic_error("Task queue invariant violated: Pop returned empty after non-empty check");
 		}
+		task.value()(); // Execute task
 	}
 }

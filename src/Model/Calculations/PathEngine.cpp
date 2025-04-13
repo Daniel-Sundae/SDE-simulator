@@ -41,25 +41,6 @@ auto PathEngine::SamplePaths(const PathQuery& pathQuery) const -> Paths
     return paths;
 }
 
-
-auto PathEngine::SamplePath(const PathQuery& pathQuery) const -> Path
-{
-    (void)pathQuery;
-    return {};
-    //const std::size_t points = pathQuery.simulationParameters.Points();
-    //const auto& drift = pathQuery.processDefinition.drift;
-    //const auto& diffusion = pathQuery.processDefinition.diffusion;
-    //const Time dt = pathQuery.simulationParameters.dt;
-    //const State startValueData = pathQuery.processDefinition.startValueData;
-    //Path path = {};
-    //assert(points != 0);
-    //path.reserve(points);
-    //path.push_back(startValueData);
-    //for (std::size_t i = 1; i < points; ++i)
-    //    path.push_back(path.back() + Increment(drift, diffusion, static_cast<Time>(i) * dt, path.back(), dt));
-    //return path;
-};
-
 auto PathEngine::GeneratePDFData(const PDFQuery& pdfQuery) const -> PDFData
 {
     return pdfQuery.pdf.GeneratePDFData(pdfQuery.points);
@@ -75,7 +56,7 @@ auto PathEngine::Increment(
     return drift(t, Xt) * dt + diffusion(t, Xt) * Utils::db(dt);
 }
 
-auto PathEngine::Stop() const -> void
+auto PathEngine::KillEngine() const -> void
 {
     int dummy;
     (void)dummy;

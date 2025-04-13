@@ -10,6 +10,7 @@ class TaskQueue {
 public:
 	explicit TaskQueue();
 	auto Pop() -> std::optional<Task>;
+	auto Clear() -> void;
 	auto PushBack(Task&& task) -> void;
 	auto PushFront(Task&& task) -> void;
 	auto Empty() const -> bool;
