@@ -19,7 +19,7 @@ endif()
 if(MSVC)
     add_compile_options(
         /W4            # Warning level 4
-        /WX            # Treat warnings as errors
+        #/WX            # Treat warnings as errors
         /permissive-   # Strict standards conformance
         /MP            # Multi-processor compilation
     )
@@ -39,11 +39,25 @@ else()
     set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 endif()
 
+# Headers
 add_library(CommonIncludes INTERFACE)
 target_include_directories(CommonIncludes
     INTERFACE Include
 )
 
+
+# GTESTS
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG    v1.16.0
+)
+set(INSTALL_GTEST OFF CACHE BOOL "Disable installing GTest")
+FetchContent_MakeAvailable(googletest)
+enable_testing()
+
+add_subdirectory(Tests)
 add_subdirectory(src/Model)
 add_subdirectory(src/View)
 add_subdirectory(src/Presenter)
@@ -60,3 +74,11 @@ target_link_libraries(StochasticSim PRIVATE
     View
     Presenter
 )
+
+# windeployqt for DLLs
+if(WIN32)
+    add_custom_command(TARGET StochasticSim POST_BUILD
+        COMMAND "${CMAKE_PREFIX_PATH}/bin/windeployqt.exe" "$<TARGET_FILE:StochasticSim>"
+        COMMENT "Deploying Qt dependencies..."
+    )
+endif()

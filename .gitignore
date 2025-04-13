@@ -3,3 +3,4 @@ all_code.txt
 build/
 build_and_deploy.sh
 CMakeListsOld.txt
+CMakeFiles/

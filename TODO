@@ -29,3 +29,5 @@ DESIGN CHOICES MADE:
 - Every query is self contained, meaning chart is always cleared when doing a new sample
 - There simulation is non blocking and user can cancel query
 
+ERRORS
+GBM, no randomness, 0.01 diffusion.

@@ -7,8 +7,9 @@
 
 class EngineThreadPool {
 public:
-	explicit EngineThreadPool(unsigned int num_threads = 0);
-	auto Enqueue(const std::function<Path()> task, Priority prio) -> std::future<Path>;
+	explicit EngineThreadPool(unsigned int nrThreads = 0);
+	~EngineThreadPool();
+	auto Enqueue(const std::function<Path()> f, Priority prio) -> std::future<Path>;
 	auto Stop() -> void;
 private:
 	// Only allow moving object to engine
@@ -19,5 +20,6 @@ private:
 	std::vector<std::jthread> m_threads;
 	std::unique_ptr<TaskQueue> m_tasks;
 	std::stop_source m_stopSource;
-	std::condition_variable m_goSignal;
+	std::condition_variable m_cv;
+	std::mutex m_cvMtx;
 };

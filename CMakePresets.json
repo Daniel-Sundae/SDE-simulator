@@ -9,9 +9,9 @@
             "binaryDir": "${sourceDir}/build/Debug-MSVC",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_PREFIX_PATH": "C:/Qt/6.8.3/msvc2022_64/lib/cmake",
-                "CMAKE_C_COMPILER": "cl.exe",
-                "CMAKE_CXX_COMPILER": "cl.exe"
+                "CMAKE_PREFIX_PATH": "C:/Qt/6.8.3/msvc2022_64",
+                "CMAKE_C_COMPILER": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.42.34433/bin/Hostx64/x64/cl.exe",
+                "CMAKE_CXX_COMPILER": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.42.34433/bin/Hostx64/x64/cl.exe"
             },
             "condition": {
                 "type": "equals",
@@ -27,7 +27,7 @@
             "binaryDir": "${sourceDir}/build/Debug-MinGW",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_PREFIX_PATH": "C:/Qt/6.8.3/mingw_64/lib/cmake",
+                "CMAKE_PREFIX_PATH": "C:/Qt/6.8.3/mingw_64",
                 "CMAKE_C_COMPILER": "gcc",
                 "CMAKE_CXX_COMPILER": "g++"
             },

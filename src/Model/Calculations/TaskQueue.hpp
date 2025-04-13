@@ -9,11 +9,11 @@
 class TaskQueue {
 public:
 	explicit TaskQueue();
-	[[nodiscard]] auto Pop() -> std::optional<Task>;
+	auto Pop() -> std::optional<Task>;
 	auto PushBack(Task&& task) -> void;
 	auto PushFront(Task&& task) -> void;
 	auto Empty() const -> bool;
 private:
 	std::deque<Task> m_tasks;
-	mutable std::mutex m_qMutex;
+	mutable std::mutex m_qMtx;
 };
