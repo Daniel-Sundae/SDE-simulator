@@ -74,7 +74,7 @@ auto InputHandler::SamplePaths() -> void
 	const PathQuery deterministicQuery = CreateDriftQuery(pQuery);
 	const PDFQuery pdfQuery = CreatePDFQuery(pQuery);
 	Listener()->GeneratePDFData(pdfQuery);
-	Listener()->GetDrift(deterministicQuery);
+	//Listener()->GetDrift(deterministicQuery);
 	Listener()->SamplePaths(pQuery);
 }
 

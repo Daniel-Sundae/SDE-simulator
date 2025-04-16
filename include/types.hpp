@@ -16,7 +16,7 @@ using Distribution = std::vector<State>;
 using PDFData = std::vector<Density>;
 using StateDot = double; // dX/dt
 using Range = std::pair<double, double>;
-using Task = std::packaged_task<Path()>;
+using Task = std::function<void()>;
 template <typename T>
 concept IntOrDouble = std::same_as<T, int> || std::same_as<T, double>;
 

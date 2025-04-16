@@ -10,7 +10,7 @@ class EngineThreadPool {
 public:
 	explicit EngineThreadPool(unsigned int nrThreads = 0);
 	~EngineThreadPool();
-	auto Enqueue(const std::function<Path()> f) -> std::future<Path>;
+	auto Enqueue(const std::function<void()> f) -> void;
 	auto ClearTasks() -> void;
 	auto NrTasks() const -> std::size_t;
 private:

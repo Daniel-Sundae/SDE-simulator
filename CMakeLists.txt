@@ -77,8 +77,9 @@ target_link_libraries(StochasticSim PRIVATE
 
 # windeployqt for DLLs
 if(WIN32)
+    find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${CMAKE_PREFIX_PATH}/bin")
     add_custom_command(TARGET StochasticSim POST_BUILD
-        COMMAND "${CMAKE_PREFIX_PATH}/bin/windeployqt.exe" "$<TARGET_FILE:StochasticSim>"
+        COMMAND "${WINDEPLOYQT_EXECUTABLE}" "$<TARGET_FILE:StochasticSim>"
         COMMENT "Deploying Qt dependencies..."
     )
 endif()

@@ -6,10 +6,12 @@
 OutputHandler::OutputHandler()
 	: IPresenterComponent()
 	, m_distributionSupport(std::make_pair<State>(0,0))
+	, m_paths{}
 { }
 
-auto OutputHandler::OnPathsReceived(const PathQuery& pQuery, const Paths& paths) -> void
+auto OutputHandler::OnPathsReceived(const PathQuery& pQuery, Paths&& paths) -> void
 {
+	m_paths = std::move(paths);
 	Listener()->ClearPathChart(false);
 	Listener()->SetPathChartMaxTime(pQuery.simulationParameters.time);
 	Listener()->UpdatePathChartTitle(pQuery);

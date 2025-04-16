@@ -14,13 +14,16 @@ MainPresenter::MainPresenter()
 auto MainPresenter::SamplePaths(const PathQuery& pQuery) const -> void
 {
 	//Listener()->SamplingStarted(); //Setup loading symbol
-	Listener()->OnPathsReceived(pQuery, m_engine->SamplePaths(pQuery));
+	m_engine->SamplePathsAsync(
+		pQuery,
+		[this, pQuery](Paths results) {Listener()->OnPathsReceived(pQuery, std::move(results));}
+	);
 }
 
 auto MainPresenter::GetDrift(const PathQuery& pQuery) const -> void
 {
 	assert(pQuery.simulationParameters.samples == 1);
-	Listener()->OnDriftDataReceived(m_engine->SamplePaths(pQuery)[0]);
+	m_engine->SamplePathsAsync(pQuery, [this](Paths results) {Listener()->OnDriftDataReceived(std::move(results)[0]);});
 }
 
 auto MainPresenter::GeneratePDFData(const PDFQuery& pdfQuery) const -> void
@@ -34,6 +37,7 @@ auto MainPresenter::GeneratePDFData(const PDFQuery& pdfQuery) const -> void
 auto MainPresenter::Clear() const -> void
 {
 	Listener()->OnClear();
+	m_engine->RequestCancel();
 }
 
 auto MainPresenter::GetInputHandler() const -> InputHandler*

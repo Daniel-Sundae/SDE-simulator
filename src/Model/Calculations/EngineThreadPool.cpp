@@ -25,15 +25,19 @@ EngineThreadPool::~EngineThreadPool()
 		std::unique_lock<std::mutex> lock(m_taskMtx);
 		m_stopSource.request_stop();
 	}
-	m_cv.notify_all(); // Kills threads
+	m_cv.notify_all(); // Kill threads
 }
 
 auto EngineThreadPool::ClearTasks() -> void
 {
-	std::queue<Task> empty;
+	//std::queue<Task> empty;
 	{
 		std::scoped_lock lock(m_taskMtx);
-		std::swap(m_tasks, empty);
+		while (!m_tasks.empty()) {
+			auto task = std::move(m_tasks.front());
+			m_tasks.pop();
+		}
+		//std::swap(m_tasks, empty);
 	}
 }
 
@@ -43,16 +47,13 @@ auto EngineThreadPool::NrTasks() const -> std::size_t
 	return m_tasks.size();
 }
 
-auto EngineThreadPool::Enqueue(std::function<Path()> f) -> std::future<Path>
+auto EngineThreadPool::Enqueue(std::function<void()> task) -> void
 {
-	std::packaged_task<Path()> task(std::move(f));
-	std::future<Path> future = task.get_future();
 	{
 		std::unique_lock<std::mutex> lock(m_taskMtx);
 		m_tasks.push(std::move(task));
 	}
-	m_cv.notify_one();
-	return future;
+	m_cv.notify_one(); // Don't need to hold lock here?
 }
 
 void EngineThreadPool::DoTasks(std::stop_token st)

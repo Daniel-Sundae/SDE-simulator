@@ -2,6 +2,9 @@
 #include "Types.hpp"
 #include "EngineThreadPool.hpp"
 #include <memory>
+#include <mutex>
+#include <optional>
+#include <functional>
 
 struct PathQuery;
 struct PDFQuery;
@@ -9,10 +12,11 @@ struct PDFQuery;
 class PathEngine{
 public:
 	explicit PathEngine();
-	auto SamplePaths(const PathQuery& pQuery) const -> Paths;
+	auto SamplePathsAsync(const PathQuery& pathQuery, std::function<void(Paths)> onCompletionCb) -> void;
 	auto GeneratePDFData(const PDFQuery& pdfQuery) const -> PDFData;
-	auto KillEngine() const -> void;
+	auto RequestCancel() -> void;
 private:
+	auto SamplePathGenerator(const PathQuery& pathQuery, const std::size_t slot) -> std::function<void()>;
 	inline auto Increment(
 		const Drift& drift,
 		const Diffusion& diffusion,
@@ -20,5 +24,11 @@ private:
 		const State Xt,
 		const Time dt) const -> State;
 	std::unique_ptr<EngineThreadPool> m_tp;
-	std::atomic_bool m_guiWantToCancel;
+	Paths m_paths;
+	std::mutex m_pathsMtx;
+	std::atomic<bool> m_cancelRequested;
+	std::atomic<std::size_t> m_completedTasks;
+	std::condition_variable m_completionCv;
+	std::mutex m_completionMtx;
+	std::atomic<bool> m_isRunning;
 };

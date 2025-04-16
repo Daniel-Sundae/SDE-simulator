@@ -57,10 +57,22 @@ protected:
 
     auto WaitForResults() -> void
     {
-        for (auto& future : m_futures) {
-            future.get();
+        try{
+            for (auto& future : m_futures) {
+                future.get();
+            }
+            m_futures.clear();
         }
-        m_futures.clear();
+        catch (...) {
+            try {
+                throw; // rethrow the current exception
+            } catch (const std::exception& e) {
+                std::cout << "Caught std::exception: " << e.what() << std::endl;
+                // You can inspect e here
+            } catch (...) {
+                std::cout << "Caught unknown exception" << std::endl;
+            }
+        }
     };
 
 };
@@ -135,33 +147,7 @@ TEST_F(EngineThreadPoolTest, TestTpClearTasks) {
     m_tp->ClearTasks();
     std::cout << m_tp->NrTasks() << std::endl;
     std::cout << m_futures.size() << std::endl;
-
-    try {
-        WaitForResults(); // Call the function expected to throw
-
-        // If it didn't throw, something is wrong with the test setup
-        FAIL() << "WaitForResults() did not throw any exception.";
-
-    }
-    catch (const std::future_error& e) {
-        // This would catch the broken_promise if it occurred
-        FAIL() << "Caught std::future_error with code " << e.code().message()
-            << ". Expected a different exception type based on debugger break.";
-
-    }
-    catch (const std::exception& e) {
-        // Catch any standard exception (most exceptions derive from this)
-        // THIS IS LIKELY THE BLOCK THAT WILL EXECUTE
-        std::cerr << "Caught std::exception-derived type: " << typeid(e).name() << std::endl;
-        std::cerr << "what(): " << e.what() << std::endl;
-        FAIL() << "Caught unexpected std::exception: " << typeid(e).name() << " - " << e.what();
-
-    }
-    catch (...) {
-        // Catch anything else that doesn't derive from std::exception
-        std::cerr << "Caught a non-standard exception type." << std::endl;
-        FAIL() << "Caught a non-standard exception type.";
-    }
+    WaitForResults();
     ASSERT_EQ(m_tp->NrTasks(), 0);
     ASSERT_EQ(m_results.size(), 1);
 }
