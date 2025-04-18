@@ -1,13 +1,25 @@
+# Qt discovery and AUTOMOC are now handled globally in the root CMakeLists.txt
+
 file(GLOB_RECURSE PRESENTER_SOURCES "*.cpp")
 file(GLOB_RECURSE PRESENTER_HEADERS "*.hpp")
 file(GLOB_RECURSE PRESENTER_HEADERS "*.inl")
 
 add_library(Presenter ${PRESENTER_SOURCES} ${PRESENTER_HEADERS})
 
+# Include directories are often handled by target_link_libraries with Qt targets
 target_include_directories(Presenter
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        # Explicitly add Qt include directories for Intellisense
+        ${Qt6Core_INCLUDE_DIRS}
+        ${Qt6Widgets_INCLUDE_DIRS}
 )
 
 target_link_libraries(Presenter
-    PUBLIC Model View CommonIncludes
+    PUBLIC
+        Model
+        View
+        CommonIncludes
+        Qt6::Core # Link against Qt Core
+        Qt6::Widgets # Add Widgets for transitive includes from View
 )

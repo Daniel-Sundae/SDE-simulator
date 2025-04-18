@@ -11,22 +11,38 @@ MainPresenter::MainPresenter()
 	, m_engine(std::make_unique<PathEngine>())
 {}
 
-auto MainPresenter::SamplePaths(const PathQuery& pQuery) const -> void
+// Remove const
+auto MainPresenter::SamplePaths(const PathQuery& pQuery) -> void
 {
 	//Listener()->SamplingStarted(); //Setup loading symbol
 	m_engine->SamplePathsAsync(
 		pQuery,
-		[this, pQuery](Paths results) {Listener()->OnPathsReceived(pQuery, std::move(results));}
+		[this, pQuery](Paths results) {
+			Listener()->HandleWorkerResult(pQuery, std::move(results));
+		}
 	);
 }
 
-auto MainPresenter::GetDrift(const PathQuery& pQuery) const -> void
+// Remove const
+auto MainPresenter::SampleDriftCurve(const PathQuery& deterministicQuery) -> void
 {
-	assert(pQuery.simulationParameters.samples == 1);
-	m_engine->SamplePathsAsync(pQuery, [this](Paths results) {Listener()->OnDriftDataReceived(std::move(results)[0]);});
+	assert(deterministicQuery.simulationParameters.samples == 1);
+	Listener()->OnDriftDataReceived(m_engine->SampleDriftCurve(deterministicQuery));
 }
 
-auto MainPresenter::GeneratePDFData(const PDFQuery& pdfQuery) const -> void
+// Remove const
+auto MainPresenter::OnQueriesReceived(const PathQuery& pQuery, const PathQuery& deterministicQuery, const PDFQuery& pdfQuery) -> void
+{
+	if(m_engine->IsBusy()){
+		return;
+	}
+	SamplePaths(pQuery);
+	SampleDriftCurve(deterministicQuery);
+	GeneratePDFData(pdfQuery);
+}
+
+// Remove const
+auto MainPresenter::GeneratePDFData(const PDFQuery& pdfQuery) -> void
 {
 	// This is really confusing pattern that I should change.
 	// Looks like result is ignored and not clear that pdf is caching data
@@ -34,10 +50,11 @@ auto MainPresenter::GeneratePDFData(const PDFQuery& pdfQuery) const -> void
 	Listener()->OnPDFReceived(pdfQuery.pdf);
 }
 
-auto MainPresenter::Clear() const -> void
+// Remove const
+auto MainPresenter::Clear() -> void
 {
 	Listener()->OnClear();
-	m_engine->RequestCancel();
+	// m_engine->RequestCancel();
 }
 
 auto MainPresenter::GetInputHandler() const -> InputHandler*

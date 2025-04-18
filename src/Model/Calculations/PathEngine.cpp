@@ -13,7 +13,7 @@ PathEngine::PathEngine()
     , m_completedTasks(0)
     , m_completionCv()
     , m_completionMtx()
-    , m_isRunning(false)
+    , m_isBusy(false)
 { }
 
 auto PathEngine::SamplePathGenerator(const PathQuery& pathQuery, const std::size_t slot) -> std::function<void()>
@@ -34,23 +34,40 @@ auto PathEngine::SamplePathGenerator(const PathQuery& pathQuery, const std::size
             }
             path.push_back(path.back() + this->Increment(drift, diffusion, static_cast<Time>(i) * dt, path.back(), dt));
         }
-        {
-            std::scoped_lock sl(m_pathsMtx);
-            // Check again before writing
-            if (m_cancelRequested) return;
-            m_paths[slot] = std::move(path);
-        }
+        // Check again before writing
+        if (m_cancelRequested) return;
+        // Don't need to protect vector since each thread 
+        // is given unique slot with preallocated space
+        m_paths[slot] = std::move(path);
         m_completedTasks.fetch_add(1);
         m_completionCv.notify_one();
     };
 }
 
+auto PathEngine::SampleDriftCurve(const PathQuery& pathQuery) const -> Path
+{
+    const std::size_t points = pathQuery.simulationParameters.Points();
+    const auto& drift = pathQuery.processDefinition.drift;
+    const auto& diffusion = pathQuery.processDefinition.diffusion;
+    const Time dt = pathQuery.simulationParameters.dt;
+    const State startValueData = pathQuery.processDefinition.startValueData;
+    Path path = {};
+    assert(points != 0);
+    path.reserve(points);
+    path.push_back(startValueData);
+    for (std::size_t i = 1; i < points; ++i) {
+        path.push_back(path.back() + Increment(drift, diffusion, static_cast<Time>(i) * dt, path.back(), dt));
+    }
+    return path;
+}
+
 auto PathEngine::SamplePathsAsync(const PathQuery& pathQuery, std::function<void(Paths)> onCompletionCb) -> void
 {
-    bool expect = false;
-    if (!m_isRunning.compare_exchange_strong(expect, true)) {
-        return;
+    if(m_isBusy.load()){
+        throw std::runtime_error("Engine is busy. Aborting transaction.");
     }
+    m_isBusy = true;
+
     auto mainTask = [this, pathQuery, onCompletionCb]() -> void{
         m_cancelRequested = false;
         const std::size_t nrSamples = pathQuery.simulationParameters.samples;
@@ -76,9 +93,9 @@ auto PathEngine::SamplePathsAsync(const PathQuery& pathQuery, std::function<void
             returnVal = m_cancelRequested.load() ? Paths{} : std::move(m_paths);
             m_paths.clear();
         }
-        m_tp->ClearTasks();
+        m_tp->ClearTasks(); // Flush queue incase cancel requested
         onCompletionCb(std::move(returnVal));
-        m_isRunning = false;
+        m_isBusy = false;
     };
     m_tp->Enqueue(mainTask);
 }
@@ -87,6 +104,11 @@ auto PathEngine::RequestCancel() -> void
 {
     m_cancelRequested = true;
     m_completionCv.notify_one();
+}
+
+auto PathEngine::IsBusy() -> bool
+{
+    return m_isBusy.load() ? true : false;
 }
 
 auto PathEngine::GeneratePDFData(const PDFQuery& pdfQuery) const -> PDFData

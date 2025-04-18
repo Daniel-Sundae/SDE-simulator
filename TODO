@@ -4,13 +4,15 @@ MATH TODO:
 
 
 FUNCTIONALITY TODO:
-- loading symbol for simulation taking time
-- Add dot showing the final result of sim in chart graph.
+- Add widget with info from query on left side, loading symbol for simulation taking time on right side
+- change title of pathchart informing only 100 paths being shown
+- set drifline on top
 - Implement:
 	seed
 	sample
 	rk/other solvers
 	other processes
+- Check listener interface const overload from cline
 
 CODE DESIGN TODO:
 - Stresstest to check if inputhandler can get into broken state

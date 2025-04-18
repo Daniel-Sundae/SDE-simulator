@@ -2,5 +2,6 @@ all_code.txt
 .vs/
 build/
 build_and_deploy.sh
-CMakeListsOld.txt
 CMakeFiles/
+.vscode/
+

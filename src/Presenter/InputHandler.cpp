@@ -73,9 +73,7 @@ auto InputHandler::SamplePaths() -> void
 	const PathQuery pQuery = PathQuery{ *m_processDefinition, *m_simulationParameters};
 	const PathQuery deterministicQuery = CreateDriftQuery(pQuery);
 	const PDFQuery pdfQuery = CreatePDFQuery(pQuery);
-	Listener()->GeneratePDFData(pdfQuery);
-	//Listener()->GetDrift(deterministicQuery);
-	Listener()->SamplePaths(pQuery);
+	Listener()->OnQueriesReceived(pQuery, deterministicQuery, pdfQuery);
 }
 
 auto InputHandler::CreateDriftQuery(const PathQuery& pQuery) const -> PathQuery {

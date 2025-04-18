@@ -13,10 +13,12 @@ class PathEngine{
 public:
 	explicit PathEngine();
 	auto SamplePathsAsync(const PathQuery& pathQuery, std::function<void(Paths)> onCompletionCb) -> void;
+	auto SampleDriftCurve(const PathQuery& pathQuery) const -> Path;
 	auto GeneratePDFData(const PDFQuery& pdfQuery) const -> PDFData;
 	auto RequestCancel() -> void;
+    auto IsBusy() -> bool;
 private:
-	auto SamplePathGenerator(const PathQuery& pathQuery, const std::size_t slot) -> std::function<void()>;
+    auto SamplePathGenerator(const PathQuery& pathQuery, const std::size_t slot) -> std::function<void()>;
 	inline auto Increment(
 		const Drift& drift,
 		const Diffusion& diffusion,
@@ -30,5 +32,5 @@ private:
 	std::atomic<std::size_t> m_completedTasks;
 	std::condition_variable m_completionCv;
 	std::mutex m_completionMtx;
-	std::atomic<bool> m_isRunning;
+	std::atomic<bool> m_isBusy;
 };

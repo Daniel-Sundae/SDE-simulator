@@ -2,24 +2,40 @@
 #include "OutputDispatcher.hpp"
 #include "PathQuery.hpp"
 #include "PDF.hpp"
+#include <QtCore/qmetatype.h> // For QMetaType registration (needed for connect)
 
-OutputHandler::OutputHandler()
-	: IPresenterComponent()
+OutputHandler::OutputHandler(QObject* parent)
+	: QObject(parent) // Initialize QObject base class
+	, IPresenterComponent()
 	, m_distributionSupport(std::make_pair<State>(0,0))
 	, m_paths{}
-{ }
+	, m_driftCurve{}
+{
+    connect(this, &OutputHandler::internalPathsReady,
+            this, &OutputHandler::OnPathsReceived,
+            Qt::QueuedConnection);
+}
 
-auto OutputHandler::OnPathsReceived(const PathQuery& pQuery, Paths&& paths) -> void
+auto OutputHandler::HandleWorkerResult(const PathQuery& query, Paths paths) -> void
+{
+    emit internalPathsReady(query, std::move(paths));
+}
+
+auto OutputHandler::OnPathsReceived(const PathQuery& pQuery, Paths paths) -> void
 {
 	m_paths = std::move(paths);
+	// Change statustext from "Generating paths" to "Rendering GUI"
 	Listener()->ClearPathChart(false);
 	Listener()->SetPathChartMaxTime(pQuery.simulationParameters.time);
 	Listener()->UpdatePathChartTitle(pQuery);
 	Listener()->UpdateDistributionChartTitle(pQuery.processDefinition.type);
 	Distribution distribution;
-	distribution.reserve(paths.size());
-	for (const auto& p : paths) {
-		Listener()->PlotPath(p);
+	distribution.reserve(m_paths.size());
+	for (std::size_t i = 0; i < m_paths.size(); ++i) {
+		const Path& p = m_paths[i];
+		if(i < 20){
+			Listener()->PlotPath(p);
+		}
 		if(IsInSupport(p.back())) {
 			distribution.push_back(p.back());
 		}
@@ -28,9 +44,10 @@ auto OutputHandler::OnPathsReceived(const PathQuery& pQuery, Paths&& paths) -> v
 	// Remove loading symbol if there currently is one
 }
 
-auto OutputHandler::OnDriftDataReceived(const Path& driftData) const -> void
+auto OutputHandler::OnDriftDataReceived(Path&& driftCurve) -> void
 {
-	Listener()->PlotPathChartDriftData(driftData);
+	m_driftCurve = std::move(driftCurve);
+	Listener()->PlotPathChartDriftData(driftCurve);
 }
 
 auto OutputHandler::OnPDFReceived(const PDF& pdf) -> void

@@ -39,12 +39,20 @@ else()
     set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 endif()
 
+# --- Qt Configuration ---
+# Find all required Qt components centrally
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets Charts)
+# Set AUTOMOC, AUTOUIC, AUTORCC globally for targets needing them
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
+# --- End Qt Configuration ---
+
 # Headers
 add_library(CommonIncludes INTERFACE)
 target_include_directories(CommonIncludes
     INTERFACE Include
 )
-
 
 # GTESTS
 include(FetchContent)
@@ -57,10 +65,12 @@ set(INSTALL_GTEST OFF CACHE BOOL "Disable installing GTest")
 FetchContent_MakeAvailable(googletest)
 enable_testing()
 
-add_subdirectory(Tests)
+# Adjust subdirectory order for dependency clarity
 add_subdirectory(src/Model)
+add_subdirectory(src/Presenter) # Presenter before View
 add_subdirectory(src/View)
-add_subdirectory(src/Presenter)
+add_subdirectory(Tests)
+
 add_executable(StochasticSim
     src/main.cpp
     src/AppInitializer.cpp
@@ -68,11 +78,18 @@ add_executable(StochasticSim
 target_include_directories(StochasticSim PRIVATE
     src
     Include
+    ${Qt6Core_INCLUDE_DIRS}      # Explicitly add Qt Core includes
+    ${Qt6Widgets_INCLUDE_DIRS}   # Explicitly add Qt Widgets includes
+    ${Qt6Gui_INCLUDE_DIRS}       # Explicitly add Qt Gui includes (for QPalette, QColor)
 )
+# Link the executable against necessary libraries (including Qt if main.cpp uses it)
 target_link_libraries(StochasticSim PRIVATE
     Model
     View
     Presenter
+    Qt6::Core      # Link main executable if needed
+    Qt6::Widgets   # Link main executable if needed
+    Qt6::Gui       # Link Gui module (for QPalette, QColor)
 )
 
 # windeployqt for DLLs

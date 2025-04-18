@@ -4,12 +4,22 @@
 #include "InputDispatcher.hpp"
 #include "MainPresenter.hpp"
 #include "MainWindow.hpp"
+#include "PathQuery.hpp" // Include for PathQuery type
+#include "Types.hpp"     // Include for Paths type
+#include <QMetaType>     // Include for qRegisterMetaType
+#include <QtGui/qpalette.h> // Include for QPalette
+#include <QtGui/qcolor.h>   // Include for QColor
 
 AppInitializer::AppInitializer(QApplication& app)
     : m_app(app)
 	, m_mainWindow(std::make_unique<MainWindow>())
 	, m_mainPresenter(std::make_unique<MainPresenter>())
 {
+    // Register custom types for queued signal/slot connections
+    qRegisterMetaType<PathQuery>("PathQuery");
+    qRegisterMetaType<Paths>("Paths");
+    // Ensure PathQuery and Paths have default constructors and copy/move semantics
+
 	InitializeComponents();
     SetStyle();
 }

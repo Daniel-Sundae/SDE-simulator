@@ -10,6 +10,7 @@ EngineThreadPool::EngineThreadPool(unsigned int nrThreads)
 	if (!nrThreads) {
 		nrThreads = std::thread::hardware_concurrency();
 	}
+	// nrThreads = 2;
 	m_threads.reserve(nrThreads);
 	std::stop_token st = m_stopSource.get_token();
 	for (unsigned int i = 0; i < nrThreads; ++i) {
