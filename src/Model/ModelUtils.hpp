@@ -1,6 +1,8 @@
 #pragma once
 #include <random>
 #include <cmath>
+#include "PathQuery.hpp"
+#include "PDFQuery.hpp"
 
 namespace Utils
 {
@@ -16,3 +18,11 @@ namespace Utils
         return d(threadLocalGenerator());
     }
 }
+
+struct Transaction{
+	const PathQuery pathQuery;
+	const PathQuery deterministicQuery;
+	const PDFQuery pdfQuery;
+    Transaction(const PathQuery& _pathQuery, const PathQuery& _deterministicQuery, const PDFQuery& _pdfQuery)
+        : pathQuery(_pathQuery), deterministicQuery(_deterministicQuery), pdfQuery(_pdfQuery) {}
+};

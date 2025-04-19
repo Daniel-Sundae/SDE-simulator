@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include <vector>
-#include <QtWidgets/qapplication.h>
+#include <QtWidgets/QApplication>
 
 class MainWindow;
 class MainPresenter;

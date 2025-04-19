@@ -2,12 +2,12 @@
 #include "Types.hpp"
 #include "Constants.hpp"
 #include <functional>
-class PDF {
+struct PDF {
     const State m_EV;
     const double m_stddev;
     const std::function<Density(State)> m_pdf;
-    mutable PDFData m_data;
-    mutable Range m_support;
+    PDFData m_data;
+    Range m_support;
     static constexpr double threshold = DefaultConstants::pdfThreshold;
 
 public:
@@ -20,39 +20,37 @@ public:
     {
     }
     auto operator()(State s) const -> Density { return m_pdf(s); }
-    explicit operator bool() const {
+    explicit operator bool() const{
         return m_pdf ? true : false;
     }
+
     auto EV() const -> double {
         return m_EV;
     }
+
     auto StdDev() const -> double {
         return m_stddev;
     }
 
-    auto GetPDFData() const -> std::optional<const PDFData> {
-        if (m_data.empty()) {
-            return std::nullopt;
-        };
+    auto GetPDFData() const -> PDFData {
         return m_data;
     }
 
-    auto GeneratePDFData(const std::size_t points) const -> PDFData {
-        PDFData newData;
-        newData.reserve(points);
-        const auto [start, end] = GetSupport();
+    auto GeneratePDFData(const std::size_t points) -> void{
+        m_data.clear();
+        m_data.reserve(points);
+        const auto [start, end] = GenerateSupport();
         const double increment = (end - start) / static_cast<double>(points);
         for (State state = start; state < end; state += increment) {
-            newData.push_back(m_pdf(state));
+            m_data.push_back(m_pdf(state));
         }
-        m_data = newData;
-        return newData;
     }
 
-    auto GetSupport() const -> Range {
-        if (!(m_support.first == 0 && m_support.second == 0))
-            return m_support;
+    auto GetSupport() const -> Range{
+        return m_support;
+    }
 
+    auto GenerateSupport() -> Range {
         std::size_t points = 1000;
         const State start = EV() - 5 * StdDev();
         const State end = EV() + 5 * StdDev();

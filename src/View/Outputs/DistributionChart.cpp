@@ -2,13 +2,13 @@
 #include "ViewUtils.hpp"
 #include "PathQuery.hpp"
 #include <algorithm>
-#include <QtCharts/qbarset.h>
-#include <QtCharts/qbarseries.h>
-#include <QtCharts/qvalueaxis.h>
-#include <QtCharts/qlineseries.h>
-#include <QtCharts/qbarcategoryaxis.h>
+#include <QtCharts/QBarSet>
+#include <QtCharts/QBarSeries>
+#include <QtCharts/QValueAxis>
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QBarCategoryAxis>
 
-static std::size_t nrBins = 50;
+static std::size_t nrBins = 100;
 
 DistributionChart::DistributionChart()
 	: QChart()
@@ -129,4 +129,3 @@ auto DistributionChart::InitializeDistributionChart() -> void
 	m_distributionSeries->setBarWidth(1);
 	GUI::SetPDFStyle(m_pdf);
 }
-

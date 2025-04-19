@@ -2,10 +2,10 @@
 #include "Constants.hpp"
 #include "InputDispatcher.hpp"
 #include "ViewUtils.hpp"
-#include <QtWidgets/qdoublespinbox>
-#include <QtWidgets/qcombobox>
-#include <QtWidgets/qformlayout.h>
-#include <QtWidgets/qlabel.h>
+#include <QtWidgets/QDoubleSpinBox>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QFormLayout>
+#include <QtWidgets/QLabel>
 
 DefinitionManager::DefinitionManager(InputDispatcher *parent)
     : InputDispatcherGroupBox(parent)
@@ -102,4 +102,3 @@ auto DefinitionManager::InitializeDesign() -> void
     definitionLayout->addRow(new QLabel("Diffusion (σ):", this), m_widgets[DefinitionWidget::SIGMA]);
     definitionLayout->addRow(new QLabel("Start (X<sub>0</sub>):", this), m_widgets[DefinitionWidget::STARTVALUE]);
 }
-

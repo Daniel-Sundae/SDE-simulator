@@ -1,5 +1,5 @@
 #include "PathEngine.hpp"
-#include "Utils.hpp"
+#include "ModelUtils.hpp"
 #include "PathQuery.hpp"
 #include "PDFQuery.hpp"
 #include <thread>
@@ -39,7 +39,14 @@ auto PathEngine::SamplePathGenerator(const PathQuery& pathQuery, const std::size
         // Don't need to protect vector since each thread 
         // is given unique slot with preallocated space
         m_paths[slot] = std::move(path);
-        m_completedTasks.fetch_add(1);
+        
+        // Important to lock to prevent mainTask reading stale data.
+        // The unlocking operation guarantees the increment is visible to
+        // mainTask thread before it evaluates predicate.
+        {
+            std::scoped_lock lock(m_completionMtx);
+            m_completedTasks.fetch_add(1);
+        }
         m_completionCv.notify_one();
     };
 }
@@ -109,11 +116,6 @@ auto PathEngine::RequestCancel() -> void
 auto PathEngine::IsBusy() -> bool
 {
     return m_isBusy.load() ? true : false;
-}
-
-auto PathEngine::GeneratePDFData(const PDFQuery& pdfQuery) const -> PDFData
-{
-    return pdfQuery.pdf.GeneratePDFData(pdfQuery.points);
 }
 
 auto PathEngine::Increment(

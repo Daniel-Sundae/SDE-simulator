@@ -1,14 +1,15 @@
 #pragma once
 
 #include "Types.hpp"
-#include <QtWidgets/qwidget.h>
-#include <QtWidgets/qboxlayout.h>
-#include <QtCharts/qchartview.h>
-#include <QtCharts/qchart.h>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QBoxLayout>
+#include <QtCharts/QChartView>
+#include <QtCharts/QChart>
 
 struct PathQuery;
 class PathChart;
 class DistributionChart;
+class StatusManager; // Forward declaration
 
 class OutputDispatcher : public QWidget{
     Q_OBJECT
@@ -16,10 +17,14 @@ class OutputDispatcher : public QWidget{
 public:
     explicit OutputDispatcher(QWidget* parent = nullptr);
 
+    // StatusManager
+    auto SetQueryInfo(const PathQuery &pQuery) const -> void;
+    auto SetStatus(const StatusSignal signal) const -> void;
+
     // PathChart
-    auto UpdatePathChartTitle(const PathQuery& pQuery) const -> void;
     auto PlotPath(const Path& path) const -> void;
-    auto PlotPathChartDriftData(const Path& driftLine) const -> void;
+    auto UpdatePathChartTitle(bool allPathsPlotted) const -> void;
+    auto PlotPathChartDriftData(const Path &driftLine) const -> void;
     auto ClearPathChart(bool clearDrift = true) -> void;
     auto SetPathChartMaxTime(const Time time) -> void;
 
@@ -35,7 +40,8 @@ private:
     auto GetPathChart() const -> PathChart*;
     auto GetDistributionChart() const -> DistributionChart*;
 private:
-    QVBoxLayout* m_layout;
+    QVBoxLayout* layout;
+    StatusManager* m_statusManager;
     QChartView* m_pathChartView;
     QChartView* m_distributionChartView;
 };

@@ -1,6 +1,6 @@
 #pragma once
 #include "PathQuery.hpp"
-#include <QtCharts/qchart.h>
+#include <QtCharts/QChart>
 
 class QChartView;
 class QValueAxis;
@@ -11,7 +11,7 @@ class PathChart : public QChart{
 
 public:
     explicit PathChart();
-    auto UpdateTitle(const PathQuery& pQuery) -> void;
+    auto UpdateTitle(bool allPathsPlotted) -> void;
     auto PlotPath(const Path& sampleData) -> void;
     auto ClearPathChart(bool clearDrift = true) -> void;
     auto PlotDriftCurve(const Path& driftLine) -> void;

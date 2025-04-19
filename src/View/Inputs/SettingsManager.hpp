@@ -1,7 +1,7 @@
 #pragma once
 #include "Types.hpp"
 #include "InputDispatcher.hpp"
-#include <QtWidgets/qgroupbox.h>
+#include <QtWidgets/QGroupBox>
 
 class SettingsManager : public InputDispatcherGroupBox
 {

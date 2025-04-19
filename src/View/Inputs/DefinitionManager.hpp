@@ -3,7 +3,7 @@
 #include "Types.hpp"
 #include "InputDispatcher.hpp"
 #include <unordered_map>
-#include <QtWidgets/qgroupbox.h>
+#include <QtWidgets/QGroupBox>
 
 class DefinitionManager : public InputDispatcherGroupBox
 {
@@ -17,4 +17,3 @@ private:
 private:
 	std::unordered_map<DefinitionWidget, QWidget*> m_widgets;
 };
-

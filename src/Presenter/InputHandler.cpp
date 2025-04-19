@@ -1,6 +1,7 @@
 #include "InputHandler.hpp"
 #include "ProcessData.hpp"
 #include "PDFQuery.hpp"
+#include "ModelUtils.hpp"
 #include <assert.h>
 
 InputHandler::InputHandler()
@@ -12,9 +13,14 @@ InputHandler::InputHandler()
 	m_inputSigma = ProcessData::GetSigmaData(m_processDefinition->type).defaultValue;
 }
 
-auto InputHandler::Clear() -> void
+auto InputHandler::Clear() const -> void
 {
 	Listener()->Clear();
+}
+
+auto InputHandler::Cancel() const -> void
+{
+	Listener()->Cancel();
 }
 
 auto InputHandler::OnProcessTypeModified(ProcessType newType) -> void
@@ -62,8 +68,6 @@ auto InputHandler::SamplePaths() -> void
 {
 	if(!CanSample())
 		return;
-	Clear();
-	// Need to get drift and diffusion here since they are dependent on type
 	m_processDefinition = std::make_unique<ProcessDefinition>(
 		m_processDefinition->type,
 		ProcessData::GetDrift(m_processDefinition->type, m_inputMu),
@@ -73,7 +77,7 @@ auto InputHandler::SamplePaths() -> void
 	const PathQuery pQuery = PathQuery{ *m_processDefinition, *m_simulationParameters};
 	const PathQuery deterministicQuery = CreateDriftQuery(pQuery);
 	const PDFQuery pdfQuery = CreatePDFQuery(pQuery);
-	Listener()->OnQueriesReceived(pQuery, deterministicQuery, pdfQuery);
+	Listener()->OnTransactionReceived(Transaction{pQuery, deterministicQuery, pdfQuery});
 }
 
 auto InputHandler::CreateDriftQuery(const PathQuery& pQuery) const -> PathQuery {

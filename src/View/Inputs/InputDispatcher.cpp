@@ -5,7 +5,7 @@
 #include "SettingsManager.hpp"
 #include "InputHandler.hpp"
 #include "MainWindow.hpp"
-#include <QtWidgets/qboxlayout.h>
+#include <QtWidgets/QBoxLayout>
 
 
 InputDispatcher::InputDispatcher(QWidget* parent)
@@ -36,6 +36,11 @@ auto InputDispatcher::OnGoButtonClicked() const -> void
 auto InputDispatcher::OnClearButtonClicked() const -> void
 {
     m_inputHandler->Clear();
+}
+
+auto InputDispatcher::OnCancelButtonClicked() const -> void
+{
+    m_inputHandler->Cancel();
 }
 
 auto InputDispatcher::OnProcessTypeModified(const ProcessType newType) const -> void

@@ -1,7 +1,7 @@
 #pragma once
-#include <QtCore/qstring.h>
-#include <QtWidgets/qspinbox.h>
-#include <QtWidgets/qpushbutton.h>
+#include <QtCore/QString>
+#include <QtWidgets/QSpinBox>
+#include <QtWidgets/QPushButton>
 #include <QtCharts>
 
 namespace GUI
@@ -96,4 +96,3 @@ namespace GUI
         }
     }
 }
-

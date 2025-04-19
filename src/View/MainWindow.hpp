@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QtWidgets/qmainwindow.h>
+#include <QtWidgets/QMainWindow>
 
 class QWidget;
 class QHBoxLayout;
@@ -21,4 +21,3 @@ private:
     OutputDispatcher* m_outputDispatcher;
     InputDispatcher* m_inputDispatcher;
 };
-

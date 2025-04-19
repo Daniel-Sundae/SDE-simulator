@@ -14,7 +14,6 @@ public:
 	explicit PathEngine();
 	auto SamplePathsAsync(const PathQuery& pathQuery, std::function<void(Paths)> onCompletionCb) -> void;
 	auto SampleDriftCurve(const PathQuery& pathQuery) const -> Path;
-	auto GeneratePDFData(const PDFQuery& pdfQuery) const -> PDFData;
 	auto RequestCancel() -> void;
     auto IsBusy() -> bool;
 private:

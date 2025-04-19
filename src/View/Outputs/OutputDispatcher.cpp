@@ -1,31 +1,52 @@
 #include "PathChart.hpp"
 #include "DistributionChart.hpp"
 #include "OutputDispatcher.hpp"
+#include "StatusManager.hpp"
+#include <QtWidgets/QGraphicsLayout>
 
 OutputDispatcher::OutputDispatcher(QWidget *parent)
     : QWidget(parent)
-    , m_layout(new QVBoxLayout(this))
+    , m_statusManager(new StatusManager(this))
     , m_pathChartView(new QChartView(this))
     , m_distributionChartView(new QChartView(this))
 {
+    layout = new QVBoxLayout(this);
+    layout->addWidget(m_statusManager);
+    // Wrapper is only for aligning the Status Manager with the charts
+    QVBoxLayout* groupBoxWrapperLayout = new QVBoxLayout();
+    groupBoxWrapperLayout->setContentsMargins(8, 0, 8, 0);
+    groupBoxWrapperLayout->addWidget(m_statusManager);
+    layout->addLayout(groupBoxWrapperLayout);
     auto* pathChart = new PathChart();
     m_pathChartView->setChart(pathChart);
-    m_layout->addWidget(m_pathChartView);
+    layout->addWidget(m_pathChartView);
     auto* distributionChart = new DistributionChart();
     m_distributionChartView->setChart(distributionChart);
-    m_layout->addWidget(m_distributionChartView);
-    setLayout(m_layout);
+    layout->addWidget(m_distributionChartView);
+    setLayout(layout);
 }
 
+////////////////////////////////////////
+//// STATUS MANAGER
+////////////////////////////////////////
+
+auto OutputDispatcher::SetQueryInfo(const PathQuery& pQuery) const -> void
+{
+    m_statusManager->SetQueryInfo(pQuery);
+}
+
+auto OutputDispatcher::SetStatus(const StatusSignal signal) const -> void
+{
+    m_statusManager->SetStatus(signal);
+}
 
 ////////////////////////////////////////
 //// PATH CHART
 ////////////////////////////////////////
 
-
-auto OutputDispatcher::UpdatePathChartTitle(const PathQuery& pQuery) const -> void
+auto OutputDispatcher::UpdatePathChartTitle(bool allPathsPlotted) const -> void
 {
-    GetPathChart()->UpdateTitle(pQuery);
+    GetPathChart()->UpdateTitle(allPathsPlotted);
 }
 
 auto OutputDispatcher::PlotPathChartDriftData(const Path& driftLine) const -> void

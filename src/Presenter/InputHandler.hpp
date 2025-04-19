@@ -17,7 +17,8 @@ public:
     template <IntOrDouble T>
     auto OnSimulationParametersModified(const SimulationWidget param, T userValue) -> void;
     auto SamplePaths() -> void;
-    auto Clear() -> void;
+    auto Clear() const -> void;
+    auto Cancel() const -> void;
 private:
     auto CanSample() const -> bool;
     auto CreateDriftQuery(const PathQuery& pQuery) const -> PathQuery;

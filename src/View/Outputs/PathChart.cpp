@@ -2,9 +2,9 @@
 #include "ProcessData.hpp"
 #include "Types.hpp"
 #include "ViewUtils.hpp"
-#include <QtCharts/qlineseries.h>
-#include <QtCharts/qchartview.h>
-#include <QtCharts/qvalueaxis.h>
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QChartView>
+#include <QtCharts/QValueAxis>
 
 PathChart::PathChart()
     : QChart()
@@ -17,26 +17,9 @@ PathChart::PathChart()
     InitializeProcessChart();
 }
 
-auto PathChart::UpdateTitle(const PathQuery& pQuery) -> void
+auto PathChart::UpdateTitle(bool allPathsPlotted) -> void
 {
-    QString title;
-    QTextStream stream(&title);
-    stream << "Definition: "
-           << QString::fromUtf8(ProcessData::GetName(pQuery.processDefinition.type))
-           << ": "
-           << QString::fromUtf8(ProcessData::GetDefinition(pQuery.processDefinition.type))
-           << " with μ = "
-           << QString::number(pQuery.processDefinition.drift.Mu())
-           << ", σ = "
-           << QString::number(pQuery.processDefinition.diffusion.Sigma())
-           << ", X<sub>0</sub> = "
-           << QString::number(pQuery.processDefinition.startValueData)
-           << '\n'
-           << "Simulation: Time = "
-           << QString::number(pQuery.simulationParameters.time)
-           << ", dt = "
-           << QString::number(pQuery.simulationParameters.dt);
-    stream.flush();
+    QString title = allPathsPlotted ? "" : QString("Only plotting first %1 paths").arg(DefaultConstants::maxPathsToDraw);
     setTitle(title);
 }
 
@@ -180,4 +163,3 @@ auto PathChart::InitializeProcessChart() -> void
     GUI::SetDriftStyle(m_driftCurve);
     setMargins(QMargins(50, 20, 20, 20));
 }
-

@@ -1,9 +1,9 @@
 ﻿#include "SettingsManager.hpp"
 #include "InputDispatcher.hpp"
 #include "ViewUtils.hpp"
-#include <QtWidgets/qcheckbox.h>
-#include <QtWidgets/qformlayout.h>
-#include <QtWidgets/qlabel.h>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QFormLayout>
+#include <QtWidgets/QLabel>
 
 
 SettingsManager::SettingsManager(InputDispatcher* parent)

@@ -60,3 +60,8 @@ enum class SettingsWidget {
     FIXSEED,
 };
 
+enum class StatusSignal{
+    READY = 0,
+    SAMPLING,
+    RENDERING
+};

@@ -1,9 +1,9 @@
 #pragma once
 #include "ProcessData.hpp"
 #include "InputHandler.hpp"
-#include <QtWidgets/qboxlayout.h>
-#include <QtWidgets/qwidget.h>
-#include <QtWidgets/qgroupbox.h>
+#include <QtWidgets/QBoxLayout>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QGroupBox>
 
 class ActionManager;
 class DefinitionManager;
@@ -16,10 +16,11 @@ class InputDispatcher : public QWidget
     Q_OBJECT
 
 public:
-    explicit InputDispatcher(QWidget* parent = nullptr);
+    explicit InputDispatcher(QWidget* parent);
     auto SetInputHandler(InputHandler* inputHandler) -> void;
     auto OnGoButtonClicked() const -> void;
     auto OnClearButtonClicked() const -> void;
+    auto OnCancelButtonClicked() const -> void;
     auto OnProcessTypeModified(const ProcessType newType) const -> void;
     auto OnProcessDefinitionModified(const DefinitionWidget param, double userValue) const -> void;
     auto OnSolverTypeModified(const SolverType newType) const -> void;

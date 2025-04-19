@@ -1,7 +1,7 @@
 #pragma once
 #include "PathQuery.hpp"
 #include <array>
-#include <QtCharts/qchart.h>
+#include <QtCharts/QChart>
 
 class QValueAxis;
 class QBarCategoryAxis;

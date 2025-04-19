@@ -4,11 +4,11 @@
 #include "InputDispatcher.hpp"
 #include "MainPresenter.hpp"
 #include "MainWindow.hpp"
-#include "PathQuery.hpp" // Include for PathQuery type
-#include "Types.hpp"     // Include for Paths type
-#include <QMetaType>     // Include for qRegisterMetaType
-#include <QtGui/qpalette.h> // Include for QPalette
-#include <QtGui/qcolor.h>   // Include for QColor
+#include "PathQuery.hpp"
+#include "Types.hpp"
+#include <QMetaType>
+#include <QtGui/QPalette>
+#include <QtGui/QColor>
 
 AppInitializer::AppInitializer(QApplication& app)
     : m_app(app)

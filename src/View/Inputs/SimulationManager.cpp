@@ -1,9 +1,9 @@
 ﻿#include "SimulationManager.hpp"
 #include "Constants.hpp"
 #include "ViewUtils.hpp"
-#include <QtWidgets/qcombobox.h>
-#include <QtWidgets/qformlayout.h>
-#include <QtWidgets/qlabel.h>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QFormLayout>
+#include <QtWidgets/QLabel>
 
 
 SimulationManager::SimulationManager(InputDispatcher* parent)

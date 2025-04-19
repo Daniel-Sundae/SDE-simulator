@@ -17,6 +17,9 @@ auto ActionManager::AddActionWidgets() -> void
     auto* clearButton = new QPushButton("CLEAR", this);
     clearButton->setToolTip("Remove all samples.");
     clearButton->setStyleSheet("QPushButton { background-color: red; }");
+    auto* cancelButton = new QPushButton("CANCEL", this);
+    cancelButton->setToolTip("Cancel current sampling.");
+    cancelButton->setStyleSheet("QPushButton { background-color: red; }");
     connect(
         goButton,
         &QPushButton::clicked,
@@ -27,8 +30,14 @@ auto ActionManager::AddActionWidgets() -> void
         &QPushButton::clicked,
         this,
         [this]() { Parent()->OnClearButtonClicked(); });
+    connect(
+        cancelButton,
+        &QPushButton::clicked,
+        this,
+        [this]() { Parent()->OnCancelButtonClicked(); });
     auto layout = new QHBoxLayout(this);
     layout->addWidget(goButton);
     layout->addWidget(clearButton);
+    layout->addWidget(cancelButton);
     setStyleSheet(GUI::GroupBoxDescription());
 }
