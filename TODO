@@ -2,34 +2,23 @@
 MATH TODO:
 - Implement example 3.1.1. Can I see that using left edge Bt as weight gives 0 on average while right edge gives T? (Stratonovic vs ito)
 
-
 FUNCTIONALITY TODO:
-- Add widget with info from query on left side, loading symbol for simulation taking time on right side
-- change title of pathchart informing only 100 paths being shown
 - set drifline on top
 - Implement:
-	seed
-	sample
+	seed and multithread options
 	rk/other solvers
 	other processes
-- Check listener interface const overload from cline
+- tooltips not working
+- switch useseed to std::optional<uint32_t>
+- can't have threadlocal generator if seed should be dynamic. Make sure seed works. Test it
+- make sure singe thread works. Test it.
 
 CODE DESIGN TODO:
-- Stresstest to check if inputhandler can get into broken state
-- Use valgrind
-- Use sub cmakeprojects
 
 TECH DETAILS TODO:
-- use async. Transmit loading signal to OutputDispatcher
 - swap out std::function to something more performant
-- move std::function into taskqueue instead of copying it
-- use condition variable isntead of busy waiting for threads
-- do non blocking instead of gathering the futures immediately
-- Remove copying and instead move ownership of PathQuery from inputhandler to PathEngine. (Maybe forwarding?)
 
 DESIGN CHOICES MADE:
-- Every query is self contained, meaning chart is always cleared when doing a new sample
-- There simulation is non blocking and user can cancel query
 
 ERRORS
 GBM, no randomness, 0.01 diffusion.

@@ -25,8 +25,12 @@ public:
     auto OnProcessDefinitionModified(const DefinitionWidget param, double userValue) const -> void;
     auto OnSolverTypeModified(const SolverType newType) const -> void;
     template<IntOrDouble T>
-    auto OnSimulationParametersModified(const SimulationWidget param, T userValue) const -> void {
-        m_inputHandler->OnSimulationParametersModified(param, userValue);
+    auto OnSimulationParameterModified(const SimulationWidget param, T userValue) const -> void {
+        m_inputHandler->OnSimulationParameterModified(param, userValue);
+    }
+    template<IntOrBool T>
+    auto OnSettingsParameterModified(const SettingsWidget param, T userValue) const -> void {
+        m_inputHandler->OnSettingsParameterModified(param, userValue);
     }
 
 private:

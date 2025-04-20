@@ -20,7 +20,7 @@
             }
         },
         {
-            "name": "debug-windows-mingw_64",
+            "name": "debug-mingw_64",
             "displayName": "Debug with MinGW Qt Compiler",
             "description": "Build configuration for Debug using MinGW compiler from Qt",
             "generator": "Ninja",
@@ -30,11 +30,6 @@
                 "CMAKE_PREFIX_PATH": "C:/Qt/6.8.3/mingw_64",
                 "CMAKE_C_COMPILER": "C:/Qt/Tools/mingw1310_64/bin/gcc.exe",
                 "CMAKE_CXX_COMPILER": "C:/Qt/Tools/mingw1310_64/bin/g++.exe"
-            },
-            "condition": {
-                "type": "equals",
-                "lhs": "${hostSystemName}",
-                "rhs": "Windows"
             }
         },
         {

@@ -2,7 +2,7 @@
 #include "PathEngine.hpp"
 #include "InputHandler.hpp"
 #include "PDFQuery.hpp"
-#include "ModelUtils.hpp"
+#include "Transaction.hpp"
 #include <cassert>
 
 MainPresenter::MainPresenter()

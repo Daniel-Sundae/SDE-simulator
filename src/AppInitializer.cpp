@@ -15,10 +15,8 @@ AppInitializer::AppInitializer(QApplication& app)
 	, m_mainWindow(std::make_unique<MainWindow>())
 	, m_mainPresenter(std::make_unique<MainPresenter>())
 {
-    // Register custom types for queued signal/slot connections
-    qRegisterMetaType<PathQuery>("PathQuery");
+    // Register custom type to move data from enginethread to GUI thread
     qRegisterMetaType<Paths>("Paths");
-    // Ensure PathQuery and Paths have default constructors and copy/move semantics
 
 	InitializeComponents();
     SetStyle();

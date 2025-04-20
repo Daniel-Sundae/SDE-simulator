@@ -5,6 +5,8 @@
 #include <mutex>
 #include <optional>
 #include <functional>
+#include <random>
+#include <cmath>
 
 struct PathQuery;
 struct PDFQuery;
@@ -24,6 +26,8 @@ private:
 		const Time t,
 		const State Xt,
 		const Time dt) const -> State;
+	inline auto db(double dt) const -> double;
+private:
 	std::unique_ptr<EngineThreadPool> m_tp;
 	Paths m_paths;
 	std::mutex m_pathsMtx;
@@ -32,4 +36,5 @@ private:
 	std::condition_variable m_completionCv;
 	std::mutex m_completionMtx;
 	std::atomic<bool> m_isBusy;
+	SettingsParameters m_engineSettings;
 };

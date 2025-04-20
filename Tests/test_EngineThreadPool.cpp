@@ -3,6 +3,7 @@
 #include "EngineThreadPool.hpp"
 #include <chrono>
 #include <mutex>
+#include <algorithm>
 
 class EngineThreadPoolTest : public ::testing::Test {
 protected:
@@ -15,7 +16,7 @@ protected:
         SetUp(0);
     }
 
-    void SetUp(unsigned int nrThreads) {
+    void SetUp(std::uint32_t nrThreads) {
         TearDown();
         m_tp = std::make_unique<EngineThreadPool>(nrThreads);
     }
@@ -32,7 +33,7 @@ protected:
         m_futures.clear();
     }
 
-    auto GenerateTaskFunction(const unsigned int taskTimeMs, const State resultState) -> std::function<Path()>
+    auto GenerateTaskFunction(const std::uint32_t taskTimeMs, const State resultState) -> std::function<Path()>
     {
         return [this, taskTimeMs, resultState]() -> Path {
             std::this_thread::sleep_for(std::chrono::milliseconds(taskTimeMs));
@@ -51,7 +52,19 @@ protected:
         std::size_t nrTasks = 1) -> void
     {
         for (std::size_t i = 0; i < nrTasks; ++i) {
-            m_futures.emplace_back(m_tp->Enqueue(f));
+            // Create a promise and future to manage the task result
+            auto promise = std::make_shared<std::promise<Path>>();
+            m_futures.push_back(promise->get_future());
+            
+            // Create a wrapper task that fulfills the promise
+            m_tp->Enqueue([f, promise]() {
+                try {
+                    Path result = f();
+                    promise->set_value(result);
+                } catch (...) {
+                    promise->set_exception(std::current_exception());
+                }
+            });
         }
     }
 
@@ -117,13 +130,13 @@ TEST_F(EngineThreadPoolTest, TestTpOrder) {
 }
 
 TEST_F(EngineThreadPoolTest, TestTpMultiThreadIsFaster) {
-    unsigned int maxThreads = 4; // Increase or decrease depending on machine. Higher nr means more flaky test.
-    unsigned int nrTasks = 20;
+    std::uint32_t maxThreads = 4; // Increase or decrease depending on machine. Higher nr means more flaky test.
+    std::uint32_t nrTasks = 20;
     using Duration = std::chrono::steady_clock::duration;
     std::vector<Duration> durations = {};
     durations.reserve(maxThreads);
     auto task = GenerateTaskFunction(50, 0.1);
-    for (unsigned int i = 1; i <= maxThreads; ++i) {
+    for (std::uint32_t i = 1; i <= maxThreads; ++i) {
         SetUp(i);
         auto startTime = std::chrono::steady_clock::now();
         DoEnqueue(task, nrTasks);
@@ -136,8 +149,8 @@ TEST_F(EngineThreadPoolTest, TestTpMultiThreadIsFaster) {
 
 TEST_F(EngineThreadPoolTest, TestTpClearTasks) {
     SetUp(1);
-    unsigned int taskTime = 100;
-    unsigned int nrTasks = 10;
+    std::uint32_t taskTime = 100;
+    std::uint32_t nrTasks = 10;
     auto task = GenerateTaskFunction(taskTime, 0.1);
     DoEnqueue(task, nrTasks);
     // Ensures thread picks up task before we clear tasks

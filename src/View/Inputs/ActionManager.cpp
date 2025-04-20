@@ -16,10 +16,10 @@ auto ActionManager::AddActionWidgets() -> void
     goButton->setStyleSheet("QPushButton { background-color: green; }");
     auto* clearButton = new QPushButton("CLEAR", this);
     clearButton->setToolTip("Remove all samples.");
-    clearButton->setStyleSheet("QPushButton { background-color: red; }");
+    clearButton->setStyleSheet("QPushButton { background-color: red; padding: 2px;}");
     auto* cancelButton = new QPushButton("CANCEL", this);
     cancelButton->setToolTip("Cancel current sampling.");
-    cancelButton->setStyleSheet("QPushButton { background-color: red; }");
+    cancelButton->setStyleSheet("QPushButton { background-color: red; padding: 2px;}");
     connect(
         goButton,
         &QPushButton::clicked,

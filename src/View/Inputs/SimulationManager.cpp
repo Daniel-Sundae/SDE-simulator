@@ -42,7 +42,7 @@ auto SimulationManager::AddComboBoxes() -> void
 template <IntOrDouble T>
 auto SimulationManager::SimulationModifiedCb(SimulationWidget param) const{
     return [this, param](T newValue) {
-        Parent()->OnSimulationParametersModified(param, newValue);
+        Parent()->OnSimulationParameterModified(param, newValue);
     };
 }
 

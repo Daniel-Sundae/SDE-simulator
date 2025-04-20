@@ -52,8 +52,13 @@ public:
 
     auto GenerateSupport() -> Range {
         std::size_t points = 1000;
-        const State start = EV() - 5 * StdDev();
-        const State end = EV() + 5 * StdDev();
+        State start = EV() - 5 * StdDev();
+        State end = EV() + 5 * StdDev();
+        // In case user set stddev = 0
+        if (abs(end-start) < threshold ){
+            start -= 1;
+            end += 1;
+        }
         m_support.first = start;
         m_support.second = end;
         const double increment = (end - start) / static_cast<double>(points);

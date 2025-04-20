@@ -15,7 +15,9 @@ public:
     auto OnProcessDefinitionModified(DefinitionWidget param, double userValue) -> void;
     auto OnSolverTypeModified(SolverType newType) -> void;
     template <IntOrDouble T>
-    auto OnSimulationParametersModified(const SimulationWidget param, T userValue) -> void;
+    auto OnSimulationParameterModified(const SimulationWidget param, T userValue) -> void;
+    template <IntOrBool T>
+    auto OnSettingsParameterModified(const SettingsWidget param, T userValue) -> void;
     auto SamplePaths() -> void;
     auto Clear() const -> void;
     auto Cancel() const -> void;
@@ -26,6 +28,7 @@ private:
 private:
     std::unique_ptr<ProcessDefinition> m_processDefinition;
     std::unique_ptr<SimulationParameters> m_simulationParameters;
+    std::unique_ptr<SettingsParameters> m_settingsParameters;
     double m_inputMu;
     double m_inputSigma;
 };

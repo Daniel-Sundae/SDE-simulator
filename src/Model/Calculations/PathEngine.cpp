@@ -1,5 +1,4 @@
 #include "PathEngine.hpp"
-#include "ModelUtils.hpp"
 #include "PathQuery.hpp"
 #include "PDFQuery.hpp"
 #include <thread>
@@ -14,6 +13,7 @@ PathEngine::PathEngine()
     , m_completionCv()
     , m_completionMtx()
     , m_isBusy(false)
+    , m_engineSettings()
 { }
 
 auto PathEngine::SamplePathGenerator(const PathQuery& pathQuery, const std::size_t slot) -> std::function<void()>
@@ -74,6 +74,7 @@ auto PathEngine::SamplePathsAsync(const PathQuery& pathQuery, std::function<void
         throw std::runtime_error("Engine is busy. Aborting transaction.");
     }
     m_isBusy = true;
+    m_engineSettings = pathQuery.settingsParameters;
 
     auto mainTask = [this, pathQuery, onCompletionCb]() -> void{
         m_cancelRequested = false;
@@ -86,7 +87,7 @@ auto PathEngine::SamplePathsAsync(const PathQuery& pathQuery, std::function<void
         m_completedTasks = 0;
         for (std::size_t i = 0; i < nrSamples; ++i) {
             m_paths[i].reserve(pathQuery.simulationParameters.Points());
-            m_tp->Enqueue(SamplePathGenerator(pathQuery, i));
+            m_engineSettings.useThreading ? m_tp->Enqueue(SamplePathGenerator(pathQuery, i)) : SamplePathGenerator(pathQuery, i)();
         }
 
         // Wait until tasks done or GUI thread cancels
@@ -125,5 +126,14 @@ auto PathEngine::Increment(
     const State Xt,
     const Time dt) const -> State
 {
-    return drift(t, Xt) * dt + diffusion(t, Xt) * Utils::db(dt);
+    return drift(t, Xt) * dt + diffusion(t, Xt) * db(dt);
+}
+
+auto PathEngine::db(double dt) const -> double
+{
+    // Each thread should have exactly one generator
+    thread_local std::mt19937 generator(m_engineSettings.useSeed.first ? m_engineSettings.useSeed.second : std::random_device{}());
+    double stdev = std::sqrt(dt);
+    std::normal_distribution<> d(0.0, stdev);
+    return d(generator);
 }

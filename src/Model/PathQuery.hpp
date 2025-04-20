@@ -35,7 +35,7 @@ struct ProcessDefinition {
     Diffusion diffusion = ProcessData::GetDiffusion(defaultProcess, ProcessData::GetSigmaData(defaultProcess).defaultValue);
     State startValueData = ProcessData::GetStartValueData(defaultProcess).defaultValue;
 
-    ProcessDefinition() = default;
+    explicit ProcessDefinition() = default;
     ProcessDefinition(const ProcessType t)
         : type(t)
         , drift(ProcessData::GetDrift(t, ProcessData::GetMuData(t).defaultValue))
@@ -52,12 +52,23 @@ struct ProcessDefinition {
     }
 };
 
+struct SettingsParameters{
+    bool useThreading;
+    std::pair<bool, std::uint32_t> useSeed;
+    explicit SettingsParameters()
+    : useThreading(true)
+    , useSeed({false, 0})
+    {}
+};
+
 struct PathQuery {
     const ProcessDefinition processDefinition;
     const SimulationParameters simulationParameters;
-    PathQuery(const ProcessDefinition& def, const SimulationParameters& simParam)
+    const SettingsParameters settingsParameters;
+    PathQuery(const ProcessDefinition& def, const SimulationParameters& simParam, const SettingsParameters& settParam)
         : processDefinition(def)
         , simulationParameters(simParam)
+        , settingsParameters(settParam)
     {
     }
 };

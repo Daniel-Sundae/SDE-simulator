@@ -1,14 +1,13 @@
 #pragma once
 #include "Types.hpp"
 #include "PathQuery.hpp"
-//#include "TaskQueue.hpp"
 #include <queue>
 #include <future>
 #include <thread>
 
 class EngineThreadPool {
 public:
-	explicit EngineThreadPool(unsigned int nrThreads = 0);
+	explicit EngineThreadPool(std::uint32_t nrThreads = 0);
 	~EngineThreadPool();
 	auto Enqueue(const std::function<void()> f) -> void;
 	auto ClearTasks() -> void;

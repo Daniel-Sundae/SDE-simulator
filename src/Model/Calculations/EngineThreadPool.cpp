@@ -1,6 +1,6 @@
 #include "EngineThreadPool.hpp"
 
-EngineThreadPool::EngineThreadPool(unsigned int nrThreads)
+EngineThreadPool::EngineThreadPool(std::uint32_t nrThreads)
 	: m_threads{}
 	, m_tasks()
 	, m_stopSource()
@@ -13,7 +13,7 @@ EngineThreadPool::EngineThreadPool(unsigned int nrThreads)
 	// nrThreads = 2;
 	m_threads.reserve(nrThreads);
 	std::stop_token st = m_stopSource.get_token();
-	for (unsigned int i = 0; i < nrThreads; ++i) {
+	for (std::uint32_t i = 0; i < nrThreads; ++i) {
 		m_threads.emplace_back([this, st](std::stop_token) {this->DoTasks(st);}); // Do not let jthread create stoptoken.
 		//m_threads.emplace_back([this](std::stop_token st) {this->DoTasks(st);}); // Let jthread create stoptoken.
 	}

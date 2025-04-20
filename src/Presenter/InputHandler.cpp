@@ -1,13 +1,14 @@
 #include "InputHandler.hpp"
 #include "ProcessData.hpp"
 #include "PDFQuery.hpp"
-#include "ModelUtils.hpp"
+#include "Transaction.hpp"
 #include <assert.h>
 
 InputHandler::InputHandler()
 	: IPresenterComponent()
 	, m_processDefinition(std::make_unique<ProcessDefinition>())
 	, m_simulationParameters(std::make_unique<SimulationParameters>())
+	, m_settingsParameters(std::make_unique<SettingsParameters>())
 {
 	m_inputMu = ProcessData::GetMuData(m_processDefinition->type).defaultValue;
 	m_inputSigma = ProcessData::GetSigmaData(m_processDefinition->type).defaultValue;
@@ -74,10 +75,10 @@ auto InputHandler::SamplePaths() -> void
 		ProcessData::GetDiffusion(m_processDefinition->type, m_inputSigma),
 		m_processDefinition->startValueData);
 
-	const PathQuery pQuery = PathQuery{ *m_processDefinition, *m_simulationParameters};
+	const PathQuery pQuery{ *m_processDefinition, *m_simulationParameters, *m_settingsParameters};
 	const PathQuery deterministicQuery = CreateDriftQuery(pQuery);
 	const PDFQuery pdfQuery = CreatePDFQuery(pQuery);
-	Listener()->OnTransactionReceived(Transaction{pQuery, deterministicQuery, pdfQuery});
+	Listener()->OnTransactionReceived(Transaction{std::move(pQuery), std::move(deterministicQuery), std::move(pdfQuery)});
 }
 
 auto InputHandler::CreateDriftQuery(const PathQuery& pQuery) const -> PathQuery {
@@ -92,7 +93,7 @@ auto InputHandler::CreateDriftQuery(const PathQuery& pQuery) const -> PathQuery 
 		pQuery.simulationParameters.time,
 		pQuery.simulationParameters.dt,
 		1);
-	return PathQuery( definition, simulationParams);
+	return PathQuery( definition, simulationParams, pQuery.settingsParameters);
 }
 
 auto InputHandler::CreatePDFQuery(const PathQuery& pQuery) const -> PDFQuery {

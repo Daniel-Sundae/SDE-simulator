@@ -19,6 +19,8 @@ using Range = std::pair<double, double>;
 using Task = std::function<void()>;
 template <typename T>
 concept IntOrDouble = std::same_as<T, int> || std::same_as<T, double>;
+template <typename T>
+concept IntOrBool = std::same_as<T, uint32_t> || std::same_as<T, bool>;
 
 enum class ProcessType{
     NONE = 0,
@@ -56,7 +58,6 @@ enum class SimulationWidget {
 
 enum class SettingsWidget {
     THREADS = 0,
-    AUTOUPDATE,
     FIXSEED,
 };
 

@@ -9,7 +9,7 @@ class SettingsManager : public InputDispatcherGroupBox
 public:
 	explicit SettingsManager(InputDispatcher* parent);
 private:
-	auto AddCheckBoxes() -> void;
+	auto AddMultiThreadCheckBox() -> void;
 	auto AddSeedWidget() -> void;
 	auto InitializeDesign() -> void;
 private:
