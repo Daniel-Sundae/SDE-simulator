@@ -6,7 +6,7 @@
 
 class OutputDispatcher;
 struct PathQuery;
-class PDF;
+struct PDF;
 
 class OutputHandler final : public QObject, public IPresenterComponent<OutputDispatcher> {
     Q_OBJECT
@@ -20,13 +20,13 @@ public:
     auto OnPDFReceived(const PDF &pdf) -> void;
     auto Clear() const -> void;
 
-    
-    public slots:
+
+public slots:
 	auto OnPathsReceived(const Paths& paths) -> void;
-    
-    signals:
-    auto internalPathsReady(Paths paths) -> void;
-    
+
+signals:
+    auto InternalPathReadySignal(Paths paths) -> void;
+
 private:
     auto HasSupport() const -> bool;
     auto DeleteSupport() -> void;

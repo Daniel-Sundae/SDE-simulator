@@ -25,7 +25,7 @@ auto MainPresenter::SamplePaths(const PathQuery& pQuery) -> void
 auto MainPresenter::SampleDriftCurve(const PathQuery& deterministicQuery) -> void
 {
 	assert(deterministicQuery.simulationParameters.samples == 1);
-	Listener()->OnDriftDataReceived(m_engine->SampleDriftCurve(deterministicQuery));
+	Listener()->OnDriftDataReceived(m_engine->SampleOnePath(deterministicQuery));
 }
 
 auto MainPresenter::OnTransactionReceived(const Transaction&& transaction) -> void

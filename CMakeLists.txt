@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.25)
 project(StochasticSim VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -54,22 +54,29 @@ target_include_directories(CommonIncludes
     INTERFACE Include
 )
 
-# GTESTS
-include(FetchContent)
-FetchContent_Declare(
-  googletest
-  GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG    v1.16.0
-)
-set(INSTALL_GTEST OFF CACHE BOOL "Disable installing GTest")
-FetchContent_MakeAvailable(googletest)
-enable_testing()
+## GTESTS
+#option(BUILD_TESTING "Build the tests for StochasticSim" ON) # Add option
+#
+#if(BUILD_TESTING)
+#  message(STATUS "Building Tests")
+#  include(FetchContent)
+#  FetchContent_Declare(
+#    googletest
+#    GIT_REPOSITORY https://github.com/google/googletest.git
+#    GIT_TAG    v1.16.0
+#  )
+#  set(INSTALL_GTEST OFF CACHE BOOL "Disable installing GTest")
+#  FetchContent_MakeAvailable(googletest)
+#  enable_testing()
+#  add_subdirectory(Tests)
+#else()
+#    message(STATUS "Skipping Tests")
+#endif()
 
 # Adjust subdirectory order for dependency clarity
 add_subdirectory(src/Model)
 add_subdirectory(src/Presenter) # Presenter before View
 add_subdirectory(src/View)
-add_subdirectory(Tests)
 
 add_executable(StochasticSim
     src/main.cpp

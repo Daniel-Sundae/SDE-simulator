@@ -8,10 +8,10 @@ FUNCTIONALITY TODO:
 	seed and multithread options
 	rk/other solvers
 	other processes
-- tooltips not working
 - switch useseed to std::optional<uint32_t>
 - can't have threadlocal generator if seed should be dynamic. Make sure seed works. Test it
 - make sure singe thread works. Test it.
+- make sure that if we are checking to use seed in db, that it is thread safe. All threads are currently reading from same std::pair.
 
 CODE DESIGN TODO:
 
@@ -21,4 +21,5 @@ TECH DETAILS TODO:
 DESIGN CHOICES MADE:
 
 ERRORS
-GBM, no randomness, 0.01 diffusion.
+- GBM, no randomness, 0.01 diffusion.
+- tooltips not working

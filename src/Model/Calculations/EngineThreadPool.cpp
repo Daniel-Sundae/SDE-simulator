@@ -6,11 +6,11 @@ EngineThreadPool::EngineThreadPool(std::uint32_t nrThreads)
 	, m_stopSource()
 	, m_cv()
 	, m_taskMtx()
+	, m_nrBusyThreads(0)
 {
 	if (!nrThreads) {
 		nrThreads = std::thread::hardware_concurrency();
 	}
-	// nrThreads = 2;
 	m_threads.reserve(nrThreads);
 	std::stop_token st = m_stopSource.get_token();
 	for (std::uint32_t i = 0; i < nrThreads; ++i) {
@@ -31,21 +31,16 @@ EngineThreadPool::~EngineThreadPool()
 
 auto EngineThreadPool::ClearTasks() -> void
 {
-	//std::queue<Task> empty;
-	{
-		std::scoped_lock lock(m_taskMtx);
-		while (!m_tasks.empty()) {
-			auto task = std::move(m_tasks.front());
-			m_tasks.pop();
-		}
-		//std::swap(m_tasks, empty);
+	std::scoped_lock lock(m_taskMtx);
+	while (!m_tasks.empty()) {
+		auto task = std::move(m_tasks.front());
+		m_tasks.pop();
 	}
 }
 
-auto EngineThreadPool::NrTasks() const -> std::size_t
+auto EngineThreadPool::NrBusyThreads() const -> uint32_t
 {
-	std::scoped_lock lock(m_taskMtx);
-	return m_tasks.size();
+	return m_nrBusyThreads.load();
 }
 
 auto EngineThreadPool::Enqueue(std::function<void()> task) -> void
@@ -70,6 +65,8 @@ void EngineThreadPool::DoTasks(std::stop_token st)
 			task = std::move(m_tasks.front());
 			m_tasks.pop();
 		}
-		task(); // Execute task
+		m_nrBusyThreads++;
+		task();
+		m_nrBusyThreads--;
 	}
 }

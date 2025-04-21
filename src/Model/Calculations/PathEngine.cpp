@@ -6,43 +6,31 @@
 
 PathEngine::PathEngine()
     : m_tp(std::make_unique<EngineThreadPool>())
-    , m_paths()
+    , m_pathResults()
     , m_pathsMtx()
     , m_cancelRequested(false)
     , m_completedTasks(0)
     , m_completionCv()
     , m_completionMtx()
-    , m_isBusy(false)
     , m_engineSettings()
 { }
 
-auto PathEngine::SamplePathGenerator(const PathQuery& pathQuery, const std::size_t slot) -> std::function<void()>
+auto PathEngine::SamplePathFunctor(const PathQuery& pathQuery, const std::size_t slot, const std::size_t seed) -> std::function<void()>
 {
-    return [this, pathQuery, slot]() -> void {
-        const std::size_t points = pathQuery.simulationParameters.Points();
-        const auto& drift = pathQuery.processDefinition.drift;
-        const auto& diffusion = pathQuery.processDefinition.diffusion;
-        const Time dt = pathQuery.simulationParameters.dt;
-        const State startValueData = pathQuery.processDefinition.startValueData;
-        Path path = {};
-        assert(points != 0);
-        path.reserve(points);
-        path.push_back(startValueData);
-        for (std::size_t i = 1; i < points; ++i) {
-            if (i % 100 == 0 && m_cancelRequested.load()) {
-                return;
-            }
-            path.push_back(path.back() + this->Increment(drift, diffusion, static_cast<Time>(i) * dt, path.back(), dt));
-        }
-        // Check again before writing
+    return [this, pathQuery, slot, seed]() -> void {
+        std::mt19937 generator(seed);
+        Path path = SampleOnePathImpl(pathQuery, generator);
+
+        // Check before writing
         if (m_cancelRequested) return;
+        
         // Don't need to protect vector since each thread 
         // is given unique slot with preallocated space
-        m_paths[slot] = std::move(path);
-        
-        // Important to lock to prevent mainTask reading stale data.
-        // The unlocking operation guarantees the increment is visible to
-        // mainTask thread before it evaluates predicate.
+        m_pathResults[slot] = std::move(path);
+
+        // Important to lock atomic for two reasons:
+        // 1: Unlocking guarantees increment is visible for mainTask thread before checking predicate. Prevents false re-sleep.
+        // 2: Holding mtx guarantees mainTask is listening for wakeup. Prevent lost wake-up
         {
             std::scoped_lock lock(m_completionMtx);
             m_completedTasks.fetch_add(1);
@@ -51,7 +39,14 @@ auto PathEngine::SamplePathGenerator(const PathQuery& pathQuery, const std::size
     };
 }
 
-auto PathEngine::SampleDriftCurve(const PathQuery& pathQuery) const -> Path
+auto PathEngine::SampleOnePath(const PathQuery& pathQuery) const -> Path
+{
+    const uint32_t seed = pathQuery.settingsParameters.useSeed.first ? pathQuery.settingsParameters.useSeed.second : std::random_device{}();
+    std::mt19937 generator(seed);
+    return SampleOnePathImpl(pathQuery, generator);
+}
+
+auto PathEngine::SampleOnePathImpl(const PathQuery& pathQuery, std::mt19937& generator) const -> Path
 {
     const std::size_t points = pathQuery.simulationParameters.Points();
     const auto& drift = pathQuery.processDefinition.drift;
@@ -63,60 +58,66 @@ auto PathEngine::SampleDriftCurve(const PathQuery& pathQuery) const -> Path
     path.reserve(points);
     path.push_back(startValueData);
     for (std::size_t i = 1; i < points; ++i) {
-        path.push_back(path.back() + Increment(drift, diffusion, static_cast<Time>(i) * dt, path.back(), dt));
+        if (i % 100 == 0 && m_cancelRequested.load()) {
+            return {};
+        }
+        path.push_back(path.back() + Increment(drift, diffusion, static_cast<Time>(i) * dt, path.back(), dt, generator));
     }
     return path;
 }
 
 auto PathEngine::SamplePathsAsync(const PathQuery& pathQuery, std::function<void(Paths)> onCompletionCb) -> void
 {
-    if(m_isBusy.load()){
-        throw std::runtime_error("Engine is busy. Aborting transaction.");
-    }
-    m_isBusy = true;
+    assert(!IsBusy() && "Cannot query busy engine");
     m_engineSettings = pathQuery.settingsParameters;
-
+    m_cancelRequested = false;
+    m_completedTasks = 0;
+    
     auto mainTask = [this, pathQuery, onCompletionCb]() -> void{
-        m_cancelRequested = false;
+
+        // Prepare results vector
         const std::size_t nrSamples = pathQuery.simulationParameters.samples;
-        {
-            std::scoped_lock sl(m_pathsMtx);
-            m_paths.clear();
-            m_paths.resize(nrSamples);
-        }
-        m_completedTasks = 0;
+        assert(m_tp->NrBusyThreads() == 1 && "Only mainTask should be running");
+        m_pathResults.clear();
+        m_pathResults.resize(nrSamples);
         for (std::size_t i = 0; i < nrSamples; ++i) {
-            m_paths[i].reserve(pathQuery.simulationParameters.Points());
-            m_engineSettings.useThreading ? m_tp->Enqueue(SamplePathGenerator(pathQuery, i)) : SamplePathGenerator(pathQuery, i)();
+            m_pathResults[i].resize(pathQuery.simulationParameters.Points());
+            // Provide unique generator for each task
+            const uint32_t seed = pathQuery.settingsParameters.useSeed.first ? pathQuery.settingsParameters.useSeed.second + i : std::random_device{}();
+            m_engineSettings.useThreading ? m_tp->Enqueue(SamplePathFunctor(pathQuery, i, seed)) : SamplePathFunctor(pathQuery, i, seed)();
         }
 
         // Wait until tasks done or GUI thread cancels
-        {
-            std::unique_lock<std::mutex> lock(m_completionMtx);
-            m_completionCv.wait(lock, [this, nrSamples]() {return m_completedTasks == nrSamples || m_cancelRequested;});
-        }
+        std::unique_lock<std::mutex> completionLock(m_completionMtx);
+        m_completionCv.wait(completionLock, [this, nrSamples]() {return m_completedTasks == nrSamples || m_cancelRequested;});
+
+        // Extract result (if any)
         Paths returnVal;
         {
             std::scoped_lock sl(m_pathsMtx);
-            returnVal = m_cancelRequested.load() ? Paths{} : std::move(m_paths);
-            m_paths.clear();
+            returnVal = m_cancelRequested.load() ? Paths{} : std::move(m_pathResults);
         }
-        m_tp->ClearTasks(); // Flush queue incase cancel requested
         onCompletionCb(std::move(returnVal));
-        m_isBusy = false;
+
+        // Clearing is relevant if sampling was cancelled
+        m_tp->ClearTasks();
+        m_pathResults.clear();
     };
     m_tp->Enqueue(mainTask);
 }
 
 auto PathEngine::RequestCancel() -> void
 {
-    m_cancelRequested = true;
+    {
+        std::scoped_lock lock(m_completionMtx); // Ensures mainTask reads updated atomic bool
+        m_cancelRequested = true;
+    }
     m_completionCv.notify_one();
 }
 
 auto PathEngine::IsBusy() -> bool
 {
-    return m_isBusy.load() ? true : false;
+    return m_tp->NrBusyThreads() ? true : false;
 }
 
 auto PathEngine::Increment(
@@ -124,16 +125,13 @@ auto PathEngine::Increment(
     const Diffusion& diffusion,
     const Time t,
     const State Xt,
-    const Time dt) const -> State
+    const Time dt,
+    std::mt19937& generator) const -> State
 {
-    return drift(t, Xt) * dt + diffusion(t, Xt) * db(dt);
-}
-
-auto PathEngine::db(double dt) const -> double
-{
-    // Each thread should have exactly one generator
-    thread_local std::mt19937 generator(m_engineSettings.useSeed.first ? m_engineSettings.useSeed.second : std::random_device{}());
-    double stdev = std::sqrt(dt);
-    std::normal_distribution<> d(0.0, stdev);
-    return d(generator);
+    const double dB = [&generator, dt](){
+        double stdev = std::sqrt(dt);
+        std::normal_distribution<> d(0.0, stdev);
+        return d(generator);
+    }();
+    return drift(t, Xt) * dt + diffusion(t, Xt) * dB;
 }

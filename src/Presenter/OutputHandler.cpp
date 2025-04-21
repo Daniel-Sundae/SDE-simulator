@@ -10,15 +10,15 @@ OutputHandler::OutputHandler(QObject* parent)
 	, IPresenterComponent()
 	, m_distributionSupport(std::make_pair<State>(0,0))
 {
-    connect(this, &OutputHandler::internalPathsReady,
+    connect(this, &OutputHandler::InternalPathReadySignal,
             this, &OutputHandler::OnPathsReceived,
             Qt::QueuedConnection);
 }
 
 auto OutputHandler::HandleWorkerResult(Paths&& paths) -> void
 {
-	// Pass data ownership to GUI thread.
-    emit internalPathsReady(std::move(paths));
+	// Pass data ownership from worker thread to GUI thread.
+    emit InternalPathReadySignal(std::move(paths));
 }
 
 auto OutputHandler::OnPathsReceived(const Paths& paths) -> void

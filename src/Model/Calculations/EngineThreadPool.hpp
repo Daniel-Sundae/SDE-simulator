@@ -11,9 +11,10 @@ public:
 	~EngineThreadPool();
 	auto Enqueue(const std::function<void()> f) -> void;
 	auto ClearTasks() -> void;
-	auto NrTasks() const -> std::size_t;
+    auto NrBusyThreads() const -> uint32_t;
+
 private:
-	// Only allow moving object to engine
+    // Only allow moving object to engine
 	EngineThreadPool(const EngineThreadPool&) = delete;
 	EngineThreadPool& operator=(const EngineThreadPool&) = delete;
 	auto DoTasks(std::stop_token st) -> void;
@@ -23,4 +24,5 @@ private:
 	std::stop_source m_stopSource;
 	std::condition_variable m_cv;
 	mutable std::mutex m_taskMtx;
+	std::atomic<uint32_t> m_nrBusyThreads;
 };

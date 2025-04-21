@@ -39,6 +39,7 @@ auto DistributionChart::UpdateTitle(const ProcessType type) -> void
 auto DistributionChart::PlotDistribution(const Distribution& results) -> void
 {
 	assert(m_distributionSet->count() == 0);
+	if(results.empty()) return;
 	const State binWidth = (m_xAxis->max() - m_xAxis->min()) / static_cast<qreal>(nrBins);
 	std::vector<std::size_t> histogram(nrBins, 0);
 	for (double res : results) {

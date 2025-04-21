@@ -14,27 +14,29 @@ struct PDFQuery;
 class PathEngine{
 public:
 	explicit PathEngine();
-	auto SamplePathsAsync(const PathQuery& pathQuery, std::function<void(Paths)> onCompletionCb) -> void;
-	auto SampleDriftCurve(const PathQuery& pathQuery) const -> Path;
-	auto RequestCancel() -> void;
+    auto SamplePathsAsync(const PathQuery &pathQuery, std::function<void(Paths)> onCompletionCb) -> void;
+    auto SampleOnePath(const PathQuery& pathQuery) const -> Path;
+    auto RequestCancel() -> void;
     auto IsBusy() -> bool;
+
 private:
-    auto SamplePathGenerator(const PathQuery& pathQuery, const std::size_t slot) -> std::function<void()>;
-	inline auto Increment(
-		const Drift& drift,
-		const Diffusion& diffusion,
+    auto SamplePathFunctor(const PathQuery &pathQuery, const std::size_t slot, const std::size_t seed) -> std::function<void()>;
+    auto SampleOnePathImpl(const PathQuery &pathQuery, std::mt19937 &generator) const -> Path;
+    auto Increment(
+		const Drift &drift,
+		const Diffusion &diffusion,
 		const Time t,
 		const State Xt,
-		const Time dt) const -> State;
-	inline auto db(double dt) const -> double;
+		const Time dt,
+		std::mt19937 &generator) const -> State;
+
 private:
 	std::unique_ptr<EngineThreadPool> m_tp;
-	Paths m_paths;
+	Paths m_pathResults;
 	std::mutex m_pathsMtx;
 	std::atomic<bool> m_cancelRequested;
 	std::atomic<std::size_t> m_completedTasks;
 	std::condition_variable m_completionCv;
 	std::mutex m_completionMtx;
-	std::atomic<bool> m_isBusy;
 	SettingsParameters m_engineSettings;
 };
