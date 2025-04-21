@@ -20,7 +20,7 @@ public:
     auto IsBusy() -> bool;
 
 private:
-    auto SamplePathFunctor(const PathQuery &pathQuery, const std::size_t slot, const std::size_t seed) -> std::function<void()>;
+    auto SamplePathFunctor(const PathQuery &pathQuery, const std::size_t slot, const uint32_t seed) -> std::function<void()>;
     auto SampleOnePathImpl(const PathQuery &pathQuery, std::mt19937 &generator) const -> Path;
     auto Increment(
 		const Drift &drift,

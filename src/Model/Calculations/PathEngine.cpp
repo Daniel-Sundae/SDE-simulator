@@ -15,7 +15,7 @@ PathEngine::PathEngine()
     , m_engineSettings()
 { }
 
-auto PathEngine::SamplePathFunctor(const PathQuery& pathQuery, const std::size_t slot, const std::size_t seed) -> std::function<void()>
+auto PathEngine::SamplePathFunctor(const PathQuery& pathQuery, const std::size_t slot, const uint32_t seed) -> std::function<void()>
 {
     return [this, pathQuery, slot, seed]() -> void {
         std::mt19937 generator(seed);

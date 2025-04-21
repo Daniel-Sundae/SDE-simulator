@@ -2,7 +2,7 @@
     "version": 3,
     "configurePresets": [
         {
-            "name": "debug-windows-msvc",
+            "name": "debug-msvc",
             "displayName": "Debug with MSVC Qt Compiler",
             "description": "Build configuration for Debug using MSVC compiler",
             "generator": "Ninja",
@@ -12,11 +12,6 @@
                 "CMAKE_PREFIX_PATH": "C:/Qt/6.8.3/msvc2022_64",
                 "CMAKE_C_COMPILER": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.42.34433/bin/Hostx64/x64/cl.exe",
                 "CMAKE_CXX_COMPILER": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.42.34433/bin/Hostx64/x64/cl.exe"
-            },
-            "condition": {
-                "type": "equals",
-                "lhs": "${hostSystemName}",
-                "rhs": "Windows"
             }
         },
         {
