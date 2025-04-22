@@ -7,7 +7,7 @@
 
 static const std::unordered_map<StatusSignal, QString> statusToString = {
     {StatusSignal::READY, QString("Ready")},
-    {StatusSignal::SAMPLING, QString("Sampling... (CLEAR to cancel)")},
+    {StatusSignal::SAMPLING, QString("Sampling...")},
     {StatusSignal::RENDERING, QString("Rendering...")},
 };
 

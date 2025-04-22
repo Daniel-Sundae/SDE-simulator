@@ -11,11 +11,12 @@ EngineThreadPool::EngineThreadPool(std::uint32_t nrThreads)
 	if (!nrThreads) {
 		nrThreads = std::thread::hardware_concurrency();
 	}
+	// Need at least 2 threads. One mainTask thread and 1 worker thread.
+	nrThreads = std::max(nrThreads, static_cast<std::uint32_t>(2));
 	m_threads.reserve(nrThreads);
 	std::stop_token st = m_stopSource.get_token();
 	for (std::uint32_t i = 0; i < nrThreads; ++i) {
 		m_threads.emplace_back([this, st](std::stop_token) {this->DoTasks(st);}); // Do not let jthread create stoptoken.
-		//m_threads.emplace_back([this](std::stop_token st) {this->DoTasks(st);}); // Let jthread create stoptoken.
 	}
 }
 
@@ -38,7 +39,7 @@ auto EngineThreadPool::ClearTasks() -> void
 	}
 }
 
-auto EngineThreadPool::NrBusyThreads() const -> uint32_t
+auto EngineThreadPool::NrBusyThreads() const -> std::uint32_t
 {
 	return m_nrBusyThreads.load();
 }
@@ -49,7 +50,7 @@ auto EngineThreadPool::Enqueue(std::function<void()> task) -> void
 		std::unique_lock<std::mutex> lock(m_taskMtx);
 		m_tasks.push(std::move(task));
 	}
-	m_cv.notify_one(); // Don't need to hold lock here?
+	m_cv.notify_one();
 }
 
 void EngineThreadPool::DoTasks(std::stop_token st)

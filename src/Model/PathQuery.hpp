@@ -54,7 +54,7 @@ struct ProcessDefinition {
 
 struct SettingsParameters{
     bool useThreading;
-    std::pair<bool, uint32_t> useSeed;
+    std::pair<bool, std::uint32_t> useSeed;
     explicit SettingsParameters()
     : useThreading(true)
     , useSeed({false, 0})

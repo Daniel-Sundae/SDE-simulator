@@ -101,33 +101,26 @@ auto PathChart::UpdateYAxisIfNeeded(State min_Y, State max_Y) -> void
     qreal currentYMin = m_yAxis->min();
     qreal currentYMax = m_yAxis->max();
     qreal currentYRange = currentYMax - currentYMin;
-
     bool adjustY = false;
     qreal hysteresis = std::max(1.0, currentYRange * 0.05);  // 5% hysteresis
-
     if (desiredYMin < currentYMin - hysteresis || desiredYMax > currentYMax + hysteresis) {
         adjustY = true;
     }
     else if (currentYRange > 5.0 * dataYRange && dataYRange > 0) {
         adjustY = true;
     }
-
     if (adjustY) {
         qreal roundTo = std::max(1.0, std::pow(10, std::floor(std::log10(dataYRange / 5))));
         qreal newYMin = std::floor(desiredYMin / roundTo) * roundTo;
         qreal newYMax = std::ceil(desiredYMax / roundTo) * roundTo;
-
         if (newYMin > 0 && newYMin < dataYRange * 0.5) newYMin = 0;
         if (newYMax < 0 && newYMax > -dataYRange * 0.5) newYMax = 0;
-
         if (newYMax - newYMin < 1.0) {
             qreal midPoint = (newYMax + newYMin) / 2.0;
             newYMin = midPoint - 0.5;
             newYMax = midPoint + 0.5;
         }
-
         m_yAxis->setRange(newYMin, newYMax);
-
         int tickCount = std::min(11, std::max(5, static_cast<int>((newYMax - newYMin) / roundTo) + 1));
         m_yAxis->setTickCount(tickCount);
         m_yAxis->applyNiceNumbers();

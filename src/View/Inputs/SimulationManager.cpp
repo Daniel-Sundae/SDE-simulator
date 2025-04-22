@@ -50,21 +50,21 @@ auto SimulationManager::AddSpinBoxes() -> void
 {
     auto* timeWidget = new QSpinBox(this);
     timeWidget->setValue(static_cast<uint64_t>(DefaultConstants::Simulation::time));
-    timeWidget->setMinimum(0);
-    timeWidget->setMaximum(100);
-    timeWidget->setSingleStep(10);
+    timeWidget->setMinimum(1);
+    timeWidget->setMaximum(30);
+    timeWidget->setSingleStep(5);
     m_widgets[SimulationWidget::TIME] = timeWidget;
     auto* dtWidget = new QDoubleSpinBox(this);
     dtWidget->setValue(DefaultConstants::Simulation::dt);
     dtWidget->setMinimum(0);
-    dtWidget->setMaximum(1);
-    dtWidget->setSingleStep(0.1);
+    dtWidget->setMaximum(0.5);
+    dtWidget->setSingleStep(0.01);
     m_widgets[SimulationWidget::dt] = dtWidget;
     auto* samplesWidget = new QSpinBox(this);
     samplesWidget->setValue(1);
     samplesWidget->setMinimum(1);
-    samplesWidget->setMaximum(10000);
-    samplesWidget->setSingleStep(1);
+    samplesWidget->setMaximum(100000);
+    samplesWidget->setSingleStep(10);
     m_widgets[SimulationWidget::SAMPLES] = samplesWidget;
 
     connect(

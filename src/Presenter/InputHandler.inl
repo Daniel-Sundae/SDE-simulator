@@ -39,7 +39,7 @@ auto InputHandler::OnSettingsParameterModified(const SettingsWidget param, T use
 				assert(false && "Threading checkbox parameter must be invoked with bool type");
 			break;
 		case SettingsWidget::FIXSEED:
-			if constexpr (std::is_same_v<T, uint32_t>)
+			if constexpr (std::is_same_v<T, std::uint32_t>)
 				if(userValue == 0){
 					m_settingsParameters->useSeed = {false, 0};
 				}

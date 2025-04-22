@@ -11,7 +11,7 @@ public:
 	~EngineThreadPool();
 	auto Enqueue(const std::function<void()> f) -> void;
 	auto ClearTasks() -> void;
-    auto NrBusyThreads() const -> uint32_t;
+    auto NrBusyThreads() const -> std::uint32_t;
 
 private:
     // Only allow moving object to engine

@@ -59,7 +59,6 @@ auto OutputHandler::PrepareGUI(const PathQuery& pQuery) -> void
 
 auto OutputHandler::OnPDFReceived(const PDF& pdf) -> void
 {
-	assert(!HasSupport());
 	m_distributionSupport = pdf.GetSupport();
 	Listener()->SetDistributionChartSupport(m_distributionSupport);
 	Listener()->UpdateDistributionChartPDF(pdf.GetPDFData());

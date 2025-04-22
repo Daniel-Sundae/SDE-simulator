@@ -40,9 +40,10 @@ auto DefinitionManager::UpdateWidgetProperties(ProcessType process, bool initial
 
 auto DefinitionManager::AddDefinitionWidgets() -> void
 {
-    std::array<ProcessType, 2> processTypes = {
+    std::array<ProcessType, 3> processTypes = {
         ProcessType::BM,
         ProcessType::GBM,
+        ProcessType::OU,
     };
     auto* processes = new QComboBox(this);
     for (int i = 0; i < static_cast<int>(processTypes.size()); ++i) {

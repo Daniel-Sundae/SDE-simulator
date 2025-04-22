@@ -81,9 +81,11 @@ auto DistributionChart::UpdateDistributionChartPDF(const PDFData& pdfData) -> vo
 
 auto DistributionChart::PlotExpValLine(const State EV) -> void
 {
-	(void)EV;
-    // GUI::SetDriftStyle(series);
-
+	QVector<QPointF> points;
+    points.reserve(2);
+    points.append(QPointF(EV, 0));
+    points.append(QPointF(EV, m_yAxisDensity->max()*1.1));
+	m_expValLine->replace(points);
 }
 
 auto DistributionChart::SetDistributionChartSupport(const Range range) -> void
@@ -121,6 +123,7 @@ auto DistributionChart::InitializeDistributionChart() -> void
 	m_pdf->attachAxis(m_xAxis);
 	m_pdf->attachAxis(m_yAxisDensity);
 	m_pdf->setName("Probability Density Function");
+	m_expValLine->setPen(QPen(Qt::gray, 3.0, Qt::DashLine));
 	m_expValLine->attachAxis(m_xAxis);
 	m_expValLine->attachAxis(m_yAxisDensity);
 	m_expValLine->setName("Expected Value");

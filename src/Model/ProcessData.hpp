@@ -40,7 +40,7 @@ public:
         static constexpr std::string_view definition = "dX = μdt + σdB";
         static constexpr Constants muData{ {-0.5,0.5},0,0.1 };
         static constexpr Constants sigmaData{ {0,1.2},0.2,0.1 };
-        static constexpr Constants startValueData{ {-100,100},0,1 };
+        static constexpr Constants startValueData{ {-100, 100}, 0,1 };
         static auto drift(const double _mu) -> Drift {
             return Drift(_mu, [_mu](Time, State) { return _mu; });
         };
@@ -50,18 +50,12 @@ public:
         static auto pdf(const State startValue, const Time time, const double _mu, const double _sigma) -> PDF {
             const double EV = startValue + _mu * time;
             const double stddev = _sigma * std::sqrt(time);
-            // Pre computed constants
-            const double sqrt_2pi = std::sqrt(2.0 * DefaultConstants::PI);
-            const double sigma_t = _sigma * std::sqrt(time);
-            const double variance_t = _sigma * _sigma * time;
-            const double two_variance_t = 2.0 * variance_t;
-            const double drift_term = _mu * time;
+            const double denominator = std::sqrt(2.0 * DefaultConstants::PI * time) * _sigma;
+            const double expDenominator = 2.0 * _sigma * _sigma * time;
             const auto _pdf = [=](const State endValue) -> Density {
-                const double diff = endValue - startValue - drift_term;
-                const double diff_squared = diff * diff;
-                const double denominator = sigma_t * sqrt_2pi;
-                const double exponent = -diff_squared / two_variance_t;
-                return std::exp(exponent) / denominator;
+                const double expNumerator = - std::pow(endValue - (startValue + _mu * time), 2);
+                const double exponent = expNumerator / expDenominator;
+                return (1 / denominator) * std::exp(exponent);
                 };
             return PDF(EV, stddev, _pdf);
         };
@@ -74,39 +68,58 @@ public:
         static constexpr std::string_view definition = "dX = μXdt + σXdB";
         static constexpr Constants muData{ {-0.5,0.5},0,0.1 };
         static constexpr Constants sigmaData{ {0,1},0.2,0.1 };
-        static constexpr Constants startValueData{ {0.1,100},1,1 };
+        static constexpr Constants startValueData{ {0.1, 100},1,1 };
         static auto drift(const double _mu) -> Drift {
-            return Drift(_mu, [_mu](Time, State s) { return _mu * s; });
-            };
+            return Drift(_mu, [_mu](Time, State Xt) { return _mu * Xt; });
+        };
         static auto diffusion(const double _sigma) -> Diffusion {
-            return Diffusion(_sigma, [_sigma](Time, State s) { return _sigma * s; });
-            };
-        // Theoretical solution for GBM:
-        // f(s)=\frac{1}{s \sqrt{2 \pi \sigma^2 T}} \exp \left[-\frac{\left(\ln \left(\frac{s}{S_0}\right)-\left(\mu-\frac{\sigma^2}{2}\right) T\right)^2}{2 \sigma^2 T}\right]
+            return Diffusion(_sigma, [_sigma](Time, State Xt) { return _sigma * Xt; });
+        };
         static auto pdf(const State startValue, const Time time, const double _mu, const double _sigma) -> PDF {
             const double EV = startValue * std::exp(_mu * time);
             const double stddev = EV * sqrt(exp(_sigma * _sigma * time) - 1);
-            // Pre computed constants
-            const double sigma_squared = _sigma * _sigma;
-            const double adjusted_drift = _mu - 0.5 * sigma_squared;
-            const double sqrt_2pi = std::sqrt(2.0 * DefaultConstants::PI);
-            const double sigma_t = _sigma * std::sqrt(time);
-            const double variance_t = sigma_squared * time;
-            const double two_variance_t = 2.0 * variance_t;
+            const double expDenominator = 2.0 * _sigma * _sigma * time;      
             const auto _pdf = [=](const State endValue) -> Density {
                 if (endValue <= 0.0) {
                     return 0;
                 }
-                const double log_ratio = std::log(endValue / startValue);
-                const double drift_term = adjusted_drift * time;
-                const double diff = log_ratio - drift_term;
-                const double diff_squared = diff * diff;
-                const double denominator = endValue * sigma_t * sqrt_2pi;
-                const double exponent = -diff_squared / two_variance_t;
-                return std::exp(exponent) / denominator;
-                };
-            return PDF(EV, stddev, _pdf);
+                const double expNumerator = - std::pow(std::log(endValue / startValue) - (_mu - 0.5 * _sigma * _sigma) * time, 2);
+                const double denominator = std::sqrt(2 * DefaultConstants::PI * time) * endValue * _sigma;
+                return (1 / denominator) * std::exp(expNumerator / expDenominator);
             };
+            return PDF(EV, stddev, _pdf);
+        };
+    };
+
+    struct OU : RequiredFields<OU> {
+        static constexpr std::string_view name = "Ornstein-Uhlenbeck Process";
+        static constexpr std::string_view acronym = "OU";
+        static constexpr std::string_view description = "Ornstein-Uhlenbeck process (mean-reverting with θ = 1).";
+        static constexpr std::string_view definition = "dX = θ(μ - X)dt + σdB";
+        static constexpr Constants muData{ {-10, 10}, 0, 0.1 };
+        static constexpr Constants sigmaData{ {0.01, 2}, 0.2, 0.1 };
+        static constexpr Constants startValueData{ {-50, 50}, 1, 1 };
+    
+        static auto drift(const double _mu) -> Drift {
+            return Drift(_mu, [_mu](Time, State Xt) { return DefaultConstants::OUthetaData * (_mu - Xt); });
+        };
+    
+        static auto diffusion(const double _sigma) -> Diffusion {
+            return Diffusion(_sigma, [_sigma](Time, State) { return _sigma; });
+        };
+
+        static auto pdf(const State startValue, const Time time, const double _mu, const double _sigma) -> PDF {
+            const double EV = startValue * std::exp(-DefaultConstants::OUthetaData * time) + _mu * (1.0 - std::exp(-DefaultConstants::OUthetaData * time));
+            const double _privateRepeatedVal = (_sigma * _sigma) / (2.0 * DefaultConstants::OUthetaData) * (1.0 - std::exp(-2.0 * DefaultConstants::OUthetaData * time));
+            const double stddev = std::sqrt(_privateRepeatedVal);
+            const double expDenominator = 2.0 * _privateRepeatedVal;
+            const auto _pdf = [=](const State endValue) -> Density {
+                const double expNumerator = -std::pow(endValue - EV, 2);
+                const double denominator = std::sqrt(2.0 * DefaultConstants::PI * _privateRepeatedVal);
+                return (1.0 / denominator) * std::exp(expNumerator / expDenominator);
+            };
+            return PDF(EV, stddev, _pdf);
+        };
     };
 
 private:
@@ -117,58 +130,55 @@ private:
             return Field(ProcessData::BM{});
         case ProcessType::GBM:
             return Field(ProcessData::GBM{});
-        case ProcessType::BB:
-        case ProcessType::NONE:
-        case ProcessType::CUSTOM:
-        case ProcessType::Levy:
         case ProcessType::OU:
+           return Field(ProcessData::OU{});
+        case ProcessType::Levy:
             throw std::runtime_error("Process type not implemented");
         }
         throw std::runtime_error("Unknown process type");
     }
 
-#define GET_STATIC_FIELD(field) ProcessData::GetField<[](auto t) { return decltype(t)::field; }>(type)
+#define GET_PROCESS_FIELD(field) ProcessData::GetField<[](auto t) { return decltype(t)::field; }>(type)
 public:
     static auto GetName(ProcessType type) -> std::string_view
     {
-        return GET_STATIC_FIELD(name);
+        return GET_PROCESS_FIELD(name);
     }
     static auto GetAcronym(ProcessType type) -> std::string_view
     {
-        return GET_STATIC_FIELD(acronym);
+        return GET_PROCESS_FIELD(acronym);
     }
     static auto GetDescription(ProcessType type) -> std::string_view
     {
-        return GET_STATIC_FIELD(description);
+        return GET_PROCESS_FIELD(description);
     }
     static auto GetDefinition(ProcessType type) -> std::string_view
     {
-        return GET_STATIC_FIELD(definition);
+        return GET_PROCESS_FIELD(definition);
     }
     static auto GetMuData(ProcessType type) -> Constants
     {
-        return GET_STATIC_FIELD(muData);
+        return GET_PROCESS_FIELD(muData);
     }
     static auto GetSigmaData(ProcessType type) -> Constants
     {
-        return GET_STATIC_FIELD(sigmaData);
+        return GET_PROCESS_FIELD(sigmaData);
     }
     static auto GetStartValueData(ProcessType type) -> Constants
     {
-        return GET_STATIC_FIELD(startValueData);
+        return GET_PROCESS_FIELD(startValueData);
     }
     static auto GetDrift(ProcessType type, const double _mu) -> Drift
     {
-        return GET_STATIC_FIELD(drift)(_mu);
+        return GET_PROCESS_FIELD(drift)(_mu);
     }
     static auto GetDiffusion(ProcessType type, const double _sigma) -> Diffusion
     {
-        return GET_STATIC_FIELD(diffusion)(_sigma);
+        return GET_PROCESS_FIELD(diffusion)(_sigma);
     }
     static auto GetPDF(ProcessType type, const State startValue, const Time time, const double _mu, const double _sigma) -> PDF
     {
-        return GET_STATIC_FIELD(pdf)(startValue, time, _mu, _sigma);
+        return GET_PROCESS_FIELD(pdf)(startValue, time, _mu, _sigma);
     }
-#undef GET_STATIC_FIELD
-
+#undef GET_PROCESS_FIELD
 };

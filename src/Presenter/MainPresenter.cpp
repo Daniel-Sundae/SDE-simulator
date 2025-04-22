@@ -34,7 +34,6 @@ auto MainPresenter::OnTransactionReceived(const Transaction&& transaction) -> vo
 		return;
 	}
 	Listener()->PrepareGUI(transaction.pathQuery);
-	// Need to set distribution support before sampling paths
 	Listener()->OnPDFReceived(transaction.pdfQuery.pdf);
 	SamplePaths(transaction.pathQuery);
 	SampleDriftCurve(transaction.deterministicQuery);
