@@ -17,7 +17,6 @@ public:
         const double incrementSize;
     };
 
-
     using DiffusionFunction = std::function<Diffusion(const double)>;
 
     template <typename ProcessT>

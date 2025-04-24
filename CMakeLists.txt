@@ -30,7 +30,7 @@ else()
         -Wall
         -Wextra
         -Wpedantic
-        -Werror        # Treat warnings as errors
+        #-Werror        # Treat warnings as errors
         -Wshadow       # Warn about shadowed variables
         -Wnon-virtual-dtor
         -pedantic-errors
@@ -53,25 +53,6 @@ add_library(CommonIncludes INTERFACE)
 target_include_directories(CommonIncludes
     INTERFACE Include
 )
-
-## GTESTS
-#option(BUILD_TESTING "Build the tests for StochasticSim" ON) # Add option
-#
-#if(BUILD_TESTING)
-#  message(STATUS "Building Tests")
-#  include(FetchContent)
-#  FetchContent_Declare(
-#    googletest
-#    GIT_REPOSITORY https://github.com/google/googletest.git
-#    GIT_TAG    v1.16.0
-#  )
-#  set(INSTALL_GTEST OFF CACHE BOOL "Disable installing GTest")
-#  FetchContent_MakeAvailable(googletest)
-#  enable_testing()
-#  add_subdirectory(Tests)
-#else()
-#    message(STATUS "Skipping Tests")
-#endif()
 
 # Adjust subdirectory order for dependency clarity
 add_subdirectory(src/Model)

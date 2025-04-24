@@ -21,7 +21,8 @@ public:
 
 private:
     auto SamplePathFunctor(const PathQuery &pathQuery, const std::size_t slot, const std::uint32_t seed) -> std::function<void()>;
-    auto SampleOnePathImpl(const PathQuery &pathQuery, std::mt19937 &generator) const -> Path;
+	template <typename F>
+	auto SampleOnePathImpl(const PathQuery &pathQuery, std::mt19937 &generator, F dXt) const -> Path;
     auto Increment(
 		const Drift &drift,
 		const Diffusion &diffusion,

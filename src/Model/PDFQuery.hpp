@@ -11,7 +11,7 @@ struct PDFQuery {
 private:
     static auto PDFWithData(PDF pdfWithNoData, std::size_t points) -> PDF
     {
-        pdfWithNoData.GeneratePDFData(points);
+        pdfWithNoData.GeneratePDFData(std::max(points, static_cast<std::size_t>(1000)));
         return pdfWithNoData;
     }
 };

@@ -1,6 +1,7 @@
 #include "PathEngine.hpp"
 #include "PathQuery.hpp"
 #include "PDFQuery.hpp"
+#include "SolverData.hpp"
 #include <thread>
 #include <cassert>
 
@@ -19,7 +20,7 @@ auto PathEngine::SamplePathFunctor(const PathQuery& pathQuery, const std::size_t
 {
     return [this, pathQuery, slot, seed]() -> void {
         std::mt19937 generator(seed);
-        Path path = SampleOnePathImpl(pathQuery, generator);
+        Path path = SampleOnePathImpl(pathQuery, generator, dXtFunctor(pathQuery.simulationParameters.solver));
 
         // Check before writing
         if (m_cancelRequested) return;
@@ -43,10 +44,11 @@ auto PathEngine::SampleOnePath(const PathQuery& pathQuery) const -> Path
 {
     const std::uint32_t seed = pathQuery.settingsParameters.useSeed.first ? pathQuery.settingsParameters.useSeed.second : std::random_device{}();
     std::mt19937 generator(seed);
-    return SampleOnePathImpl(pathQuery, generator);
+    return SampleOnePathImpl(pathQuery, generator, dXtFunctor(pathQuery.simulationParameters.solver));
 }
 
-auto PathEngine::SampleOnePathImpl(const PathQuery& pathQuery, std::mt19937& generator) const -> Path
+template <typename F>
+auto PathEngine::SampleOnePathImpl(const PathQuery& pathQuery, std::mt19937& generator, F dXt) const -> Path
 {
     const std::size_t points = pathQuery.simulationParameters.Points();
     const auto& drift = pathQuery.processDefinition.drift;
@@ -61,7 +63,7 @@ auto PathEngine::SampleOnePathImpl(const PathQuery& pathQuery, std::mt19937& gen
         if (i % 100 == 0 && m_cancelRequested.load()) {
             return {};
         }
-        path.push_back(path.back() + Increment(drift, diffusion, static_cast<Time>(i) * dt, path.back(), dt, generator));
+        path.push_back(path.back() + dXt(drift, diffusion, static_cast<Time>(i) * dt, path.back(), dt, generator));
     }
     return path;
 }
@@ -119,20 +121,4 @@ auto PathEngine::RequestCancel() -> void
 auto PathEngine::IsBusy() -> bool
 {
     return m_tp->NrBusyThreads() ? true : false;
-}
-
-auto PathEngine::Increment(
-    const Drift& drift,
-    const Diffusion& diffusion,
-    const Time t,
-    const State Xt,
-    const Time dt,
-    std::mt19937& generator) const -> State
-{
-    const double dB = [&generator, dt](){
-        double stdev = std::sqrt(dt);
-        std::normal_distribution<> d(0.0, stdev);
-        return d(generator);
-    }();
-    return drift(t, Xt) * dt + diffusion(t, Xt) * dB;
 }
