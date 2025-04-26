@@ -20,6 +20,7 @@ if(MSVC)
     add_compile_options(
         /W4            # Warning level 4
         #/WX            # Treat warnings as errors
+        /WX-            # Do not treat warnings as errors
         /permissive-   # Strict standards conformance
         /MP            # Multi-processor compilation
     )
@@ -48,6 +49,24 @@ add_library(CommonIncludes INTERFACE)
 target_include_directories(CommonIncludes
     INTERFACE Include
 )
+
+# Google tests
+option(BUILD_TESTING "Build the tests" OFF)
+if(BUILD_TESTING)
+    find_package(GTest CONFIG QUIET)
+    if(GTest_FOUND)
+        message(STATUS "Using system-installed GTest")
+    else()
+        include(FetchContent)
+        FetchContent_Declare(
+            googletest
+            URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+        )
+        FetchContent_MakeAvailable(googletest)
+    endif()
+    enable_testing()
+    add_subdirectory(Tests)
+endif()
 
 add_subdirectory(src/Model)
 add_subdirectory(src/Presenter)

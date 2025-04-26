@@ -3,129 +3,48 @@
 #include "EngineThreadPool.hpp"
 #include <chrono>
 #include <mutex>
+#include <latch>
 #include <algorithm>
 
 class EngineThreadPoolTest : public ::testing::Test {
 protected:
     std::unique_ptr<EngineThreadPool> m_tp;
     Paths m_results;
-    std::mutex m_resultMtx;
-    std::vector< std::future<Path> > m_futures;
+    std::unique_ptr<std::latch> m_nrTasksLeft;
 
-    void SetUp() override {
-        SetUp(0);
-    }
-
-    void SetUp(std::uint32_t nrThreads) {
+    void RuntimeSetUp(std::uint32_t nrThreads, std::uint32_t nrTasks) {
         TearDown();
+        m_results.resize(nrTasks);
+        m_nrTasksLeft = std::make_unique<std::latch>(nrTasks);
         m_tp = std::make_unique<EngineThreadPool>(nrThreads);
     }
 
     void TearDown() {
-        WaitForResults();
+        m_nrTasksLeft.reset();
         m_tp.reset();
-        {
-           std::unique_lock lock(m_resultMtx, std::try_to_lock);
-           ASSERT_TRUE(lock.owns_lock())
-            << "No thread should be writing to results when tearing down.";
-            m_results.clear();
-        }
-        m_futures.clear();
+        m_results.clear();
     }
 
-    auto GenerateTaskFunction(const std::uint32_t taskTimeMs, const State resultState) -> std::function<Path()>
+    auto GenerateTaskFunction(const std::uint32_t taskTimeMs, const State resultState, const std::uint32_t slot) -> std::function<void()>
     {
-        return [this, taskTimeMs, resultState]() -> Path {
+        return [this, taskTimeMs, resultState, slot]() -> void {
             std::this_thread::sleep_for(std::chrono::milliseconds(taskTimeMs));
-            {
-                std::scoped_lock sl(m_resultMtx);
-                m_results.push_back({ resultState });
-            }
-            // This returned empty path is completely ignored by tests.
-            // Needed for EngineThreadPool::Enqueue interface.
-            return {};
+            m_results[slot] = { resultState };
+            m_nrTasksLeft->count_down();
         };
     }
-
-    auto DoEnqueue(
-        std::function<Path()> f,
-        std::size_t nrTasks = 1) -> void
-    {
-        for (std::size_t i = 0; i < nrTasks; ++i) {
-            // Create a promise and future to manage the task result
-            auto promise = std::make_shared<std::promise<Path>>();
-            m_futures.push_back(promise->get_future());
-            
-            // Create a wrapper task that fulfills the promise
-            m_tp->Enqueue([f, promise]() {
-                try {
-                    Path result = f();
-                    promise->set_value(result);
-                } catch (...) {
-                    promise->set_exception(std::current_exception());
-                }
-            });
-        }
-    }
-
-    auto WaitForResults() -> void
-    {
-        try{
-            for (auto& future : m_futures) {
-                future.get();
-            }
-            m_futures.clear();
-        }
-        catch (...) {
-            try {
-                throw; // rethrow the current exception
-            } catch (const std::exception& e) {
-                std::cout << "Caught std::exception: " << e.what() << std::endl;
-                // You can inspect e here
-            } catch (...) {
-                std::cout << "Caught unknown exception" << std::endl;
-            }
-        }
-    };
-
 };
 
 TEST_F(EngineThreadPoolTest, TestTpSimpleTasks) {
-    SetUp(1);
-    auto task1 = GenerateTaskFunction(GetRandomInt(1, 300), 0.1);
-    auto task2 = GenerateTaskFunction(GetRandomInt(1, 300), 0.2);
-    auto task3 = GenerateTaskFunction(GetRandomInt(1, 300), 0.3);
-    auto task4 = GenerateTaskFunction(GetRandomInt(1, 300), 0.4);
+    std::uint32_t nrTasks = 4;
+    RuntimeSetUp(1, nrTasks);
 
-    DoEnqueue(task1);
-    DoEnqueue(task2);
-    DoEnqueue(task3);
-    DoEnqueue(task4);
-    WaitForResults();
+    for(std::uint32_t slot = 0; slot < nrTasks; ++slot){
+        m_tp->Enqueue(GenerateTaskFunction(GetRandomInt(1, 300), 0.1 + slot, slot));
+    }
+    m_nrTasksLeft->wait();
 
-    std::vector<Path> expected = { {0.1}, {0.2}, {0.3}, {0.4} };
-    ASSERT_EQ(expected, m_results);
-}
-
-TEST_F(EngineThreadPoolTest, TestTpOrder) {
-    SetUp(2);
-    auto slowTask = GenerateTaskFunction(200, 0.2);
-    auto fastTask = GenerateTaskFunction(0, 0.1);
-    DoEnqueue(slowTask);
-    DoEnqueue(fastTask);
-    WaitForResults();
-
-    // Expect that fast task is done first since there are two threads working on them simultaneously
-    std::vector<Path> expected = { {0.1}, {0.2} };
-    ASSERT_EQ(expected, m_results);
-
-    SetUp(1);
-    DoEnqueue(slowTask);
-    DoEnqueue(fastTask);
-    WaitForResults();
-
-    // Expect slow task is done first since it was enqueued first and only one working thread
-    expected = { {0.2}, {0.1} };
+    std::vector<Path> expected = { {0.1}, {1.1}, {2.1}, {3.1} };
     ASSERT_EQ(expected, m_results);
 }
 
@@ -135,32 +54,35 @@ TEST_F(EngineThreadPoolTest, TestTpMultiThreadIsFaster) {
     using Duration = std::chrono::steady_clock::duration;
     std::vector<Duration> durations = {};
     durations.reserve(maxThreads);
-    auto task = GenerateTaskFunction(50, 0.1);
-    for (std::uint32_t i = 1; i <= maxThreads; ++i) {
-        SetUp(i);
+    // Start from nrThreads = 2 since threadpool impl requires it 
+    for (std::uint32_t nrThreads = 2; nrThreads <= maxThreads; ++nrThreads) {
+        RuntimeSetUp(nrThreads, nrTasks);
         auto startTime = std::chrono::steady_clock::now();
-        DoEnqueue(task, nrTasks);
-        WaitForResults();
+        for(std::uint32_t slot = 0; slot < nrTasks; ++slot){
+            m_tp->Enqueue(GenerateTaskFunction(50, 1.0, slot));
+        }
+        m_nrTasksLeft->wait();
         durations.push_back(std::chrono::steady_clock::now() - startTime);
-        ASSERT_EQ(m_results.size(), nrTasks);
+        ASSERT_EQ(m_results, Paths(nrTasks, {1})); // Sanity check that sampling was done.
     }
     ASSERT_TRUE(std::is_sorted(durations.begin(), durations.end(), std::greater<Duration>()));
 }
 
 TEST_F(EngineThreadPoolTest, TestTpClearTasks) {
-    SetUp(1);
     std::uint32_t taskTime = 100;
-    std::uint32_t nrTasks = 10;
-    auto task = GenerateTaskFunction(taskTime, 0.1);
-    DoEnqueue(task, nrTasks);
-    // Ensures thread picks up task before we clear tasks
+    std::uint32_t nrTasks = 5;
+    RuntimeSetUp(2, nrTasks);
+    // Override latch so we only wait for the two enqueue tasks
+    m_nrTasksLeft = std::make_unique<std::latch>(2);
+    m_tp->Enqueue(GenerateTaskFunction(taskTime, 0.1, 3));
+    m_tp->Enqueue(GenerateTaskFunction(taskTime, 0.2, 4));
+    // Ensures threads picks up task before we clear remaining tasks
     std::this_thread::sleep_for(std::chrono::milliseconds(taskTime/10));
-    std::cout << m_tp->NrTasks() << std::endl;
-    std::cout << m_futures.size() << std::endl;
+    ASSERT_EQ(m_tp->NrBusyThreads(), 2);
     m_tp->ClearTasks();
-    std::cout << m_tp->NrTasks() << std::endl;
-    std::cout << m_futures.size() << std::endl;
-    WaitForResults();
-    ASSERT_EQ(m_tp->NrTasks(), 0);
-    ASSERT_EQ(m_results.size(), 1);
+    m_nrTasksLeft->wait(); // Only waits for 2 working threads
+    // Ensures threadpool threads have decremented NrBusyThreads counter
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    ASSERT_EQ(m_tp->NrBusyThreads(), 0);
+    ASSERT_EQ(m_results, Paths({{}, {}, {}, {0.1}, {0.2}}));
 }

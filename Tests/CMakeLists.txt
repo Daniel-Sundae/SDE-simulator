@@ -1,13 +1,14 @@
-add_executable(run_tests
+add_executable(StochasticSimTests
     test_EngineThreadPool.cpp
 )
 
-target_link_libraries(run_tests
+include(GoogleTest)
+
+target_link_libraries(StochasticSimTests
     PRIVATE
     GTest::gtest_main
     Model
     CommonIncludes
 )
 
-include(GoogleTest)
-gtest_discover_tests(run_tests)
+gtest_discover_tests(StochasticSimTests)
