@@ -1,6 +1,5 @@
 #include "PathEngine.hpp"
 #include "PathQuery.hpp"
-#include "PDFQuery.hpp"
 #include "SolverData.hpp"
 #include <thread>
 #include <cassert>

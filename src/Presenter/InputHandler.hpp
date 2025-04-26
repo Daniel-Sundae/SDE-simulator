@@ -6,7 +6,6 @@
 #include <memory>
 #include <optional>
 
-struct PDFQuery;
 
 class InputHandler final : public IPresenterComponent<MainPresenter> {
 public:
@@ -24,7 +23,6 @@ public:
 private:
     auto CanSample() const -> bool;
     auto CreateDriftQuery(const PathQuery& pQuery) const -> PathQuery;
-    auto CreatePDFQuery(const PathQuery& pQuery) const -> PDFQuery;
 private:
     std::unique_ptr<ProcessDefinition> m_processDefinition;
     std::unique_ptr<SimulationParameters> m_simulationParameters;

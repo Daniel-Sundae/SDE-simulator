@@ -1,7 +1,6 @@
 #include "MainPresenter.hpp"
 #include "PathEngine.hpp"
 #include "InputHandler.hpp"
-#include "PDFQuery.hpp"
 #include "Transaction.hpp"
 #include <cassert>
 
@@ -34,7 +33,7 @@ auto MainPresenter::OnTransactionReceived(const Transaction&& transaction) -> vo
 		return;
 	}
 	Listener()->PrepareGUI(transaction.pathQuery);
-	Listener()->OnPDFReceived(transaction.pdfQuery.pdf);
+	Listener()->OnPDFReceived(transaction.pdf);
 	SamplePaths(transaction.pathQuery);
 	SampleDriftCurve(transaction.deterministicQuery);
 }

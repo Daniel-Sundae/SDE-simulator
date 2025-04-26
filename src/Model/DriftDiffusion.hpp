@@ -3,20 +3,25 @@
 
 class FunctionWrapper {
 protected:
+    
+    // mu or sigma
     const double parameter;
-    const std::function<StateDot(Time, State)> f;
+
+    // a(t, Xt) or b(t, Xt) in dXt = adt + bdB
+    const std::function<double(Time, State)> f;
+
+    // da/dX or db/dX
+    const std::function<double(Time, State)> fPrime;
+
 public:
-    FunctionWrapper()
-        : parameter(0)
-        , f([](Time, State) -> StateDot { return 0; })
-    {
-    }
-    FunctionWrapper(double _parameter, std::function<StateDot(Time, State)> _f)
+    FunctionWrapper(double _parameter, std::function<double(Time, State)> _f, std::function<double(Time, State)> _fPrime = [](Time, State){return 0;})
         : parameter(_parameter)
         , f(_f)
+        , fPrime(_fPrime)
     {
     }
-    auto operator()(Time t, State s) const -> StateDot { return f(t, s); }
+    auto operator()(Time t, State s) const -> double { return f(t, s); }
+    auto Prime(Time t, State s) const -> double { return fPrime(t, s); }
 };
 
 class Drift : public FunctionWrapper {

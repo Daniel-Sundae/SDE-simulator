@@ -14,7 +14,6 @@ using Path = std::vector<State>;
 using Paths = std::vector<Path>;
 using Distribution = std::vector<State>;
 using PDFData = std::vector<Density>;
-using StateDot = double; // dX/dt
 using Range = std::pair<double, double>;
 using Task = std::function<void()>;
 template <typename T>
@@ -34,6 +33,7 @@ enum class ProcessType{
 enum class SolverType {
     EULER_MARUYAMA = 0,
     RUNGE_KUTTA,
+    MILSTEIN
 };
 
 enum class ActionWidget {

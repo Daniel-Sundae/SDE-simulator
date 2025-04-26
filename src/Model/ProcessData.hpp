@@ -69,10 +69,18 @@ public:
         static constexpr Constants sigmaData{ {0,1},0.2,0.1 };
         static constexpr Constants startValueData{ {0.1, 100},1,1 };
         static auto drift(const double _mu) -> Drift {
-            return Drift(_mu, [_mu](Time, State Xt) { return _mu * Xt; });
+            return Drift(
+                _mu,
+                [_mu](Time, State Xt) { return _mu * Xt; },
+                [_mu](Time, State) { return _mu; }
+            );
         };
         static auto diffusion(const double _sigma) -> Diffusion {
-            return Diffusion(_sigma, [_sigma](Time, State Xt) { return _sigma * Xt; });
+            return Diffusion(
+                _sigma,
+                [_sigma](Time, State Xt) { return _sigma * Xt; },
+                [_sigma](Time, State) { return _sigma; }
+            );
         };
         static auto pdf(const State startValue, const Time time, const double _mu, const double _sigma) -> PDF {
             const double EV = startValue * std::exp(_mu * time);
@@ -100,7 +108,11 @@ public:
         static constexpr Constants startValueData{ {-50, 50}, 1, 1 };
     
         static auto drift(const double _mu) -> Drift {
-            return Drift(_mu, [_mu](Time, State Xt) { return DefaultConstants::OUthetaData * (_mu - Xt); });
+            return Drift(
+                _mu,
+                [_mu](Time, State Xt) { return DefaultConstants::OUthetaData * (_mu - Xt); },
+                [_mu](Time, State) { return DefaultConstants::OUthetaData * -1; }
+            );
         };
     
         static auto diffusion(const double _sigma) -> Diffusion {

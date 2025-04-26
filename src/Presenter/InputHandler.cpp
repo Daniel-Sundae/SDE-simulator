@@ -1,6 +1,5 @@
 #include "InputHandler.hpp"
 #include "ProcessData.hpp"
-#include "PDFQuery.hpp"
 #include "Transaction.hpp"
 #include <assert.h>
 
@@ -77,16 +76,17 @@ auto InputHandler::SamplePaths() -> void
 
 	const PathQuery pQuery{ *m_processDefinition, *m_simulationParameters, *m_settingsParameters};
 	const PathQuery deterministicQuery = CreateDriftQuery(pQuery);
-	const PDFQuery pdfQuery = CreatePDFQuery(pQuery);
-	Listener()->OnTransactionReceived(Transaction{std::move(pQuery), std::move(deterministicQuery), std::move(pdfQuery)});
+	const PDF pdf = ProcessData::GetPDF(pQuery.processDefinition.type, pQuery.processDefinition.startValueData, pQuery.simulationParameters.time, pQuery.processDefinition.drift.Mu(), pQuery.processDefinition.diffusion.Sigma());
+	Listener()->OnTransactionReceived(Transaction{std::move(pQuery), std::move(deterministicQuery), std::move(pdf)});
 }
 
-auto InputHandler::CreateDriftQuery(const PathQuery& pQuery) const -> PathQuery {
-
+auto InputHandler::CreateDriftQuery(const PathQuery& pQuery) const -> PathQuery
+{
 	auto definition = ProcessDefinition(
 		pQuery.processDefinition.type,
 		pQuery.processDefinition.drift,
-		{},
+		// Diffusion function is not needed by deteministic query
+		{0, [](Time, State){return 0;}},
 		pQuery.processDefinition.startValueData);
 	auto simulationParams = SimulationParameters(
 		pQuery.simulationParameters.solver,
@@ -95,9 +95,3 @@ auto InputHandler::CreateDriftQuery(const PathQuery& pQuery) const -> PathQuery 
 		1);
 	return PathQuery( definition, simulationParams, pQuery.settingsParameters);
 }
-
-auto InputHandler::CreatePDFQuery(const PathQuery& pQuery) const -> PDFQuery {
-	PDF pdf = ProcessData::GetPDF(pQuery.processDefinition.type, pQuery.processDefinition.startValueData, pQuery.simulationParameters.time, pQuery.processDefinition.drift.Mu(), pQuery.processDefinition.diffusion.Sigma());
-	return PDFQuery(pdf, pQuery.simulationParameters.Points());
-}
-

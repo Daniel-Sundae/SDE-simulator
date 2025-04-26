@@ -16,9 +16,10 @@ SimulationManager::SimulationManager(InputDispatcher* parent)
 
 auto SimulationManager::AddComboBoxes() -> void
 {
-    std::array<std::pair< SolverType, std::pair<std::string, std::string> >, 2> solverTypes = {
+    std::array<std::pair< SolverType, std::pair<std::string, std::string> >, 3> solverTypes = {
     std::pair{SolverType::EULER_MARUYAMA, std::pair{"EM", "Euler-Maruyama"}},
     std::pair{SolverType::RUNGE_KUTTA, std::pair{"RK", "Runge-Kutta"}},
+    std::pair{SolverType::MILSTEIN, std::pair{"MILSTEIN", "Milstein"}},
     };
     auto* solvers = new QComboBox(this);
     for (std::size_t i = 0; i < solverTypes.size(); ++i) {

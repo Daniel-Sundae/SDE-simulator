@@ -9,7 +9,6 @@
 #include <cmath>
 
 struct PathQuery;
-struct PDFQuery;
 
 class PathEngine{
 public:

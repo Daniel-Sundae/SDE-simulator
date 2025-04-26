@@ -5,7 +5,6 @@
 #include "PathEngine.hpp"
 
 struct PathQuery;
-struct PDFQuery;
 class InputHandler;
 struct Transaction;
 
@@ -19,7 +18,6 @@ public:
     auto OnTransactionReceived(const Transaction &&transaction) -> void;
 private:
 	auto SamplePaths(const PathQuery& pathQuery) -> void;
-    auto GeneratePDFData(const PDFQuery &pdfQuery) -> void;
 	auto SampleDriftCurve(const PathQuery& query) -> void;
 
 private:
