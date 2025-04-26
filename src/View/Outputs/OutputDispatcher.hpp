@@ -20,6 +20,7 @@ public:
     // StatusManager
     auto SetQueryInfo(const PathQuery &pQuery) const -> void;
     auto SetStatus(const StatusSignal signal) const -> void;
+    auto ClearStatus() const -> void;
 
     // PathChart
     auto PlotPath(const Path& path) const -> void;

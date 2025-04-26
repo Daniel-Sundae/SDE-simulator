@@ -67,6 +67,7 @@ auto OutputHandler::OnPDFReceived(const PDF& pdf) -> void
 
 auto OutputHandler::Clear() const -> void
 {
+	Listener()->ClearStatus();
 	Listener()->ClearPathChart();
 	Listener()->ClearDistributionChart();
 }

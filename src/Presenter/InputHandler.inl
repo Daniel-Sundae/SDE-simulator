@@ -47,7 +47,7 @@ auto InputHandler::OnSettingsParameterModified(const SettingsWidget param, T use
 					m_settingsParameters->useSeed = {true, userValue};
 				}
 			else
-				assert(false && "Threading checkbox parameter must be invoked with bool type");
+				assert(false && "Seeding checkbox parameter must be invoked with uint32_t type");
 			break;
 		default:
 			assert(false);

@@ -46,12 +46,25 @@ auto SettingsManager::AddSeedWidget() -> void
         this,
         [this, seedSpinBox](bool toggled) {
             seedSpinBox->setEnabled(toggled);
-            Parent()->OnSettingsParameterModified<uint32_t>(
+            Parent()->OnSettingsParameterModified<std::uint32_t>(
                 SettingsWidget::FIXSEED,
-                toggled ? static_cast<uint32_t>(seedSpinBox->value()) : 0
+                toggled ? static_cast<std::uint32_t>(seedSpinBox->value()) : 0
             );
         }
     );
+
+    connect(
+        seedSpinBox,
+        &QSpinBox::valueChanged,
+        this,
+        [this](int newValue) {
+            Parent()->OnSettingsParameterModified<uint32_t>(
+                SettingsWidget::FIXSEED,
+                static_cast<std::uint32_t>(newValue)
+            );
+        }
+    );
+
     auto* seedLayout = new QHBoxLayout(seedWidget);
     seedLayout->addWidget(seedCheckBox);
     seedLayout->addWidget(seedSpinBox);

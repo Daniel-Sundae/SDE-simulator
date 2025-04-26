@@ -1,20 +1,21 @@
 #pragma once
 #include "Types.hpp"
 #include "PathQuery.hpp"
-#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QWidget>
 
-class QLabel;
-
-class StatusManager : public QGroupBox
+class QGroupBox;
+class StatusManager : public QWidget
 {
     Q_OBJECT
 public:
     explicit StatusManager(QWidget* parent);
     auto SetStatus(const StatusSignal s) -> void;
     auto SetQueryInfo(const PathQuery &pQuery) -> void;
+    auto ClearStatus() -> void;
 
 private:
-    QLabel* m_queryInfo;
-    QLabel* m_statusInfo;
+    QGroupBox* m_queryDefinition;
+    QGroupBox* m_queryParameters;
+    QGroupBox* m_statusInfo;
     StatusSignal m_status;
 };

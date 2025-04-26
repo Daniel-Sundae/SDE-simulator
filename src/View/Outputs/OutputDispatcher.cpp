@@ -40,6 +40,11 @@ auto OutputDispatcher::SetStatus(const StatusSignal signal) const -> void
     m_statusManager->SetStatus(signal);
 }
 
+auto OutputDispatcher::ClearStatus() const -> void
+{
+    m_statusManager->ClearStatus();
+}
+
 ////////////////////////////////////////
 //// PATH CHART
 ////////////////////////////////////////

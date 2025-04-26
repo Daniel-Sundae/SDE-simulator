@@ -31,7 +31,7 @@ else()
         -Wextra
         -Wpedantic
         #-Werror        # Treat warnings as errors
-        -Wshadow       # Warn about shadowed variables
+        -Wshadow
         -Wnon-virtual-dtor
         -pedantic-errors
     )
@@ -39,24 +39,18 @@ else()
     set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 endif()
 
-# --- Qt Configuration ---
-# Find all required Qt components centrally
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Charts)
-# Set AUTOMOC, AUTOUIC, AUTORCC globally for targets needing them
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
-# --- End Qt Configuration ---
 
-# Headers
 add_library(CommonIncludes INTERFACE)
 target_include_directories(CommonIncludes
     INTERFACE Include
 )
 
-# Adjust subdirectory order for dependency clarity
 add_subdirectory(src/Model)
-add_subdirectory(src/Presenter) # Presenter before View
+add_subdirectory(src/Presenter)
 add_subdirectory(src/View)
 
 add_executable(StochasticSim
@@ -66,18 +60,17 @@ add_executable(StochasticSim
 target_include_directories(StochasticSim PRIVATE
     src
     Include
-    ${Qt6Core_INCLUDE_DIRS}      # Explicitly add Qt Core includes
-    ${Qt6Widgets_INCLUDE_DIRS}   # Explicitly add Qt Widgets includes
-    ${Qt6Gui_INCLUDE_DIRS}       # Explicitly add Qt Gui includes (for QPalette, QColor)
+    ${Qt6Core_INCLUDE_DIRS}
+    ${Qt6Widgets_INCLUDE_DIRS}
+    ${Qt6Gui_INCLUDE_DIRS}
 )
-# Link the executable against necessary libraries (including Qt if main.cpp uses it)
 target_link_libraries(StochasticSim PRIVATE
     Model
     View
     Presenter
-    Qt6::Core      # Link main executable if needed
-    Qt6::Widgets   # Link main executable if needed
-    Qt6::Gui       # Link Gui module (for QPalette, QColor)
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Gui
 )
 
 # windeployqt for DLLs
