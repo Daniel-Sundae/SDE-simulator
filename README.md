@@ -1,6 +1,6 @@
 ## Build Prerequisites
 - CMake 3.22+
-- Qt6 (Qt5 should be fine) with MINGW
+- Qt6 (Qt5 should be fine) with MinGW. Can be installed for free here: https://www.qt.io/download-qt-installer-oss
 - Ninja build system
 
 ## Build Instructions
