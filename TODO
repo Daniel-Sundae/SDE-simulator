@@ -1,11 +1,9 @@
-
-MATH TODO:
-
 FUNCTIONALITY TODO:
-- Implement:
-	rk/other solvers
-- write tests
-- Clean up statux box. more info on settings.
+- Write readme with info on:
+	How to build w and w/o tests
+	Youtube video
+- Docker solution
+- WASM (requires moving away from jthreads)
 
 CODE DESIGN TODO:
 
@@ -14,8 +12,6 @@ TECH DETAILS TODO:
 DESIGN CHOICES MADE:
 
 ERRORS
-- GBM, no randomness, 0.01 diffusion.
-- tooltips not working
 
 PRESENTATION:
 - Show bigger increment step -> bigger error.

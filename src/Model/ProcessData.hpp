@@ -143,10 +143,9 @@ private:
             return Field(ProcessData::GBM{});
         case ProcessType::OU:
            return Field(ProcessData::OU{});
-        case ProcessType::Levy:
-            throw std::runtime_error("Process type not implemented");
+        default:
+            throw std::runtime_error("Unknown process type");
         }
-        throw std::runtime_error("Unknown process type");
     }
 
 #define GET_PROCESS_FIELD(field) ProcessData::GetField<[](auto t) { return decltype(t)::field; }>(type)
