@@ -7,7 +7,7 @@
 
 1: Clone the project into your repository
 ```bash
-git clone this url
+git clone https://github.com/Daniel-Sundae/Stochastic-Differential-Equations.git
 ```
 2: Set environment variables QTDIR_MINGW and MINGW_PATH to your local directories
 ```bash
@@ -19,7 +19,7 @@ set MINGW_PATH=C:\Qt\Tools\mingw1310_64
 3: Configure the project
 ```bash
 # Set testing flag on if you want to build tests
-cmake --preset=release-mingw  -DBUILD_TESTING=OFF
+cmake --preset=release-mingw -DBUILD_TESTING=OFF
 ```
 
 4: Build the project
