@@ -89,7 +89,7 @@ auto PathChart::UpdateZeroLine() -> void
 
 auto PathChart::UpdateYAxisIfNeeded(State min_Y, State max_Y) -> void
 {
-    constexpr qreal yPaddingFactor = 0.25;
+    constexpr qreal yPaddingFactor = 0.3;
     qreal dataYMin = static_cast<qreal>(min_Y);
     qreal dataYMax = static_cast<qreal>(max_Y);
     qreal dataYRange = dataYMax - dataYMin;
