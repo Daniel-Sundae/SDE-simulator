@@ -3,7 +3,7 @@
 - Qt6 (Qt5 should be fine) with MinGW. Can be installed for free here: https://www.qt.io/download-qt-installer-oss
 - Ninja build system
 
-## Build Instructions
+## Build Instructions (Windows)
 
 1: Clone the project into your repository
 ```bash
