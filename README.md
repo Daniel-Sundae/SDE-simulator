@@ -1,3 +1,11 @@
+## Stochastic Differential Equation Simulator
+A GUI program for simulating and visualising Stochastic Differential Equations (SDEs) using C++20.  
+Based on the Qt framework.  
+Supports Brownian Motion, Geometric Brownian Motion and Ornstein-Uhlenbeck processes out of the box.  
+Supports Euler-Maruyama, Runge-Kutta and Milstein solvers.  
+Supports multithreaded path sampling.  
+<img src="./images/example.png" alt="Example picture" width="80%"/>
+
 ## Build Prerequisites
 - CMake 3.22+
 - Qt6 (Qt5 should be fine) with MinGW. Can be installed for free here: https://www.qt.io/download-qt-installer-oss
@@ -7,7 +15,7 @@
 
 1: Clone the project into your repository
 ```bash
-git clone https://github.com/Daniel-Sundae/Stochastic-Differential-Equations.git
+git clone https://github.com/Daniel-Sundae/SDE-simulator.git
 ```
 2: Set environment variables QTDIR_MINGW and MINGW_PATH to your local QT directories
 ```bash
