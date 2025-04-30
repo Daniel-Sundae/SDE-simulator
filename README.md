@@ -4,7 +4,7 @@ Based on the Qt framework.
 Supports Brownian Motion, Geometric Brownian Motion and Ornstein-Uhlenbeck processes out of the box.  
 Supports Euler-Maruyama, Runge-Kutta and Milstein solvers.  
 Supports multithreaded path sampling.  
-<img src="./images/example.png" alt="Example picture" width="80%"/>
+<img src="./Images/Example.png" alt="Example picture" width="100%"/>
 
 ## Build Prerequisites
 - CMake 3.22+
