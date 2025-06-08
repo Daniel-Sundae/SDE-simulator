@@ -1,0 +1,31 @@
+{
+    "version": 2,
+    "configurePresets": [
+      {
+        "name": "debug",
+        "inherits": "vcpkg",
+        "environment": {
+          "VCPKG_ROOT": "C:\\Projects\\vcpkg"
+        }
+      },
+      {
+        "name": "release",
+        "inherits": "vcpkg",
+        "environment": {
+          "VCPKG_ROOT": "C:\\Projects\\vcpkg"
+        }
+      }
+    ],
+    "buildPresets": [
+        {
+          "name": "debug",
+          "configurePreset": "debug",
+          "configuration": "Debug"
+        },
+        {
+          "name": "release",
+          "configurePreset": "release",
+          "configuration": "Release"
+        }
+    ]
+  }

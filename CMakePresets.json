@@ -1,29 +1,15 @@
 {
-    "version": 3,
+    "version": 2,
     "configurePresets": [
-        {
-            "name": "debug-mingw",
-            "displayName": "Debug MINGW",
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/Debug-MINGW",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_PREFIX_PATH": "$env{QTDIR_MINGW}",
-                "CMAKE_C_COMPILER": "$env{MINGW_PATH}/bin/gcc.exe",
-                "CMAKE_CXX_COMPILER": "$env{MINGW_PATH}/bin/g++.exe"
-            }
-        },
-        {
-            "name": "release-mingw",
-            "displayName": "Release MINGW",
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/Release-MINGW",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_PREFIX_PATH": "$env{QTDIR_MINGW}",
-                "CMAKE_C_COMPILER": "$env{MINGW_PATH}/bin/gcc.exe",
-                "CMAKE_CXX_COMPILER": "$env{MINGW_PATH}/bin/g++.exe"
-            }
+      {
+        "name": "vcpkg",
+        "generator": "Visual Studio 17 2022",
+        "architecture": "x64",
+        "binaryDir": "${sourceDir}/build",
+        "cacheVariables": {
+          "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+          "VCPKG_TARGET_TRIPLET": "x64-windows"
         }
+      }
     ]
-}
+  }

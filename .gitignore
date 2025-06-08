@@ -1,7 +1,7 @@
-all_code.txt
 .vs/
 build/
-build_and_deploy.sh
 CMakeFiles/
 .vscode/
+.vcpkg_installed/
+.vcpkg-configuration.json
 

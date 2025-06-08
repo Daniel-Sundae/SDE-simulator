@@ -13,13 +13,12 @@ target_include_directories(Presenter
         # Explicitly add Qt include directories for Intellisense
         ${Qt6Core_INCLUDE_DIRS}
         ${Qt6Widgets_INCLUDE_DIRS}
+        ${CMAKE_SOURCE_DIR}/Include
 )
 
 target_link_libraries(Presenter
     PUBLIC
         Model
         View
-        CommonIncludes
-        Qt6::Core # Link against Qt Core
-        Qt6::Widgets # Add Widgets for transitive includes from View
+        Qt6::Core
 )

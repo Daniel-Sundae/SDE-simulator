@@ -1,9 +1,9 @@
 FUNCTIONALITY TODO:
-- Write readme with info on:
-	How to build w and w/o tests
-	Youtube video
-- Docker solution
+- Let engine be stand alone process
 - WASM (requires moving away from jthreads)
+- Introduce new tab with live und data and option price and simulated option price
+- Create engine process, use "named pipe" for more simple way to transfer data from engine to p1. (data needs to be copied twice)
+-  
 
 CODE DESIGN TODO:
 

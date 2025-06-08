@@ -34,7 +34,6 @@ auto EngineThreadPool::ClearTasks() -> void
 {
 	std::scoped_lock lock(m_taskMtx);
 	while (!m_tasks.empty()) {
-		auto task = std::move(m_tasks.front());
 		m_tasks.pop();
 	}
 }
