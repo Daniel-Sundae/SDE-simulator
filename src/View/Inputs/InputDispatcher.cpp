@@ -23,37 +23,30 @@ InputDispatcher::InputDispatcher(QWidget* parent)
     layout->addWidget(m_settingsManager);
 }
 
-auto InputDispatcher::SetInputHandler(InputHandler* inputHandler) -> void
-{
+void InputDispatcher::setInputHandler(InputHandler* inputHandler){
     m_inputHandler = inputHandler;
 }
 
-auto InputDispatcher::OnGoButtonClicked() const -> void
-{
-    m_inputHandler->SamplePaths();
+void InputDispatcher::onGoButtonClicked() const{
+    m_inputHandler->samplePaths();
 }
 
-auto InputDispatcher::OnClearButtonClicked() const -> void
-{
-    m_inputHandler->Clear();
+void InputDispatcher::onClearButtonClicked() const{
+    m_inputHandler->clear();
 }
 
-auto InputDispatcher::OnCancelButtonClicked() const -> void
-{
-    m_inputHandler->Cancel();
+void InputDispatcher::onCancelButtonClicked() const{
+    m_inputHandler->cancel();
 }
 
-auto InputDispatcher::OnProcessTypeModified(const ProcessType newType) const -> void
-{
-    m_inputHandler->OnProcessTypeModified(newType);
+void InputDispatcher::onProcessTypeModified(const ProcessType newType) const{
+    m_inputHandler->onProcessTypeModified(newType);
 }
 
-auto InputDispatcher::OnProcessDefinitionModified(const DefinitionWidget param, double userValue) const -> void
-{
-    m_inputHandler->OnProcessDefinitionModified(param, userValue);
+void InputDispatcher::onProcessDefinitionModified(const DefinitionWidget param, double userValue) const{
+    m_inputHandler->onProcessDefinitionModified(param, userValue);
 }
 
-auto InputDispatcher::OnSolverTypeModified(const SolverType newType) const -> void
-{
-    m_inputHandler->OnSolverTypeModified(newType);
+void InputDispatcher::onSolverTypeModified(const SolverType newType) const{
+    m_inputHandler->onSolverTypeModified(newType);
 }

@@ -11,51 +11,44 @@ MainPresenter::MainPresenter()
 	, m_engine(std::make_unique<PathEngine>())
 {}
 
-auto MainPresenter::SamplePaths(const PathQuery& pQuery) -> void
-{
-	m_engine->SamplePathsAsync(
+void MainPresenter::samplePaths(const PathQuery& pQuery){
+	m_engine->samplePathsAsync(
 		pQuery,
 		[this](Paths results) mutable {
-			Listener()->HandleWorkerResult(std::move(results));
+			listener()->handleWorkerResult(std::move(results));
 		}
 	);
 }
 
-auto MainPresenter::SampleDriftCurve(const PathQuery& deterministicQuery) -> void
-{
+void MainPresenter::sampleDriftCurve(const PathQuery& deterministicQuery){
 	assert(deterministicQuery.simulationParameters.samples == 1);
-	Listener()->OnDriftDataReceived(m_engine->SampleOnePath(deterministicQuery));
+	listener()->onDriftDataReceived(m_engine->sampleOnePath(deterministicQuery));
 }
 
-auto MainPresenter::OnTransactionReceived(const Transaction&& transaction) -> void
-{
-	if(m_engine->IsBusy()){
+void MainPresenter::onTransactionReceived(const Transaction&& transaction){
+	if(m_engine->isBusy()){
 		return;
 	}
-	Listener()->PrepareGUI(transaction.pathQuery);
-	Listener()->OnPDFReceived(transaction.pdf);
-	SamplePaths(transaction.pathQuery);
-	SampleDriftCurve(transaction.deterministicQuery);
+	listener()->prepareGUI(transaction.pathQuery);
+	listener()->onPDFReceived(transaction.pdf);
+	samplePaths(transaction.pathQuery);
+	sampleDriftCurve(transaction.deterministicQuery);
 }
 
-auto MainPresenter::Clear() const -> void
-{
-	if(m_engine->IsBusy()){
+void MainPresenter::clear() const{
+	if(m_engine->isBusy()){
 		return;
 	}
-	Listener()->Clear();
+	listener()->clear();
 }
 
-auto MainPresenter::Cancel() const -> void
-{
-	m_engine->RequestCancel();
+void MainPresenter::cancel() const{
+	m_engine->requestcancel();
 }
 
-auto MainPresenter::GetInputHandler() const -> InputHandler*
-{
+InputHandler* MainPresenter::getInputHandler() const{
 	return m_inputHandler.get();
 }
-auto MainPresenter::GetOutputHandler() const -> OutputHandler*
-{
+OutputHandler* MainPresenter::getOutputHandler() const{
 	return m_outputHandler.get();
 }

@@ -18,7 +18,7 @@ public:
         , m_data({})
         , m_support(std::make_pair(0, 0))
     {
-        m_data = GeneratePDFData(1000); // Do this after initializing since affects m_support
+        m_data = generatePDFData(1000); // Do this after initializing since affects m_support
     }
     auto operator()(State s) const -> Density { return m_pdf(s); }
     explicit operator bool() const
@@ -26,31 +26,27 @@ public:
         return m_pdf ? true : false;
     }
 
-    auto EV() const -> double
-    {
+    double EV() const{
         return m_EV;
     }
 
-    auto StdDev() const -> double
-    {
+    double stdDev() const{
         return m_stddev;
     }
 
-    auto GetPDFData() const -> PDFData
-    {
+    PDFData getPDFData() const{
         return m_data;
     }
 
-    auto GetSupport() const -> Range{
+    Range getSupport() const{
         return m_support;
     }
 
 private:
-    auto GeneratePDFData(const std::size_t points) -> PDFData
-    {
+    PDFData generatePDFData(const std::size_t points){
         PDFData result = {};
         result.reserve(points);
-        const auto [start, end] = GenerateSupport(points);
+        const auto [start, end] = generateSupport(points);
         const double increment = (end - start) / static_cast<double>(points);
         for (State state = start; state < end; state += increment) {
             result.push_back(m_pdf(state));
@@ -58,10 +54,9 @@ private:
         return result;
     }
 
-    auto GenerateSupport(const std::size_t points) -> Range
-    {
-        State start = EV() - 5 * StdDev();
-        State end = EV() + 5 * StdDev();
+    Range generateSupport(const std::size_t points){
+        State start = EV() - 5 * stdDev();
+        State end = EV() + 5 * stdDev();
         // In case user set stddev = 0
         if (abs(end-start) < threshold ){
             start -= 1;

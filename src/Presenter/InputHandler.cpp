@@ -9,32 +9,27 @@ InputHandler::InputHandler()
 	, m_simulationParameters(std::make_unique<SimulationParameters>())
 	, m_settingsParameters(std::make_unique<SettingsParameters>())
 {
-	m_inputMu = ProcessData::GetMuData(m_processDefinition->type).defaultValue;
-	m_inputSigma = ProcessData::GetSigmaData(m_processDefinition->type).defaultValue;
+	m_inputMu = ProcessData::getMuData(m_processDefinition->type).defaultValue;
+	m_inputSigma = ProcessData::getSigmaData(m_processDefinition->type).defaultValue;
 }
 
-auto InputHandler::Clear() const -> void
-{
-	Listener()->Clear();
+void InputHandler::clear() const{
+	listener()->clear();
 }
 
-auto InputHandler::Cancel() const -> void
-{
-	Listener()->Cancel();
+void InputHandler::cancel() const{
+	listener()->cancel();
 }
 
-auto InputHandler::OnProcessTypeModified(ProcessType newType) -> void
-{
+void InputHandler::onProcessTypeModified(ProcessType newType){
 	m_processDefinition->type = newType;
 }
 
-auto InputHandler::OnSolverTypeModified(SolverType newType) -> void
-{
+void InputHandler::onSolverTypeModified(SolverType newType){
 	m_simulationParameters->solver = newType;
 }
 
-auto InputHandler::OnProcessDefinitionModified(const DefinitionWidget param, double userValue) -> void
-{
+void InputHandler::onProcessDefinitionModified(const DefinitionWidget param, double userValue){
 	switch (param) {
 	case DefinitionWidget::PROCESS:
 		throw std::invalid_argument("Use OnProcessTypeModified");
@@ -53,8 +48,7 @@ auto InputHandler::OnProcessDefinitionModified(const DefinitionWidget param, dou
 	}
 }
 
-auto InputHandler::CanSample() const -> bool
-{
+bool InputHandler::canSample() const{
 	if (m_processDefinition->type == ProcessType::NONE)
 		return false;
 	if (m_inputMu == 0 && m_inputSigma == 0)
@@ -64,24 +58,22 @@ auto InputHandler::CanSample() const -> bool
 	return true;
 }
 
-auto InputHandler::SamplePaths() -> void
-{
-	if(!CanSample())
+void InputHandler::samplePaths(){
+	if(!canSample())
 		return;
 	m_processDefinition = std::make_unique<ProcessDefinition>(
 		m_processDefinition->type,
-		ProcessData::GetDrift(m_processDefinition->type, m_inputMu),
-		ProcessData::GetDiffusion(m_processDefinition->type, m_inputSigma),
+		ProcessData::getDrift(m_processDefinition->type, m_inputMu),
+		ProcessData::getDiffusion(m_processDefinition->type, m_inputSigma),
 		m_processDefinition->startValueData);
 
 	const PathQuery pQuery{ *m_processDefinition, *m_simulationParameters, *m_settingsParameters};
-	const PathQuery deterministicQuery = CreateDriftQuery(pQuery);
-	const PDF pdf = ProcessData::GetPDF(pQuery.processDefinition.type, pQuery.processDefinition.startValueData, pQuery.simulationParameters.time, pQuery.processDefinition.drift.Mu(), pQuery.processDefinition.diffusion.Sigma());
-	Listener()->OnTransactionReceived(Transaction{std::move(pQuery), std::move(deterministicQuery), std::move(pdf)});
+	const PathQuery deterministicQuery = createDriftQuery(pQuery);
+	const PDF pdf = ProcessData::getPDF(pQuery.processDefinition.type, pQuery.processDefinition.startValueData, pQuery.simulationParameters.time, pQuery.processDefinition.drift.mu(), pQuery.processDefinition.diffusion.sigma());
+	listener()->onTransactionReceived(Transaction{std::move(pQuery), std::move(deterministicQuery), std::move(pdf)});
 }
 
-auto InputHandler::CreateDriftQuery(const PathQuery& pQuery) const -> PathQuery
-{
+PathQuery InputHandler::createDriftQuery(const PathQuery& pQuery) const{
 	auto definition = ProcessDefinition(
 		pQuery.processDefinition.type,
 		pQuery.processDefinition.drift,

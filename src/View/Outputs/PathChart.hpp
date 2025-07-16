@@ -11,16 +11,16 @@ class PathChart : public QChart{
 
 public:
     explicit PathChart();
-    auto UpdateTitle(bool allPathsPlotted) -> void;
-    auto PlotPath(const Path& sampleData) -> void;
-    auto ClearPathChart(bool clearDrift = true) -> void;
-    auto PlotDriftCurve(const Path& driftLine) -> void;
-    auto SetMaxTime(const Time time) -> void;
+    void updateTitle(bool allPathsPlotted);
+    void plotPath(const Path& sampleData);
+    void clearPathChart(bool clearDrift = true);
+    void plotDriftCurve(const Path& driftLine);
+    void setMaxTime(const Time time);
 private:
-    auto UpdateZeroLine() -> void;
-    auto UpdateYAxisIfNeeded(State min_Y, State max_Y) -> void;
-    auto InitializeAxis() -> void;
-    auto InitializeProcessChart() -> void;
+    void updateZeroLine();
+    void updateYAxisIfNeeded(State min_Y, State max_Y);
+    void initializeAxis();
+    void initializeProcessChart();
 private:
     QValueAxis* m_xAxisTime;
     QValueAxis* m_yAxis;

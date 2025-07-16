@@ -16,13 +16,13 @@ EngineThreadPool::EngineThreadPool(std::uint32_t nrThreads)
 	m_threads.reserve(nrThreads);
 	std::stop_token st = m_stopSource.get_token();
 	for (std::uint32_t i = 0; i < nrThreads; ++i) {
-		m_threads.emplace_back([this, st](std::stop_token) {this->DoTasks(st);}); // Do not let jthread create stoptoken.
+		m_threads.emplace_back([this, st](std::stop_token) {this->doTasks(st);}); // Do not let jthread create stoptoken.
 	}
 }
 
 EngineThreadPool::~EngineThreadPool()
 {
-	ClearTasks();
+	clearTasks();
 	{
 		std::unique_lock<std::mutex> lock(m_taskMtx);
 		m_stopSource.request_stop();
@@ -30,21 +30,18 @@ EngineThreadPool::~EngineThreadPool()
 	m_cv.notify_all(); // Kill threads
 }
 
-auto EngineThreadPool::ClearTasks() -> void
-{
+void EngineThreadPool::clearTasks(){
 	std::scoped_lock lock(m_taskMtx);
 	while (!m_tasks.empty()) {
 		m_tasks.pop();
 	}
 }
 
-auto EngineThreadPool::NrBusyThreads() const -> std::uint32_t
-{
+std::uint32_t EngineThreadPool::nrBusyThreads() const{
 	return m_nrBusyThreads.load();
 }
 
-auto EngineThreadPool::Enqueue(std::function<void()> task) -> void
-{
+void EngineThreadPool::enqueue(std::function<void()> task){
 	{
 		std::unique_lock<std::mutex> lock(m_taskMtx);
 		m_tasks.push(std::move(task));
@@ -52,7 +49,7 @@ auto EngineThreadPool::Enqueue(std::function<void()> task) -> void
 	m_cv.notify_one();
 }
 
-void EngineThreadPool::DoTasks(std::stop_token st)
+void EngineThreadPool::doTasks(std::stop_token st)
 {
 	Task task;
 	while (!st.stop_requested()) {

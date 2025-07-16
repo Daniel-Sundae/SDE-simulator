@@ -11,9 +11,9 @@ class DefinitionManager : public InputDispatcherGroupBox
 public:
 	explicit DefinitionManager(InputDispatcher* parent);
 private:
-	auto UpdateWidgetProperties(ProcessType process, bool initialize = false) -> void;
-	auto AddDefinitionWidgets() -> void;
-	auto InitializeDesign() -> void;
+	void updateWidgetProperties(ProcessType process, bool initialize = false);
+	void addDefinitionWidgets();
+	void initializeDesign();
 private:
 	std::unordered_map<DefinitionWidget, QWidget*> m_widgets;
 };

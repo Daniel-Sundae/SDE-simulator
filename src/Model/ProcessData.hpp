@@ -135,7 +135,7 @@ public:
 
 private:
     template <auto Field>
-    static auto GetField(ProcessType type) {
+    static auto getField(ProcessType type){
         switch (type) {
         case ProcessType::BM:
             return Field(ProcessData::BM{});
@@ -148,46 +148,37 @@ private:
         }
     }
 
-#define GET_PROCESS_FIELD(field) ProcessData::GetField<[](auto t) { return decltype(t)::field; }>(type)
+#define GET_PROCESS_FIELD(field) ProcessData::getField<[](auto t) { return decltype(t)::field; }>(type)
 public:
-    static auto GetName(ProcessType type) -> std::string_view
+    static auto getName(ProcessType type) -> std::string_view
     {
         return GET_PROCESS_FIELD(name);
     }
-    static auto GetAcronym(ProcessType type) -> std::string_view
-    {
+    static std::string_view getAcronym(ProcessType type){
         return GET_PROCESS_FIELD(acronym);
     }
-    static auto GetDescription(ProcessType type) -> std::string_view
-    {
+    static std::string_view getDescription(ProcessType type){
         return GET_PROCESS_FIELD(description);
     }
-    static auto GetDefinition(ProcessType type) -> std::string_view
-    {
+    static std::string_view getDefinition(ProcessType type){
         return GET_PROCESS_FIELD(definition);
     }
-    static auto GetMuData(ProcessType type) -> Constants
-    {
+    static Constants getMuData(ProcessType type){
         return GET_PROCESS_FIELD(muData);
     }
-    static auto GetSigmaData(ProcessType type) -> Constants
-    {
+    static Constants getSigmaData(ProcessType type){
         return GET_PROCESS_FIELD(sigmaData);
     }
-    static auto GetStartValueData(ProcessType type) -> Constants
-    {
+    static Constants getStartValueData(ProcessType type){
         return GET_PROCESS_FIELD(startValueData);
     }
-    static auto GetDrift(ProcessType type, const double _mu) -> Drift
-    {
+    static Drift getDrift(ProcessType type, const double _mu){
         return GET_PROCESS_FIELD(drift)(_mu);
     }
-    static auto GetDiffusion(ProcessType type, const double _sigma) -> Diffusion
-    {
+    static Diffusion getDiffusion(ProcessType type, const double _sigma){
         return GET_PROCESS_FIELD(diffusion)(_sigma);
     }
-    static auto GetPDF(ProcessType type, const State startValue, const Time time, const double _mu, const double _sigma) -> PDF
-    {
+    static PDF getPDF(ProcessType type, const State startValue, const Time time, const double _mu, const double _sigma){
         return GET_PROCESS_FIELD(pdf)(startValue, time, _mu, _sigma);
     }
 #undef GET_PROCESS_FIELD

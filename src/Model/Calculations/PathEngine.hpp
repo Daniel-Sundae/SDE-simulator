@@ -13,22 +13,20 @@ struct PathQuery;
 class PathEngine{
 public:
 	explicit PathEngine();
-    auto SamplePathsAsync(const PathQuery &pathQuery, std::function<void(Paths)> onCompletionCb) -> void;
-    auto SampleOnePath(const PathQuery& pathQuery) const -> Path;
-    auto RequestCancel() -> void;
-    auto IsBusy() -> bool;
+    void samplePathsAsync(const PathQuery &pathQuery, std::function<void(Paths)> onCompletionCb);
+    Path sampleOnePath(const PathQuery& pathQuery) const;
+    void requestcancel();
+    bool isBusy();
 
 private:
-    auto SamplePathFunctor(const PathQuery &pathQuery, const std::size_t slot, const std::uint32_t seed) -> std::function<void()>;
-	template <typename F>
-	auto SampleOnePathImpl(const PathQuery &pathQuery, std::mt19937 &generator, F dXt) const -> Path;
-    auto Increment(
-		const Drift &drift,
+    std::function<void()> samplePathFunctor(const PathQuery &pathQuery, const std::size_t slot, const std::uint32_t seed);
+	template <typename F>Path sampleOnePathImpl(const PathQuery &pathQuery, std::mt19937 &generator, F dXt) const;
+    State increment(const Drift &drift,
 		const Diffusion &diffusion,
 		const Time t,
 		const State Xt,
 		const Time dt,
-		std::mt19937 &generator) const -> State;
+		std::mt19937 &generator) const;
 
 private:
 	std::unique_ptr<EngineThreadPool> m_tp;

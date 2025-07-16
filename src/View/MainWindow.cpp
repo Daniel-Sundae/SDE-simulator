@@ -12,22 +12,19 @@ MainWindow::MainWindow()
     setCentralWidget(m_centralWidget);
     setWindowTitle("SDE Simulator");
     resize(1300, 600);
-    AddWidgets();
+    addWidgets();
     show();
 }
 
-auto MainWindow::AddWidgets() -> void
-{
+void MainWindow::addWidgets(){
     m_mainWindowLayout->addWidget(m_outputDispatcher, 5);
     m_mainWindowLayout->addWidget(m_inputDispatcher, 1);
 }
 
-auto MainWindow::GetInputDispatcher() const -> InputDispatcher*
-{
+InputDispatcher* MainWindow::getInputDispatcher() const{
     return m_inputDispatcher;
 }
 
-auto MainWindow::GetOutputDispatcher() const -> OutputDispatcher*
-{
+OutputDispatcher* MainWindow::getOutputDispatcher() const{
     return m_outputDispatcher;
 }

@@ -9,13 +9,12 @@
 SimulationManager::SimulationManager(InputDispatcher* parent)
 	: InputDispatcherGroupBox(parent)
 {
-    AddComboBoxes();
-    AddSpinBoxes();
-    InitializeDesign();
+    addComboBoxes();
+    addSpinBoxes();
+    initializeDesign();
 }
 
-auto SimulationManager::AddComboBoxes() -> void
-{
+void SimulationManager::addComboBoxes(){
     std::array<std::pair< SolverType, std::pair<std::string, std::string> >, 3> solverTypes = {
     std::pair{SolverType::EULER_MARUYAMA, std::pair{"EM", "Euler-Maruyama"}},
     std::pair{SolverType::RUNGE_KUTTA, std::pair{"RK", "Runge-Kutta"}},
@@ -35,20 +34,19 @@ auto SimulationManager::AddComboBoxes() -> void
         [this, solverTypes]() {
             int currentIdx = qobject_cast<QComboBox*>(m_widgets[SimulationWidget::SOLVER])->currentIndex();
             SolverType newSolver = solverTypes[static_cast<std::size_t>(currentIdx)].first;
-            Parent()->OnSolverTypeModified(newSolver);
+            Parent()->onSolverTypeModified(newSolver);
         }
     );
 }
 
 template <IntOrDouble T>
-auto SimulationManager::SimulationModifiedCb(SimulationWidget param) const{
+auto SimulationManager::simulationModifiedCb(SimulationWidget param) const{
     return [this, param](T newValue) {
-        Parent()->OnSimulationParameterModified(param, newValue);
+        Parent()->onSimulationParameterModified(param, newValue);
     };
 }
 
-auto SimulationManager::AddSpinBoxes() -> void
-{
+void SimulationManager::addSpinBoxes(){
     auto* timeWidget = new QSpinBox(this);
     timeWidget->setValue(static_cast<uint64_t>(DefaultConstants::Simulation::time));
     timeWidget->setMinimum(1);
@@ -72,28 +70,27 @@ auto SimulationManager::AddSpinBoxes() -> void
         timeWidget,
         QOverload<int>::of(&QSpinBox::valueChanged),
         this,
-        SimulationModifiedCb<int>(SimulationWidget::TIME)
+        simulationModifiedCb<int>(SimulationWidget::TIME)
     );
 
     connect(
         dtWidget,
         QOverload<double>::of(&QDoubleSpinBox::valueChanged),
         this,
-        SimulationModifiedCb<double>(SimulationWidget::dt)
+        simulationModifiedCb<double>(SimulationWidget::dt)
     );
 
     connect(
         samplesWidget,
         QOverload<int>::of(&QSpinBox::valueChanged),
         this,
-        SimulationModifiedCb<int>(SimulationWidget::SAMPLES)
+        simulationModifiedCb<int>(SimulationWidget::SAMPLES)
     );
 }
 
-auto SimulationManager::InitializeDesign() -> void
-{
+void SimulationManager::initializeDesign(){
     setTitle("Simulation");
-    setStyleSheet(GUI::GroupBoxDescription() + GUI::ComboBoxDescription() + GUI::SpinBoxDescription());
+    setStyleSheet(GUI::groupBoxDescription() + GUI::comboBoxDescription() + GUI::spinBoxDescription());
     auto* simulationLayout = new QFormLayout(this);
     simulationLayout->addRow(new QLabel("Solver:", this), m_widgets[SimulationWidget::SOLVER]);
     simulationLayout->addRow(new QLabel("Time (T):", this), m_widgets[SimulationWidget::TIME]);

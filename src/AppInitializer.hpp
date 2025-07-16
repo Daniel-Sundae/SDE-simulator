@@ -11,9 +11,9 @@ public:
 	explicit AppInitializer(QApplication& app);
 	~AppInitializer();
 private:
-	auto InitializeComponents() -> void;
+	void initializeComponents();
 
-	auto SetStyle() -> void;
+	void setStyle();
 
 	QApplication& m_app;
 	std::unique_ptr<MainWindow> m_mainWindow;

@@ -9,15 +9,15 @@ class EngineThreadPool {
 public:
 	explicit EngineThreadPool(std::uint32_t nrThreads = 0);
 	~EngineThreadPool();
-	auto Enqueue(const std::function<void()> f) -> void;
-	auto ClearTasks() -> void;
-    auto NrBusyThreads() const -> std::uint32_t;
+	void enqueue(const std::function<void()> f);
+	void clearTasks();
+    std::uint32_t nrBusyThreads() const;
 
 private:
     // Only allow moving object to engine
 	EngineThreadPool(const EngineThreadPool&) = delete;
 	EngineThreadPool& operator=(const EngineThreadPool&) = delete;
-	auto DoTasks(std::stop_token st) -> void;
+	void doTasks(std::stop_token st);
 private:
 	std::vector<std::jthread> m_threads;
 	std::queue<Task> m_tasks;

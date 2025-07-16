@@ -9,13 +9,12 @@
 SettingsManager::SettingsManager(InputDispatcher* parent)
 	: InputDispatcherGroupBox(parent)
 {
-    AddMultiThreadCheckBox();
-    AddSeedWidget();
-    InitializeDesign();
+    addMultiThreadCheckBox();
+    addSeedWidget();
+    initializeDesign();
 }
 
-auto SettingsManager::AddMultiThreadCheckBox() -> void
-{
+void SettingsManager::addMultiThreadCheckBox(){
     auto* multiThreadingCheckbBox = new QCheckBox(this);
     m_widgets[SettingsWidget::THREADS] = multiThreadingCheckbBox;
     multiThreadingCheckbBox->setChecked(true);
@@ -23,12 +22,11 @@ auto SettingsManager::AddMultiThreadCheckBox() -> void
         multiThreadingCheckbBox,
         &QCheckBox::toggled,
         this,
-        [this](bool checked){Parent()->OnSettingsParameterModified<bool>(SettingsWidget::THREADS, checked);}
+        [this](bool checked){Parent()->onSettingsParameterModified<bool>(SettingsWidget::THREADS, checked);}
     );
 }
 
-auto SettingsManager::AddSeedWidget() -> void
-{
+void SettingsManager::addSeedWidget(){
     auto* seedWidget = new QWidget(this);
     m_widgets[SettingsWidget::FIXSEED] = seedWidget;
     auto* seedCheckBox = new QCheckBox(seedWidget);
@@ -46,7 +44,7 @@ auto SettingsManager::AddSeedWidget() -> void
         this,
         [this, seedSpinBox](bool toggled) {
             seedSpinBox->setEnabled(toggled);
-            Parent()->OnSettingsParameterModified<std::uint32_t>(
+            Parent()->onSettingsParameterModified<std::uint32_t>(
                 SettingsWidget::FIXSEED,
                 toggled ? static_cast<std::uint32_t>(seedSpinBox->value()) : 0
             );
@@ -58,7 +56,7 @@ auto SettingsManager::AddSeedWidget() -> void
         &QSpinBox::valueChanged,
         this,
         [this](int newValue) {
-            Parent()->OnSettingsParameterModified<uint32_t>(
+            Parent()->onSettingsParameterModified<uint32_t>(
                 SettingsWidget::FIXSEED,
                 static_cast<std::uint32_t>(newValue)
             );
@@ -71,10 +69,9 @@ auto SettingsManager::AddSeedWidget() -> void
     seedLayout->setContentsMargins(0, 0, 0, 0);
 }
 
-auto SettingsManager::InitializeDesign() -> void
-{
+void SettingsManager::initializeDesign(){
     setTitle("Settings");
-    setStyleSheet(GUI::GroupBoxDescription() + GUI::CheckBoxDescription());
+    setStyleSheet(GUI::groupBoxDescription() + GUI::checkBoxDescription());
     auto* simulationLayout = new QFormLayout(this);
     auto* multiThreadingLabel = new QLabel("Multithreading:", this);
     multiThreadingLabel->setToolTip("Toggle multithreading to compare performance.");

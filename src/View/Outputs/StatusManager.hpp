@@ -9,9 +9,9 @@ class StatusManager : public QWidget
     Q_OBJECT
 public:
     explicit StatusManager(QWidget* parent);
-    auto SetStatus(const StatusSignal s) -> void;
-    auto SetQueryInfo(const PathQuery &pQuery) -> void;
-    auto ClearStatus() -> void;
+    void setStatus(const StatusSignal s);
+    void setQueryInfo(const PathQuery &pQuery);
+    void clearStatus();
 
 private:
     QGroupBox* m_queryDefinition;

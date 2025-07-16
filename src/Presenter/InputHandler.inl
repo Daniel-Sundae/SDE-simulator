@@ -4,9 +4,7 @@
 #include <type_traits>
 #include <cstdint>
 
-template <IntOrDouble T>
-auto InputHandler::OnSimulationParameterModified(const SimulationWidget param, T userValue) -> void
-{
+template <IntOrDouble T> void InputHandler::onSimulationParameterModified(const SimulationWidget param, T userValue){
 	switch (param) {
 		case SimulationWidget::TIME:
 			if constexpr (std::is_same_v<T, int>)
@@ -28,9 +26,7 @@ auto InputHandler::OnSimulationParameterModified(const SimulationWidget param, T
 	}
 }
 
-template <IntOrBool T>
-auto InputHandler::OnSettingsParameterModified(const SettingsWidget param, T userValue) -> void
-{
+template <IntOrBool T>void InputHandler::onSettingsParameterModified(const SettingsWidget param, T userValue){
 	switch (param){
 		case SettingsWidget::THREADS:
 			if constexpr (std::is_same_v<T, bool>)

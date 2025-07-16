@@ -17,20 +17,20 @@ class InputDispatcher : public QWidget
 
 public:
     explicit InputDispatcher(QWidget* parent);
-    auto SetInputHandler(InputHandler* inputHandler) -> void;
-    auto OnGoButtonClicked() const -> void;
-    auto OnClearButtonClicked() const -> void;
-    auto OnCancelButtonClicked() const -> void;
-    auto OnProcessTypeModified(const ProcessType newType) const -> void;
-    auto OnProcessDefinitionModified(const DefinitionWidget param, double userValue) const -> void;
-    auto OnSolverTypeModified(const SolverType newType) const -> void;
+    void setInputHandler(InputHandler* inputHandler);
+    void onGoButtonClicked() const;
+    void onClearButtonClicked() const;
+    void onCancelButtonClicked() const;
+    void onProcessTypeModified(const ProcessType newType) const;
+    void onProcessDefinitionModified(const DefinitionWidget param, double userValue) const;
+    void onSolverTypeModified(const SolverType newType) const;
     template<IntOrDouble T> // TODO: Remove?
-    auto OnSimulationParameterModified(const SimulationWidget param, T userValue) const -> void {
-        m_inputHandler->OnSimulationParameterModified(param, userValue);
+    void onSimulationParameterModified(const SimulationWidget param, T userValue) const{
+        m_inputHandler->onSimulationParameterModified(param, userValue);
     }
     template<IntOrBool T> // TODO: Remove?
-    auto OnSettingsParameterModified(const SettingsWidget param, T userValue) const -> void {
-        m_inputHandler->OnSettingsParameterModified(param, userValue);
+    void onSettingsParameterModified(const SettingsWidget param, T userValue) const{
+        m_inputHandler->onSettingsParameterModified(param, userValue);
     }
 
 private:

@@ -21,23 +21,21 @@ DistributionChart::DistributionChart()
 	, m_distributionSet(new QBarSet("Distribution", this))
 	, m_distributionSeries(new QBarSeries(this))
 {
-	InitializeAxis();
-	InitializeDistributionChart();
+	initializeAxis();
+	initializeDistributionChart();
 }
 
-auto DistributionChart::UpdateTitle(const ProcessType type) -> void
-{
+void DistributionChart::updateTitle(const ProcessType type){
 	QString title;
 	QTextStream ts(&title);
 	ts << "Sampled distribution";
-	if (ProcessData::GetPDF(type, 0, 0, 0, 0)){
+	if (ProcessData::getPDF(type, 0, 0, 0, 0)){
 		ts << " vs theoretical Probability Density Function";
 	}
 	setTitle(title);
 }
 
-auto DistributionChart::PlotDistribution(const Distribution& results) -> void
-{
+void DistributionChart::plotDistribution(const Distribution& results){
 	assert(m_distributionSet->count() == 0);
 	if(results.empty()) return;
 	const State binWidth = (m_xAxis->max() - m_xAxis->min()) / static_cast<qreal>(nrBins);
@@ -56,15 +54,13 @@ auto DistributionChart::PlotDistribution(const Distribution& results) -> void
 	m_yAxisRelativeCount->setRange(0, maxHeight * 1.1);
 }
 
-auto DistributionChart::ClearDistributionChart() -> void
-{
+void DistributionChart::clearDistributionChart(){
 	m_pdf->clear();
 	m_expValLine->clear();
 	m_distributionSet->remove(0, m_distributionSet->count());
 }
 
-auto DistributionChart::UpdateDistributionChartPDF(const PDFData& pdfData) -> void
-{
+void DistributionChart::updateDistributionChartPDF(const PDFData& pdfData){
     if (pdfData.empty()) return;
     QVector<QPointF> points;
     points.reserve(static_cast<qsizetype>(pdfData.size()));
@@ -79,8 +75,7 @@ auto DistributionChart::UpdateDistributionChartPDF(const PDFData& pdfData) -> vo
 	m_yAxisDensity->setRange(0, maxDensity * 1.1);
 }
 
-auto DistributionChart::PlotExpValLine(const State EV) -> void
-{
+void DistributionChart::plotExpValLine(const State EV){
 	QVector<QPointF> points;
     points.reserve(2);
     points.append(QPointF(EV, 0));
@@ -88,13 +83,11 @@ auto DistributionChart::PlotExpValLine(const State EV) -> void
 	m_expValLine->replace(points);
 }
 
-auto DistributionChart::SetDistributionChartSupport(const Range range) -> void
-{
+void DistributionChart::setDistributionChartSupport(const Range range){
     m_xAxis->setRange(range.first, range.second);
 }
 
-auto DistributionChart::InitializeAxis() -> void
-{
+void DistributionChart::initializeAxis(){
 	addAxis(m_xAxis, Qt::AlignBottom);
 	addAxis(m_yAxisRelativeCount, Qt::AlignLeft);
 	addAxis(m_yAxisDensity, Qt::AlignRight);
@@ -114,9 +107,8 @@ auto DistributionChart::InitializeAxis() -> void
 	m_categoryAxis->setVisible(false);
 }
 
-auto DistributionChart::InitializeDistributionChart() -> void
-{
-	GUI::SetChartStyle(this);
+void DistributionChart::initializeDistributionChart(){
+	GUI::setChartStyle(this);
 	addSeries(m_pdf);
 	addSeries(m_expValLine);
 	addSeries(m_distributionSeries);
@@ -131,5 +123,5 @@ auto DistributionChart::InitializeDistributionChart() -> void
 	m_distributionSeries->attachAxis(m_yAxisRelativeCount);
 	m_distributionSeries->append(m_distributionSet);
 	m_distributionSeries->setBarWidth(1);
-	GUI::SetPDFStyle(m_pdf);
+	GUI::setPDFStyle(m_pdf);
 }

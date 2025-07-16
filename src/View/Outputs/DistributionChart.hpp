@@ -14,15 +14,15 @@ class DistributionChart : public QChart {
 
 public:
     explicit DistributionChart();
-    auto UpdateTitle(const ProcessType type) -> void;
-    auto PlotDistribution(const Distribution& results) -> void;
-    auto ClearDistributionChart() -> void;
-    auto UpdateDistributionChartPDF(const PDFData& pdfData) -> void;
-    auto PlotExpValLine(const State EV) -> void;
-    auto SetDistributionChartSupport(const Range range) -> void;
+    void updateTitle(const ProcessType type);
+    void plotDistribution(const Distribution& results);
+    void clearDistributionChart();
+    void updateDistributionChartPDF(const PDFData& pdfData);
+    void plotExpValLine(const State EV);
+    void setDistributionChartSupport(const Range range);
 private:
-    auto InitializeAxis() -> void;
-    auto InitializeDistributionChart() -> void;
+    void initializeAxis();
+    void initializeDistributionChart();
 private:
     QValueAxis* m_xAxis;
     QBarCategoryAxis* m_categoryAxis;

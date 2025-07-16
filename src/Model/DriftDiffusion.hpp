@@ -21,17 +21,17 @@ public:
     {
     }
     auto operator()(Time t, State s) const -> double { return f(t, s); }
-    auto Prime(Time t, State s) const -> double { return fPrime(t, s); }
+    double prime(Time t, State s) const{ return fPrime(t, s); }
 };
 
 class Drift : public FunctionWrapper {
     using FunctionWrapper::FunctionWrapper;
 public:
-    auto Mu() const -> double { return parameter; }
+    double mu() const{ return parameter; }
 };
 
 class Diffusion : public FunctionWrapper {
     using FunctionWrapper::FunctionWrapper;
 public:
-    auto Sigma() const -> double { return parameter; }
+    double sigma() const{ return parameter; }
 };

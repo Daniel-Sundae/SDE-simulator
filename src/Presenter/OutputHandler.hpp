@@ -14,23 +14,23 @@ class OutputHandler final : public QObject, public IPresenterComponent<OutputDis
 public:
 	explicit OutputHandler(QObject* parent = nullptr);
     // Method called by worker thread
-    auto HandleWorkerResult(Paths&& paths) -> void;
-    auto OnDriftDataReceived(Path &&driftCurve) -> void;
-    auto PrepareGUI(const PathQuery &pQuery) -> void;
-    auto OnPDFReceived(const PDF &pdf) -> void;
-    auto Clear() const -> void;
+    void handleWorkerResult(Paths&& paths);
+    void onDriftDataReceived(Path &&driftCurve);
+    void prepareGUI(const PathQuery &pQuery);
+    void onPDFReceived(const PDF &pdf);
+    void clear() const;
 
 
 public slots:
-	auto OnPathsReceived(const Paths& paths) -> void;
+	void onPathsReceived(const Paths& paths);
 
 signals:
-    auto InternalPathReadySignal(Paths paths) -> void;
+    void internalPathReadySignal(Paths paths);
 
 private:
-    auto HasSupport() const -> bool;
-    auto DeleteSupport() -> void;
-    auto IsInSupport(const State s) const -> bool;
+    bool hasSupport() const;
+    void deleteSupport();
+    bool isInSupport(const State s) const;
 
 private:
 	Range m_distributionSupport;

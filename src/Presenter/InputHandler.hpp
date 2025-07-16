@@ -10,19 +10,17 @@
 class InputHandler final : public IPresenterComponent<MainPresenter> {
 public:
     explicit InputHandler();
-    auto OnProcessTypeModified(ProcessType newType) -> void;
-    auto OnProcessDefinitionModified(DefinitionWidget param, double userValue) -> void;
-    auto OnSolverTypeModified(SolverType newType) -> void;
-    template <IntOrDouble T>
-    auto OnSimulationParameterModified(const SimulationWidget param, T userValue) -> void;
-    template <IntOrBool T>
-    auto OnSettingsParameterModified(const SettingsWidget param, T userValue) -> void;
-    auto SamplePaths() -> void;
-    auto Clear() const -> void;
-    auto Cancel() const -> void;
+    void onProcessTypeModified(ProcessType newType);
+    void onProcessDefinitionModified(DefinitionWidget param, double userValue);
+    void onSolverTypeModified(SolverType newType);
+    template <IntOrDouble T> void onSimulationParameterModified(const SimulationWidget param, T userValue);
+    template <IntOrBool T> void onSettingsParameterModified(const SettingsWidget param, T userValue);
+    void samplePaths();
+    void clear() const;
+    void cancel() const;
 private:
-    auto CanSample() const -> bool;
-    auto CreateDriftQuery(const PathQuery& pQuery) const -> PathQuery;
+    bool canSample() const;
+    PathQuery createDriftQuery(const PathQuery& pQuery) const;
 private:
     std::unique_ptr<ProcessDefinition> m_processDefinition;
     std::unique_ptr<SimulationParameters> m_simulationParameters;

@@ -10,16 +10,14 @@ struct SimulationParameters {
         , dt(_dt)
         , samples(_samples)
     {
-        AssertValidParameters();
+        assertValidParameters();
     }
-    auto AssertValidParameters() const -> void
-    {
+    void assertValidParameters() const{
         if (dt <= 0 || time <= 0) {
             throw std::invalid_argument("Time and points must be greater than 0");
         }
     }
-    [[nodiscard]] auto Points() const -> std::size_t
-    {
+    [[nodiscard]] std::size_t points() const{
         return static_cast<std::size_t>(std::ceil(time / dt));
     }
     SolverType solver = DefaultConstants::Simulation::solver;
@@ -31,16 +29,16 @@ struct SimulationParameters {
 struct ProcessDefinition {
     static constexpr ProcessType defaultProcess = ProcessType::BM;
     ProcessType type = defaultProcess;
-    Drift drift = ProcessData::GetDrift(defaultProcess, ProcessData::GetMuData(defaultProcess).defaultValue);
-    Diffusion diffusion = ProcessData::GetDiffusion(defaultProcess, ProcessData::GetSigmaData(defaultProcess).defaultValue);
-    State startValueData = ProcessData::GetStartValueData(defaultProcess).defaultValue;
+    Drift drift = ProcessData::getDrift(defaultProcess, ProcessData::getMuData(defaultProcess).defaultValue);
+    Diffusion diffusion = ProcessData::getDiffusion(defaultProcess, ProcessData::getSigmaData(defaultProcess).defaultValue);
+    State startValueData = ProcessData::getStartValueData(defaultProcess).defaultValue;
 
     explicit ProcessDefinition() = default;
     ProcessDefinition(const ProcessType t)
         : type(t)
-        , drift(ProcessData::GetDrift(t, ProcessData::GetMuData(t).defaultValue))
-        , diffusion(ProcessData::GetDiffusion(t, ProcessData::GetSigmaData(t).defaultValue))
-        , startValueData(ProcessData::GetStartValueData(t).defaultValue)
+        , drift(ProcessData::getDrift(t, ProcessData::getMuData(t).defaultValue))
+        , diffusion(ProcessData::getDiffusion(t, ProcessData::getSigmaData(t).defaultValue))
+        , startValueData(ProcessData::getStartValueData(t).defaultValue)
     {}
 
     ProcessDefinition(const ProcessType t, Drift d, Diffusion diff, const State start)

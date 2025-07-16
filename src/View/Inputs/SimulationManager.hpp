@@ -8,11 +8,10 @@ class SimulationManager : public InputDispatcherGroupBox
 public:
 	explicit SimulationManager(InputDispatcher* parent);
 private:
-	auto AddComboBoxes() -> void;
-	auto AddSpinBoxes() -> void;
-	auto InitializeDesign() -> void;
+	void addComboBoxes();
+	void addSpinBoxes();
+	void initializeDesign();
 private:
-	template <IntOrDouble T>
-	auto SimulationModifiedCb(SimulationWidget param) const;
+	template <IntOrDouble T> auto simulationModifiedCb(SimulationWidget param) const;
 	std::unordered_map<SimulationWidget, QWidget*> m_widgets;
 };

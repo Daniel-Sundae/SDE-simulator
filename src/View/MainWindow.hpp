@@ -11,10 +11,10 @@ class MainWindow final : public QMainWindow{
     Q_OBJECT
 public:
     explicit MainWindow();
-    auto GetInputDispatcher() const -> InputDispatcher*;
-    auto GetOutputDispatcher() const -> OutputDispatcher*;
+    InputDispatcher* getInputDispatcher() const;
+    OutputDispatcher* getOutputDispatcher() const;
 private:
-    auto AddWidgets() -> void;
+    void addWidgets();
 private:
     QWidget* m_centralWidget;
     QHBoxLayout* m_mainWindowLayout;

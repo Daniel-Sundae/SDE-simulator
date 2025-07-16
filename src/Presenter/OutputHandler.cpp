@@ -10,80 +10,71 @@ OutputHandler::OutputHandler(QObject* parent)
 	, IPresenterComponent()
 	, m_distributionSupport(std::make_pair<State>(0,0))
 {
-    connect(this, &OutputHandler::InternalPathReadySignal,
-            this, &OutputHandler::OnPathsReceived,
+    connect(this, &OutputHandler::internalPathReadySignal,
+            this, &OutputHandler::onPathsReceived,
             Qt::QueuedConnection);
 }
 
-auto OutputHandler::HandleWorkerResult(Paths&& paths) -> void
-{
+void OutputHandler::handleWorkerResult(Paths&& paths){
 	// Pass data ownership from worker thread to GUI thread.
-    emit InternalPathReadySignal(std::move(paths));
+    emit internalPathReadySignal(std::move(paths));
 }
 
-auto OutputHandler::OnPathsReceived(const Paths& paths) -> void
-{
-	Listener()->SetStatus(StatusSignal::RENDERING);
+void OutputHandler::onPathsReceived(const Paths& paths){
+	listener()->setStatus(StatusSignal::RENDERING);
 	Distribution distribution;
 	distribution.reserve(paths.size());
-	assert(HasSupport());
+	assert(hasSupport());
 	for (std::size_t i = 0; i < paths.size(); ++i) {
 		const Path& p = paths[i];
 		if(i < DefaultConstants::maxPathsToDraw){
-			Listener()->PlotPath(p);
+			listener()->plotPath(p);
 		}
-		if(IsInSupport(p.back())) {
+		if(isInSupport(p.back())) {
 			distribution.push_back(p.back());
 		}
 	}
-	Listener()->PlotDistribution(distribution);
-	DeleteSupport();
-	Listener()->SetStatus(StatusSignal::READY);
+	listener()->plotDistribution(distribution);
+	deleteSupport();
+	listener()->setStatus(StatusSignal::READY);
 }
 
-auto OutputHandler::OnDriftDataReceived(Path&& driftCurve) -> void
-{
-	Listener()->PlotPathChartDriftData(driftCurve);
+void OutputHandler::onDriftDataReceived(Path&& driftCurve){
+	listener()->plotPathChartDriftData(driftCurve);
 }
 
-auto OutputHandler::PrepareGUI(const PathQuery& pQuery) -> void
-{
-	Clear();
-	Listener()->SetStatus(StatusSignal::SAMPLING);
-	Listener()->SetQueryInfo(pQuery);
-	Listener()->ClearPathChart(false);
-	Listener()->SetPathChartMaxTime(pQuery.simulationParameters.time);
-	Listener()->UpdateDistributionChartTitle(pQuery.processDefinition.type);
-	Listener()->UpdatePathChartTitle(DefaultConstants::maxPathsToDraw >= pQuery.simulationParameters.samples);
+void OutputHandler::prepareGUI(const PathQuery& pQuery){
+	clear();
+	listener()->setStatus(StatusSignal::SAMPLING);
+	listener()->setQueryInfo(pQuery);
+	listener()->clearPathChart(false);
+	listener()->setPathChartMaxTime(pQuery.simulationParameters.time);
+	listener()->updateDistributionChartTitle(pQuery.processDefinition.type);
+	listener()->updatePathChartTitle(DefaultConstants::maxPathsToDraw >= pQuery.simulationParameters.samples);
 }
 
-auto OutputHandler::OnPDFReceived(const PDF& pdf) -> void
-{
-	m_distributionSupport = pdf.GetSupport();
-	Listener()->SetDistributionChartSupport(m_distributionSupport);
-	Listener()->UpdateDistributionChartPDF(pdf.GetPDFData());
-	Listener()->UpdateDistributionChartEV(pdf.EV());
+void OutputHandler::onPDFReceived(const PDF& pdf){
+	m_distributionSupport = pdf.getSupport();
+	listener()->setDistributionChartSupport(m_distributionSupport);
+	listener()->updateDistributionChartPDF(pdf.getPDFData());
+	listener()->updateDistributionChartEV(pdf.EV());
 }
 
-auto OutputHandler::Clear() const -> void
-{
-	Listener()->ClearStatus();
-	Listener()->ClearPathChart();
-	Listener()->ClearDistributionChart();
+void OutputHandler::clear() const{
+	listener()->clearStatus();
+	listener()->clearPathChart();
+	listener()->clearDistributionChart();
 }
 
-auto OutputHandler::HasSupport() const -> bool
-{
+bool OutputHandler::hasSupport() const{
 	return m_distributionSupport.first && m_distributionSupport.second ? true : false;
 }
 
-auto OutputHandler::DeleteSupport() -> void
-{
+void OutputHandler::deleteSupport(){
 	m_distributionSupport.first = 0;
 	m_distributionSupport.second = 0;
 }
 
-auto OutputHandler::IsInSupport(const State s) const -> bool
-{
+bool OutputHandler::isInSupport(const State s) const{
 	return m_distributionSupport.first < s && s < m_distributionSupport.second ? true : false;
 }

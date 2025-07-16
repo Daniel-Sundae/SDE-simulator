@@ -11,14 +11,14 @@ struct Transaction;
 class MainPresenter final : public IPresenterComponent<OutputHandler> {
 public:
 	explicit MainPresenter();
-    auto Clear() const -> void;
-    auto Cancel() const -> void;
-    auto GetInputHandler() const -> InputHandler*;
-    auto GetOutputHandler() const -> OutputHandler*;
-    auto OnTransactionReceived(const Transaction &&transaction) -> void;
+    void clear() const;
+    void cancel() const;
+    InputHandler* getInputHandler() const;
+    OutputHandler* getOutputHandler() const;
+    void onTransactionReceived(const Transaction &&transaction);
 private:
-	auto SamplePaths(const PathQuery& pathQuery) -> void;
-	auto SampleDriftCurve(const PathQuery& query) -> void;
+	void samplePaths(const PathQuery& pathQuery);
+	void sampleDriftCurve(const PathQuery& query);
 
 private:
     std::unique_ptr<InputHandler> m_inputHandler;

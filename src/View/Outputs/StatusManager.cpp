@@ -35,32 +35,29 @@ StatusManager::StatusManager(QWidget* parent)
     layout->addWidget(m_queryDefinition, 3);
     layout->addWidget(m_queryParameters, 5);
     layout->addWidget(m_statusInfo, 1);
-    setStyleSheet(GUI::GroupBoxDescription());
+    setStyleSheet(GUI::groupBoxDescription());
 }
 
-auto StatusManager::SetStatus(const StatusSignal s) -> void
-{
+void StatusManager::setStatus(const StatusSignal s){
     m_status = s;
     m_statusInfo->findChild<QLabel*>()->setText(statusToString.at(s));
 }
 
-auto StatusManager::SetQueryInfo(const PathQuery& pQuery) -> void
-{
+void StatusManager::setQueryInfo(const PathQuery& pQuery){
     QString infoDefinition;
     QTextStream streamDefinition(&infoDefinition);
-    streamDefinition << "Process: " << QString::fromUtf8(ProcessData::GetName(pQuery.processDefinition.type)) << "\n"
-                     << "Definition: " << QString::fromUtf8(ProcessData::GetDefinition(pQuery.processDefinition.type));
+    streamDefinition << "Process: " << QString::fromUtf8(ProcessData::getName(pQuery.processDefinition.type)) << "\n"
+                     << "Definition: " << QString::fromUtf8(ProcessData::getDefinition(pQuery.processDefinition.type));
     QString infoParams;
     QTextStream streamParams(&infoParams);
-    streamParams << "Definition parameters: μ = " << QString::number(pQuery.processDefinition.drift.Mu()) << ", σ = " << QString::number(pQuery.processDefinition.diffusion.Sigma()) << ", X" << QString::fromUtf8("\u2080") << " = " << QString::number(pQuery.processDefinition.startValueData) << "\n"
+    streamParams << "Definition parameters: μ = " << QString::number(pQuery.processDefinition.drift.mu()) << ", σ = " << QString::number(pQuery.processDefinition.diffusion.sigma()) << ", X" << QString::fromUtf8("\u2080") << " = " << QString::number(pQuery.processDefinition.startValueData) << "\n"
                  << "Simulation parameters: Solver = " << solverToString.at(pQuery.simulationParameters.solver) << ", Time = " << QString::number(pQuery.simulationParameters.time) << ", dt = " << QString::number(pQuery.simulationParameters.dt) << ", Samples = " << QString::number(pQuery.simulationParameters.samples) << "\n"
                  << "Settings: Multithreading = " << (pQuery.settingsParameters.useThreading ? "Yes" : "No") << ", Seed: " << (pQuery.settingsParameters.useSeed.first ? QString::number(pQuery.settingsParameters.useSeed.second) : "Random");
     m_queryDefinition->findChild<QLabel*>()->setText(infoDefinition);
     m_queryParameters->findChild<QLabel*>()->setText(infoParams);
 }
 
-auto StatusManager::ClearStatus() -> void
-{
+void StatusManager::clearStatus(){
     m_queryDefinition->findChild<QLabel*>()->setText("");
     m_queryParameters->findChild<QLabel*>()->setText("");
 }

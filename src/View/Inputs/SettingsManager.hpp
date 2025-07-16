@@ -9,9 +9,9 @@ class SettingsManager : public InputDispatcherGroupBox
 public:
 	explicit SettingsManager(InputDispatcher* parent);
 private:
-	auto AddMultiThreadCheckBox() -> void;
-	auto AddSeedWidget() -> void;
-	auto InitializeDesign() -> void;
+	void addMultiThreadCheckBox();
+	void addSeedWidget();
+	void initializeDesign();
 private:
 	std::unordered_map<SettingsWidget, QWidget*> m_widgets;
 };

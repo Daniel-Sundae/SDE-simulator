@@ -18,28 +18,28 @@ public:
     explicit OutputDispatcher(QWidget* parent = nullptr);
 
     // StatusManager
-    auto SetQueryInfo(const PathQuery &pQuery) const -> void;
-    auto SetStatus(const StatusSignal signal) const -> void;
-    auto ClearStatus() const -> void;
+    void setQueryInfo(const PathQuery &pQuery) const;
+    void setStatus(const StatusSignal signal) const;
+    void clearStatus() const;
 
     // PathChart
-    auto PlotPath(const Path& path) const -> void;
-    auto UpdatePathChartTitle(bool allPathsPlotted) const -> void;
-    auto PlotPathChartDriftData(const Path &driftLine) const -> void;
-    auto ClearPathChart(bool clearDrift = true) -> void;
-    auto SetPathChartMaxTime(const Time time) -> void;
+    void plotPath(const Path& path) const;
+    void updatePathChartTitle(bool allPathsPlotted) const;
+    void plotPathChartDriftData(const Path &driftLine) const;
+    void clearPathChart(bool clearDrift = true);
+    void setPathChartMaxTime(const Time time);
 
     // DistributionChart
-    auto UpdateDistributionChartTitle(const ProcessType t) const -> void;
-    auto PlotDistribution(const Distribution& distribution) const -> void;
-    auto UpdateDistributionChartPDF(const PDFData& pdfData) const -> void;
-    auto SetDistributionChartSupport(const Range pdfDomain) const -> void;
-    auto UpdateDistributionChartEV(const State EV) const -> void;
-    auto ClearDistributionChart() -> void;
+    void updateDistributionChartTitle(const ProcessType t) const;
+    void plotDistribution(const Distribution& distribution) const;
+    void updateDistributionChartPDF(const PDFData& pdfData) const;
+    void setDistributionChartSupport(const Range pdfDomain) const;
+    void updateDistributionChartEV(const State EV) const;
+    void clearDistributionChart();
 
 private:
-    auto GetPathChart() const -> PathChart*;
-    auto GetDistributionChart() const -> DistributionChart*;
+    PathChart* getPathChart() const;
+    DistributionChart* getDistributionChart() const;
 private:
     QVBoxLayout* layout;
     StatusManager* m_statusManager;

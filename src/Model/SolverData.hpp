@@ -35,7 +35,7 @@ namespace dXt{
     {
         double tmp_dB = dB(dt, generator);
         double tmp_diffusionXt = diffusion(t, Xt); 
-        State milsteinCorrection = 0.5 * tmp_diffusionXt * diffusion.Prime(t, Xt) * (tmp_dB * tmp_dB - dt);
+        State milsteinCorrection = 0.5 * tmp_diffusionXt * diffusion.prime(t, Xt) * (tmp_dB * tmp_dB - dt);
         return drift(t, Xt) * dt + tmp_diffusionXt * tmp_dB + milsteinCorrection;
     };
 

@@ -30,94 +30,78 @@ OutputDispatcher::OutputDispatcher(QWidget *parent)
 //// STATUS MANAGER
 ////////////////////////////////////////
 
-auto OutputDispatcher::SetQueryInfo(const PathQuery& pQuery) const -> void
-{
-    m_statusManager->SetQueryInfo(pQuery);
+void OutputDispatcher::setQueryInfo(const PathQuery& pQuery) const{
+    m_statusManager->setQueryInfo(pQuery);
 }
 
-auto OutputDispatcher::SetStatus(const StatusSignal signal) const -> void
-{
-    m_statusManager->SetStatus(signal);
+void OutputDispatcher::setStatus(const StatusSignal signal) const{
+    m_statusManager->setStatus(signal);
 }
 
-auto OutputDispatcher::ClearStatus() const -> void
-{
-    m_statusManager->ClearStatus();
+void OutputDispatcher::clearStatus() const{
+    m_statusManager->clearStatus();
 }
 
 ////////////////////////////////////////
 //// PATH CHART
 ////////////////////////////////////////
 
-auto OutputDispatcher::UpdatePathChartTitle(bool allPathsPlotted) const -> void
-{
-    GetPathChart()->UpdateTitle(allPathsPlotted);
+void OutputDispatcher::updatePathChartTitle(bool allPathsPlotted) const{
+    getPathChart()->updateTitle(allPathsPlotted);
 }
 
-auto OutputDispatcher::PlotPathChartDriftData(const Path& driftLine) const -> void
-{
-    GetPathChart()->PlotDriftCurve(driftLine);
+void OutputDispatcher::plotPathChartDriftData(const Path& driftLine) const{
+    getPathChart()->plotDriftCurve(driftLine);
 }
 
-auto OutputDispatcher::PlotPath(const Path& path) const -> void
-{
-    GetPathChart()->PlotPath(path);
+void OutputDispatcher::plotPath(const Path& path) const{
+    getPathChart()->plotPath(path);
 }
 
-auto OutputDispatcher::ClearPathChart(bool clearDrift) -> void
-{
-    GetPathChart()->ClearPathChart(clearDrift);
+void OutputDispatcher::clearPathChart(bool clearDrift){
+    getPathChart()->clearPathChart(clearDrift);
 }
 
-auto OutputDispatcher::SetPathChartMaxTime(const Time time) -> void
-{
-    GetPathChart()->SetMaxTime(time);
+void OutputDispatcher::setPathChartMaxTime(const Time time){
+    getPathChart()->setMaxTime(time);
 }
 
 ////////////////////////////////////////
 //// DISTRIBUTION CHART
 ////////////////////////////////////////
 
-auto OutputDispatcher::UpdateDistributionChartTitle(const ProcessType type) const -> void
-{
-    GetDistributionChart()->UpdateTitle(type);
+void OutputDispatcher::updateDistributionChartTitle(const ProcessType type) const{
+    getDistributionChart()->updateTitle(type);
 }
 
-auto OutputDispatcher::PlotDistribution(const Distribution& distribution) const -> void
-{
-    GetDistributionChart()->PlotDistribution(distribution);
+void OutputDispatcher::plotDistribution(const Distribution& distribution) const{
+    getDistributionChart()->plotDistribution(distribution);
 }
 
-auto OutputDispatcher::UpdateDistributionChartPDF(const PDFData& pdfData) const -> void
-{
-    GetDistributionChart()->UpdateDistributionChartPDF(pdfData);
+void OutputDispatcher::updateDistributionChartPDF(const PDFData& pdfData) const{
+    getDistributionChart()->updateDistributionChartPDF(pdfData);
 }
 
-auto OutputDispatcher::SetDistributionChartSupport(const Range pdfDomain) const -> void
-{
-    GetDistributionChart()->SetDistributionChartSupport(pdfDomain);
+void OutputDispatcher::setDistributionChartSupport(const Range pdfDomain) const{
+    getDistributionChart()->setDistributionChartSupport(pdfDomain);
 }
 
-auto OutputDispatcher::UpdateDistributionChartEV(const State EV) const -> void
-{
-    GetDistributionChart()->PlotExpValLine(EV);
+void OutputDispatcher::updateDistributionChartEV(const State EV) const{
+    getDistributionChart()->plotExpValLine(EV);
 }
 
-auto OutputDispatcher::ClearDistributionChart() -> void
-{
-    GetDistributionChart()->ClearDistributionChart();
+void OutputDispatcher::clearDistributionChart(){
+    getDistributionChart()->clearDistributionChart();
 }
 
 ////////////////////////////////////////
 //// ACCESSORS
 ////////////////////////////////////////
 
-auto OutputDispatcher::GetPathChart() const -> PathChart*
-{
+PathChart* OutputDispatcher::getPathChart() const{
     return static_cast<PathChart*>(m_pathChartView->chart());
 }
 
-auto OutputDispatcher::GetDistributionChart() const -> DistributionChart*
-{
+DistributionChart* OutputDispatcher::getDistributionChart() const{
     return static_cast<DistributionChart*>(m_distributionChartView->chart());
 }

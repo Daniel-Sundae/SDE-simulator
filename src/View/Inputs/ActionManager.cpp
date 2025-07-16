@@ -5,12 +5,11 @@
 ActionManager::ActionManager(InputDispatcher *parent)
     : InputDispatcherGroupBox(parent)
 {
-    AddActionWidgets();
+    addActionWidgets();
 }
 
 
-auto ActionManager::AddActionWidgets() -> void
-{
+void ActionManager::addActionWidgets(){
     auto* goButton = new QPushButton("GO", this);
     goButton->setToolTip("Generate sample.");
     goButton->setStyleSheet("QPushButton { background-color: green; }");
@@ -24,20 +23,20 @@ auto ActionManager::AddActionWidgets() -> void
         goButton,
         &QPushButton::clicked,
         this,
-        [this]() { Parent()->OnGoButtonClicked(); });
+        [this]() { Parent()->onGoButtonClicked(); });
     connect(
         clearButton,
         &QPushButton::clicked,
         this,
-        [this]() { Parent()->OnClearButtonClicked(); });
+        [this]() { Parent()->onClearButtonClicked(); });
     connect(
         cancelButton,
         &QPushButton::clicked,
         this,
-        [this]() { Parent()->OnCancelButtonClicked(); });
+        [this]() { Parent()->onCancelButtonClicked(); });
     auto layout = new QHBoxLayout(this);
     layout->addWidget(goButton);
     layout->addWidget(clearButton);
     layout->addWidget(cancelButton);
-    setStyleSheet(GUI::GroupBoxDescription());
+    setStyleSheet(GUI::groupBoxDescription());
 }

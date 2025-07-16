@@ -14,7 +14,7 @@ class ActionManager : public InputDispatcherGroupBox
 public:
 	explicit ActionManager(InputDispatcher* parent);
 private:
-	auto AddActionWidgets() -> void;
+	void addActionWidgets();
 private:
 	std::unordered_map<ActionWidget, QWidget*> m_widgets;
 };

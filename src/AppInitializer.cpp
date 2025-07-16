@@ -18,22 +18,20 @@ AppInitializer::AppInitializer(QApplication& app)
     // Register custom type to move data from enginethread to GUI thread
     qRegisterMetaType<Paths>("Paths");
 
-	InitializeComponents();
-    SetStyle();
+	initializeComponents();
+    setStyle();
 }
 
 AppInitializer::~AppInitializer() = default;
 
-auto AppInitializer::InitializeComponents() -> void
-{
-	m_mainPresenter->GetOutputHandler()->SetListener(m_mainWindow->GetOutputDispatcher());
-	m_mainPresenter->SetListener(m_mainPresenter->GetOutputHandler());
-	m_mainPresenter->GetInputHandler()->SetListener(m_mainPresenter.get());
-	m_mainWindow->GetInputDispatcher()->SetInputHandler(m_mainPresenter->GetInputHandler());
+void AppInitializer::initializeComponents(){
+	m_mainPresenter->getOutputHandler()->setlistener(m_mainWindow->getOutputDispatcher());
+	m_mainPresenter->setlistener(m_mainPresenter->getOutputHandler());
+	m_mainPresenter->getInputHandler()->setlistener(m_mainPresenter.get());
+	m_mainWindow->getInputDispatcher()->setInputHandler(m_mainPresenter->getInputHandler());
 }
 
-auto AppInitializer::SetStyle() -> void
-{
+void AppInitializer::setStyle(){
     m_app.setStyle("Fusion");
     QPalette darkPalette;
     darkPalette.setColor(QPalette::Window, QColor(53, 53, 53));

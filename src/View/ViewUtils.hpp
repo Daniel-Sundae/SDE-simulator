@@ -6,8 +6,7 @@
 
 namespace GUI
 {
-    inline auto GroupBoxDescription() -> QString
-    {
+    inline QString groupBoxDescription(){
         return R"(QGroupBox {
                 border: 2px solid #CCCCCC;
                 border-radius: 5px;
@@ -24,8 +23,7 @@ namespace GUI
             })";
     }
 
-    inline auto ComboBoxDescription() -> QString
-    {
+    inline QString comboBoxDescription(){
         return R"(QComboBox {
                 min-height: 20px;
                 min-width: 80px;
@@ -33,8 +31,7 @@ namespace GUI
             })";
     }
 
-    inline auto SpinBoxDescription() -> QString
-    {
+    inline QString spinBoxDescription(){
         return R"(QDoubleSpinBox {
                 min-height: 20px;
                 min-width: 80px;
@@ -47,8 +44,7 @@ namespace GUI
             })";
     }
 
-    inline auto CheckBoxDescription() -> QString
-    {
+    inline QString checkBoxDescription(){
         return R"(QCheckBox {
             min-height: 20px;
             spacing: 5px;
@@ -60,30 +56,26 @@ namespace GUI
         )";
     }
 
-    inline auto SetDriftStyle(QLineSeries* driftSeries) -> void
-    {
+    inline void setDriftStyle(QLineSeries* driftSeries){
         const QColor highlightColor = QColor(Qt::GlobalColor::red);
         QPen seriesPen(highlightColor, 1);
         seriesPen.setStyle(Qt::PenStyle::DashLine);
         driftSeries->setPen(seriesPen);
     }
 
-    inline auto SetPDFStyle(QLineSeries* driftSeries) -> void
-    {
+    inline void setPDFStyle(QLineSeries* driftSeries){
         const QColor highlightColor = QColor(255, 121, 0); // Orange
         QPen seriesPen(highlightColor, 1);
         driftSeries->setPen(seriesPen);
     }
 
-    inline auto SetPathStyle(QLineSeries* series) -> void
-    {
+    inline void setPathStyle(QLineSeries* series){
         const QColor highlightColor = QColor(42, 130, 218); // Blue
         const QPen seriesPen(highlightColor, 1);
         series->setPen(seriesPen);
     }
 
-    inline auto SetChartStyle(QChart* chart) -> void
-    {
+    inline void setChartStyle(QChart* chart){
         chart->setBackgroundBrush(QColor(25, 25, 25));
         chart->setBackgroundPen(Qt::NoPen);
         chart->setTitleBrush(QBrush(Qt::white));
