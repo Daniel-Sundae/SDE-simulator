@@ -25,8 +25,7 @@ protected:
         m_results.clear();
     }
 
-    auto GenerateTaskFunction(const std::uint32_t taskTimeMs, const State resultState, const std::uint32_t slot) -> std::function<void()>
-    {
+    std::function<void()> generateTaskFunction(const std::uint32_t taskTimeMs, const State resultState, const std::uint32_t slot){
         return [this, taskTimeMs, resultState, slot]() -> void {
             std::this_thread::sleep_for(std::chrono::milliseconds(taskTimeMs));
             m_results[slot] = { resultState };
@@ -40,7 +39,7 @@ TEST_F(EngineThreadPoolTest, TestTpSimpleTasks) {
     RuntimeSetUp(1, nrTasks);
 
     for(std::uint32_t slot = 0; slot < nrTasks; ++slot){
-        m_tp->Enqueue(GenerateTaskFunction(GetRandomInt(1, 300), 0.1 + slot, slot));
+        m_tp->Enqueue(generateTaskFunction(GetRandomInt(1, 300), 0.1 + slot, slot));
     }
     m_nrTasksLeft->wait();
 
@@ -59,7 +58,7 @@ TEST_F(EngineThreadPoolTest, TestTpMultiThreadIsFaster) {
         RuntimeSetUp(nrThreads, nrTasks);
         auto startTime = std::chrono::steady_clock::now();
         for(std::uint32_t slot = 0; slot < nrTasks; ++slot){
-            m_tp->Enqueue(GenerateTaskFunction(50, 1.0, slot));
+            m_tp->Enqueue(generateTaskFunction(50, 1.0, slot));
         }
         m_nrTasksLeft->wait();
         durations.push_back(std::chrono::steady_clock::now() - startTime);
@@ -74,8 +73,8 @@ TEST_F(EngineThreadPoolTest, TestTpClearTasks) {
     RuntimeSetUp(2, nrTasks);
     // Override latch so we only wait for the two enqueue tasks
     m_nrTasksLeft = std::make_unique<std::latch>(2);
-    m_tp->Enqueue(GenerateTaskFunction(taskTime, 0.1, 3));
-    m_tp->Enqueue(GenerateTaskFunction(taskTime, 0.2, 4));
+    m_tp->Enqueue(generateTaskFunction(taskTime, 0.1, 3));
+    m_tp->Enqueue(generateTaskFunction(taskTime, 0.2, 4));
     // Ensures threads picks up task before we clear remaining tasks
     std::this_thread::sleep_for(std::chrono::milliseconds(taskTime/10));
     ASSERT_EQ(m_tp->NrBusyThreads(), 2);
