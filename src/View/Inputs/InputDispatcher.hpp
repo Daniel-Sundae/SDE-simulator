@@ -24,11 +24,11 @@ public:
     auto OnProcessTypeModified(const ProcessType newType) const -> void;
     auto OnProcessDefinitionModified(const DefinitionWidget param, double userValue) const -> void;
     auto OnSolverTypeModified(const SolverType newType) const -> void;
-    template<IntOrDouble T>
+    template<IntOrDouble T> // TODO: Remove?
     auto OnSimulationParameterModified(const SimulationWidget param, T userValue) const -> void {
         m_inputHandler->OnSimulationParameterModified(param, userValue);
     }
-    template<IntOrBool T>
+    template<IntOrBool T> // TODO: Remove?
     auto OnSettingsParameterModified(const SettingsWidget param, T userValue) const -> void {
         m_inputHandler->OnSettingsParameterModified(param, userValue);
     }

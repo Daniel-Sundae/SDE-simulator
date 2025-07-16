@@ -1,0 +1,185 @@
+λ /c/Projects/vcpkg (master) → ./bootstrap-vcpkg.bat
+Downloading https://github.com/microsoft/vcpkg-tool/releases/download/2025-06-02/vcpkg.exe -> C:\Projects\vcpkg\vcpkg.exe... done.
+Validating signature... done.
+
+vcpkg package management program version 2025-06-02-145689e84b7637525510e2c9b4ee603fda046b56
+
+See LICENSE.txt for license information.
+Telemetry
+---------
+vcpkg collects usage data in order to help us improve your experience.
+The data collected by Microsoft is anonymous.
+You can opt-out of telemetry by re-running the bootstrap-vcpkg script with -disableMetrics,
+passing --disable-metrics to vcpkg on the command line,
+or by setting the VCPKG_DISABLE_METRICS environment variable.
+
+Read more about vcpkg telemetry at docs/about/privacy.md
+λ /c/Projects/vcpkg (master) → cd ../Stochastic-Differential-Equations/
+λ /c/Projects/Stochastic-Differential-Equations (main) → rm -rf build
+λ /c/Projects/Stochastic-Differential-Equations (main) → cmake --preset debug
+-- Running vcpkg install
+Fetching registry information from https://github.com/microsoft/vcpkg (HEAD)...
+Detecting compiler hash for triplet x64-windows...
+Compiler found: C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe
+The following packages will be built and installed:
+  * brotli:x64-windows@1.1.0#1 -- git+https://github.com/microsoft/vcpkg@4e5b5ae1ad26c80535c893cc0307121f0398549e
+  * bzip2[core,tool]:x64-windows@1.0.8#6 -- git+https://github.com/microsoft/vcpkg@2d029da682847c5ebdc54e4dbea001331a02207e
+  * dbus:x64-windows@1.16.2#1 -- git+https://github.com/microsoft/vcpkg@53859bc14ee6f5ac022edc297a6569bc880abdec
+  * double-conversion:x64-windows@3.3.0#1 -- git+https://github.com/microsoft/vcpkg@aab0be9dfa5d0fe2452be21cfd4c7997e437c05b
+  * egl-registry:x64-windows@2024-01-25 -- git+https://github.com/microsoft/vcpkg@d883db43133dd223c4ffdbef4193943f6784d43a
+  * expat:x64-windows@2.7.1 -- git+https://github.com/microsoft/vcpkg@37702e8740157c39e52d0d254487c1811b7e1d7c
+  * freetype[brotli,bzip2,core,png,zlib]:x64-windows@2.13.3 -- git+https://github.com/microsoft/vcpkg@8a2c633dcc14eaabdb31cf4637242f4e3c2f3fa2
+    gtest:x64-windows@1.17.0#1 -- git+https://github.com/microsoft/vcpkg@9ef57e3c1c7484e79ef8dd77e9cb7770f5331248
+  * harfbuzz[core,freetype]:x64-windows@10.2.0#4 -- git+https://github.com/microsoft/vcpkg@e213a343364c5985ede5d4018a7f13969d82d3fc
+  * icu[core,tools]:x64-windows@74.2#5 -- git+https://github.com/microsoft/vcpkg@91b03be43850140e64dba01dcadc8b3f73b1083b
+  * libjpeg-turbo:x64-windows@3.1.0#1 -- git+https://github.com/microsoft/vcpkg@6180688844449e5724d6dc8eb49ab90124438ce2
+  * libpng:x64-windows@1.6.47 -- git+https://github.com/microsoft/vcpkg@2e16dddb1925ae47b5f1ea95d16d6d78f2a711b8
+  * libpq[core,lz4,openssl,zlib]:x64-windows@16.9 -- git+https://github.com/microsoft/vcpkg@e43a54123623261a1a9f85275dfd3396fe393945
+  * lz4:x64-windows@1.10.0 -- git+https://github.com/microsoft/vcpkg@4f01eec10f515a428e914107c5188366380f8dd9
+  * opengl:x64-windows@2022-12-04#3 -- git+https://github.com/microsoft/vcpkg@c3ae71738f88449ebcd781cef60d9a253fa091d4
+  * opengl-registry:x64-windows@2024-02-10#1 -- git+https://github.com/microsoft/vcpkg@22f7aa58ee78c9f0db904b6251e9265f2be26f9d
+  * openssl:x64-windows@3.5.0#1 -- git+https://github.com/microsoft/vcpkg@6819498ce6c5c3e379b3ffbd2b5d93e3fc271933
+  * pcre2[core,jit,platform-default-features]:x64-windows@10.45 -- git+https://github.com/microsoft/vcpkg@c3bbfe8c53a8712c9a988361cfb476af65fc0bee
+  * pkgconf:x64-windows@2.4.3#1 -- git+https://github.com/microsoft/vcpkg@ee86667e248e39cfb0ac994ac4e0bd00ce5b0836
+  * qtbase[brotli,concurrent,core,dbus,dnslookup,doubleconversion,freetype,gui,harfbuzz,icu,jpeg,network,opengl,openssl,pcre2,png,sql,sql-psql,sql-sqlite,testlib,thread,widgets,zstd]:x64-windows@6.8.3#2 -- git+https://github.com/microsoft/vcpkg@c6fb64e484a6762f3ea271a486044c6fb0bca96f
+    qtcharts:x64-windows@6.8.3 -- git+https://github.com/microsoft/vcpkg@a16d989d3e8c3d63cabb3dbd3cfd12f12a75b38c
+  * sqlite3[core,json1]:x64-windows@3.49.2 -- git+https://github.com/microsoft/vcpkg@a337f5fe100f83026072765ea63a8776f984f6fd
+  * vcpkg-cmake:x64-windows@2024-04-23 -- git+https://github.com/microsoft/vcpkg@e74aa1e8f93278a8e71372f1fa08c3df420eb840
+  * vcpkg-cmake-config:x64-windows@2024-05-23 -- git+https://github.com/microsoft/vcpkg@97a63e4bc1a17422ffe4eff71da53b4b561a7841
+  * vcpkg-cmake-get-vars:x64-windows@2024-09-22 -- git+https://github.com/microsoft/vcpkg@f23148add155147f3d95ae622d3b0031beb25acf
+  * vcpkg-make:x64-windows@2025-04-25 -- git+https://github.com/microsoft/vcpkg@04845a7307c8b44a551bebca82a584470dcd5f1c
+  * vcpkg-pkgconfig-get-modules:x64-windows@2024-04-03 -- git+https://github.com/microsoft/vcpkg@6845369c8cb7d3c318e8e3ae92fd2b7570a756ca
+  * vcpkg-tool-meson:x64-windows@1.7.2 -- git+https://github.com/microsoft/vcpkg@f0eaf59cb8c65aaf2fa2c1ea4a5ab75a5c04d727
+  * zlib:x64-windows@1.3.1 -- git+https://github.com/microsoft/vcpkg@3f05e04b9aededb96786a911a16193cdb711f0c9
+  * zstd:x64-windows@1.5.7 -- git+https://github.com/microsoft/vcpkg@31b7320fab13790c6861cb3c2d50dc8f60ca3602
+Additional packages (*) will be modified to complete this operation.
+Restored 30 package(s) from C:\Users\demo\AppData\Local\vcpkg\archives in 38 s. Use --debug to see more details.
+Installing 1/30 vcpkg-cmake-config:x64-windows@2024-05-23...
+Elapsed time to handle vcpkg-cmake-config:x64-windows: 5.92 ms
+vcpkg-cmake-config:x64-windows package ABI: 8b1ae8f4be6cff022eadef50d38cffca5e75f23d30fc7e280b912b164b7e8ea1
+Installing 2/30 vcpkg-cmake:x64-windows@2024-04-23...
+Elapsed time to handle vcpkg-cmake:x64-windows: 17.7 ms
+vcpkg-cmake:x64-windows package ABI: 8112fdacac7427b4feea02a5a660bd2fb97e5b898a970d195ff6370d43a794fb
+Installing 3/30 gtest:x64-windows@1.17.0#1...
+Elapsed time to handle gtest:x64-windows: 57.2 ms
+gtest:x64-windows package ABI: 3b194f3d792eed5a3128657e56fec47e0980bd83d60225f0a5c75d7ac15570d1
+Installing 4/30 zstd:x64-windows@1.5.7...
+Elapsed time to handle zstd:x64-windows: 31.3 ms
+zstd:x64-windows package ABI: 311053c7633ab4f93cb72d7a69540a780c0955256e68085fc0b028dbdeb6e655
+Installing 5/30 sqlite3[core,json1]:x64-windows@3.49.2...
+Elapsed time to handle sqlite3:x64-windows: 27.3 ms
+sqlite3:x64-windows package ABI: 7d0f6a0a1290ea7459c6ae0450b08194500ced4aab3e382fa8837bf2420b3ac5
+Installing 6/30 zlib:x64-windows@1.3.1...
+Elapsed time to handle zlib:x64-windows: 25.5 ms
+zlib:x64-windows package ABI: 312aba461200933af6d46ce7f59402b3d71c3d6783ea83983165c5bcfc6c396e
+Installing 7/30 vcpkg-cmake-get-vars:x64-windows@2024-09-22...
+Elapsed time to handle vcpkg-cmake-get-vars:x64-windows: 20.7 ms
+vcpkg-cmake-get-vars:x64-windows package ABI: 63baf48e108f34f913023e3d3674dbe0d7f83f31ce79f7889b9645fe1fbb3739
+Installing 8/30 openssl:x64-windows@3.5.0#1...
+Elapsed time to handle openssl:x64-windows: 86.9 ms
+openssl:x64-windows package ABI: 10020968339813bf91ffd695ba1bb5eca2cd536000d0f465d447acbaae7a5203
+Installing 9/30 lz4:x64-windows@1.10.0...
+Elapsed time to handle lz4:x64-windows: 62.4 ms
+lz4:x64-windows package ABI: 7ee69e70570f5816908a1908bac6ceee6381eef084e25fbca065302207fa3401
+Installing 10/30 vcpkg-tool-meson:x64-windows@1.7.2...
+Elapsed time to handle vcpkg-tool-meson:x64-windows: 25.3 ms
+vcpkg-tool-meson:x64-windows package ABI: 78f68e77b049fceecb851770d4e0861c96b79a289e8f2f31d0f921de7617e9c3
+Installing 11/30 pkgconf:x64-windows@2.4.3#1...
+Elapsed time to handle pkgconf:x64-windows: 46.6 ms
+pkgconf:x64-windows package ABI: 7099f0fa6da815eae47af0883eef6b92304a7ddf85cdde34ce1907c10974aaf6
+Installing 12/30 vcpkg-pkgconfig-get-modules:x64-windows@2024-04-03...
+Elapsed time to handle vcpkg-pkgconfig-get-modules:x64-windows: 22 ms
+vcpkg-pkgconfig-get-modules:x64-windows package ABI: 526f1c8f686b4f8c9052c160f6edca9c966f781972684370e97104dd16b9c143
+Installing 13/30 libpq[core,lz4,openssl,zlib]:x64-windows@16.9...
+Elapsed time to handle libpq:x64-windows: 428 ms
+libpq:x64-windows package ABI: 6fbff38bd161f5ef9ade4bd670812f970e307395470961a9269843e945e50887
+Installing 14/30 libpng:x64-windows@1.6.47...
+Elapsed time to handle libpng:x64-windows: 54.5 ms
+libpng:x64-windows package ABI: 500a985614b6fd7c140a2338524b24a53116f5561b62fea3a2f0c101a4189c19
+Installing 15/30 pcre2[core,jit,platform-default-features]:x64-windows@10.45...
+Elapsed time to handle pcre2:x64-windows: 90.9 ms
+pcre2:x64-windows package ABI: d72ffec5956ddf5edec5db96686d9676392993606b3e4042e103b1ee56d8b80e
+Installing 16/30 egl-registry:x64-windows@2024-01-25...
+Elapsed time to handle egl-registry:x64-windows: 20.9 ms
+egl-registry:x64-windows package ABI: 54a1f2bc70c7a730d32831bd37b3f63f4ecc8cd37309527c61cc5c91f494c60c
+Installing 17/30 opengl-registry:x64-windows@2024-02-10#1...
+Elapsed time to handle opengl-registry:x64-windows: 48.5 ms
+opengl-registry:x64-windows package ABI: 2c8e120be2b1676c34b21a5d7617fdb5041db21bb5a09624c7b4cb68e0f5f84a
+Installing 18/30 opengl:x64-windows@2022-12-04#3...
+Elapsed time to handle opengl:x64-windows: 44.6 ms
+opengl:x64-windows package ABI: b10f26dcb3378e05b69b24d1585903bb96a62b3e7140105d8b54fdbbe815aae1
+Installing 19/30 libjpeg-turbo:x64-windows@3.1.0#1...
+Elapsed time to handle libjpeg-turbo:x64-windows: 35.6 ms
+libjpeg-turbo:x64-windows package ABI: 728a3362aaa06e4eeee539addac13a969da85108785b89ce7825fddbec5708db
+Installing 20/30 vcpkg-make:x64-windows@2025-04-25...
+Elapsed time to handle vcpkg-make:x64-windows: 27.5 ms
+vcpkg-make:x64-windows package ABI: 265f6cc9b468fdffe6f2b94b9952c39b2102ed497f7cb9a829d3470d4a82ecef
+Installing 21/30 icu[core,tools]:x64-windows@74.2#5...
+Elapsed time to handle icu:x64-windows: 136 ms
+icu:x64-windows package ABI: 3a4093e0a0244aa1c9c68c4cc677553bdffe3686dead6f5c2f5af7258922f540
+Installing 22/30 bzip2[core,tool]:x64-windows@1.0.8#6...
+Elapsed time to handle bzip2:x64-windows: 163 ms
+bzip2:x64-windows package ABI: dc407291baa04383906039d2fdbf26e3e0883285c85af693b08e6a49d2d7ac71
+Installing 23/30 brotli:x64-windows@1.1.0#1...
+Elapsed time to handle brotli:x64-windows: 36.4 ms
+brotli:x64-windows package ABI: 6b3272df609dba0ec96b8f034319135a2f0fb1d9a01fedda3ece5f6c6693a8cb
+Installing 24/30 freetype[brotli,bzip2,core,png,zlib]:x64-windows@2.13.3...
+Elapsed time to handle freetype:x64-windows: 95.1 ms
+freetype:x64-windows package ABI: ba9272162cd3f3d54891710b6c631fd9c27544cf97719584741a11f4483785ad
+Installing 25/30 harfbuzz[core,freetype]:x64-windows@10.2.0#4...
+Elapsed time to handle harfbuzz:x64-windows: 74.8 ms
+harfbuzz:x64-windows package ABI: c75a2f6a02bfd58f13f47357a88f2cd590c45f2d5c9df708441a79edb376e672
+Installing 26/30 double-conversion:x64-windows@3.3.0#1...
+Elapsed time to handle double-conversion:x64-windows: 43.3 ms
+double-conversion:x64-windows package ABI: ed8677592b2caecc6086c34703a6206fddbdb233e23009cc10567606bde9e9b3
+Installing 27/30 expat:x64-windows@2.7.1...
+Elapsed time to handle expat:x64-windows: 26.6 ms
+expat:x64-windows package ABI: 8ed113aacfa9d58d8bb4cf8c1f523bac96bfde063fe54fca0fcd7233ab08673b
+Installing 28/30 dbus:x64-windows@1.16.2#1...
+Elapsed time to handle dbus:x64-windows: 69.4 ms
+dbus:x64-windows package ABI: 06c1d13de9588675913216204b7dbf347d8c11e9200610d437fa44173eb8daaa
+Installing 29/30 qtbase[brotli,concurrent,core,dbus,dnslookup,doubleconversion,freetype,gui,harfbuzz,icu,jpeg,network,opengl,openssl,pcre2,png,sql,sql-psql,sql-sqlite,testlib,thread,widgets,zstd]:x64-windows@6.8.3#2...
+Elapsed time to handle qtbase:x64-windows: 2.4 s
+qtbase:x64-windows package ABI: df6ff30729c657b7fe4994ade06dd0475fba3acaa49074db37c82cd3a23b71a0
+Installing 30/30 qtcharts:x64-windows@6.8.3...
+Elapsed time to handle qtcharts:x64-windows: 174 ms
+qtcharts:x64-windows package ABI: ac32b306756ae1c0f422169b2f1c08cb3a94433a170dd8f289647c67ff1f6fcf
+The package gtest is compatible with built-in CMake targets:
+
+    enable_testing()
+
+    find_package(GTest CONFIG REQUIRED)
+    target_link_libraries(main PRIVATE GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)
+
+    add_test(AllTestsInMain main)
+
+qtcharts provides CMake targets:
+
+  # this is heuristically generated, and may not be correct
+  find_package(Qt6Charts CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE Qt6::Charts Qt6::ChartsPrivate)
+
+All requested installations completed successfully in: 4.5 s
+-- Running vcpkg install - done
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.19045.
+-- The CXX compiler identification is MSVC 19.44.35211.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Looking for pthread_create in pthreads
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - not found
+-- Found Threads: TRUE
+-- Performing Test HAVE_STDATOMIC
+-- Performing Test HAVE_STDATOMIC - Success
+-- Found WrapAtomic: TRUE
+-- Found GTest: C:/Projects/Stochastic-Differential-Equations/build/vcpkg_installed/x64-windows/share/gtest/GTestConfig.cmake (found version "1.17.0")
+-- Configuring done (82.1s)
+-- Generating done (0.8s)
+-- Build files have been written to: C:/Projects/Stochastic-Differential-Equations/build
+λ /c/Projects/Stochastic-Differential-Equations (main) → cmake --build --preset debug

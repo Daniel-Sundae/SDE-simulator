@@ -10,14 +10,14 @@ namespace dXt{
         return dist(gen);
     }
 
-    static auto EM =  [](const Drift& drift, const Diffusion& diffusion, 
+    auto EM =  [](const Drift& drift, const Diffusion& diffusion, 
         const Time t, const State& Xt, const Time dt, 
         std::mt19937& generator) -> State
     {
         return drift(t, Xt) * dt + diffusion(t, Xt) * dB(dt, generator);
     };
 
-    static auto RK =  [](const Drift& drift, const Diffusion& diffusion, 
+    auto RK =  [](const Drift& drift, const Diffusion& diffusion, 
         const Time t, const State& Xt, const Time dt, 
         std::mt19937& generator) -> State
     {
@@ -29,7 +29,7 @@ namespace dXt{
         return tmp_driftXt * dt + tmp_diffusionXt * tmp_dB + RKCorrection;
     };
 
-    static auto MILSTEIN =  [](const Drift& drift, const Diffusion& diffusion, 
+    auto MILSTEIN =  [](const Drift& drift, const Diffusion& diffusion, 
         const Time t, const State& Xt, const Time dt, 
         std::mt19937& generator) -> State
     {
