@@ -72,14 +72,7 @@ target_link_libraries(StochasticSim PRIVATE
     Qt6::OpenGLWidgets
 )
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(WINDEPLOYQT_SCRIPT "windeployqt.debug.bat")
-    message("Using Windeploy Debug")
-else()
-    set(WINDEPLOYQT_SCRIPT "windeployqt6.exe")
-    message("Using Windeploy Release")
-endif()
 add_custom_command(TARGET StochasticSim POST_BUILD
-    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/vcpkg_installed/x64-windows/tools/Qt6/bin/${WINDEPLOYQT_SCRIPT} $<TARGET_FILE:StochasticSim>
+    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/vcpkg_installed/x64-windows/tools/Qt6/bin/$<IF:$<CONFIG:Debug>,windeployqt.debug.bat,windeployqt6.exe> $<TARGET_FILE:StochasticSim>
     COMMENT "Deploying Qt libraries"
 )

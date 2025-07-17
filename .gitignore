@@ -2,6 +2,6 @@
 build/
 CMakeFiles/
 .vscode/
-.vcpkg_installed/
-.vcpkg-configuration.json
+vcpkg_installed/
+vcpkg-configuration.json
 
