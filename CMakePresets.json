@@ -3,7 +3,7 @@
     "configurePresets": [
       {
         "name": "vcpkg",
-        "generator": "Visual Studio 17 2022",
+        "generator": "Ninja",
         "architecture": "x64",
         "binaryDir": "${sourceDir}/build",
         "cacheVariables": {

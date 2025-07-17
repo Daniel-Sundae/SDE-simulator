@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 project(StochasticSim VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -16,29 +16,18 @@ if(NOT CMAKE_BUILD_TYPE)
   )
 endif()
 
-if(MSVC)
-    add_compile_options(
-        /W4            # Warning level 4
-        #/WX            # Treat warnings as errors
-        /WX-            # Do not treat warnings as errors
-        /permissive-   # Strict standards conformance
-        /MP            # Multi-processor compilation
-    )
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Zi /sdl /analyze /guard:cf")
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O2 /Oi /Ot /GL")
-else()
-    add_compile_options(
-        -Wall
-        -Wextra
-        -Wpedantic
-        #-Werror        # Treat warnings as errors
-        -Wshadow
-        -Wnon-virtual-dtor
-        -pedantic-errors
-    )
-    set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
-    set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+if(NOT MSVC)
+  message(FATAL_ERROR "This project requires MSVC; aborting configure.")
 endif()
+
+add_compile_options(
+    /W4            # Warning level 4
+    # /WX            # Treat warnings as errors
+    /permissive-   # Strict standards conformance
+    /MP            # Multi-processor compilation
+)
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Zi /sdl /analyze /guard:cf")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O2 /Oi /Ot /GL")
 
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Charts OpenGL OpenGLWidgets)
 find_package(GTest REQUIRED)
@@ -49,6 +38,7 @@ set(CMAKE_AUTORCC ON)
 add_subdirectory(src/Model)
 add_subdirectory(src/Presenter)
 add_subdirectory(src/View)
+add_subdirectory(Tests)
 
 add_executable(StochasticSim
     src/main.cpp
