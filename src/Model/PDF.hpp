@@ -43,7 +43,7 @@ public:
     }
 
 private:
-    PDFData generatePDFData(const std::size_t points){
+    PDFData generatePDFData(const size_t points){
         PDFData result = {};
         result.reserve(points);
         const auto [start, end] = generateSupport(points);
@@ -54,7 +54,7 @@ private:
         return result;
     }
 
-    Range generateSupport(const std::size_t points){
+    Range generateSupport(const size_t points){
         State start = EV() - 5 * stdDev();
         State end = EV() + 5 * stdDev();
         // In case user set stddev = 0

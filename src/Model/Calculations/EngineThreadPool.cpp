@@ -1,6 +1,6 @@
 #include "EngineThreadPool.hpp"
 
-EngineThreadPool::EngineThreadPool(std::uint32_t nrThreads)
+EngineThreadPool::EngineThreadPool(size_t nrThreads)
 	: m_threads{}
 	, m_tasks()
 	, m_stopSource()
@@ -12,10 +12,10 @@ EngineThreadPool::EngineThreadPool(std::uint32_t nrThreads)
 		nrThreads = std::thread::hardware_concurrency();
 	}
 	// Need at least 2 threads. One mainTask thread and 1 worker thread.
-	nrThreads = std::max(nrThreads, static_cast<std::uint32_t>(2));
+	nrThreads = std::max(nrThreads, static_cast<size_t>(2));
 	m_threads.reserve(nrThreads);
 	std::stop_token st = m_stopSource.get_token();
-	for (std::uint32_t i = 0; i < nrThreads; ++i) {
+	for (size_t i = 0; i < nrThreads; ++i) {
 		m_threads.emplace_back([this, st](std::stop_token) {this->doTasks(st);}); // Do not let jthread create stoptoken.
 	}
 }
@@ -37,7 +37,7 @@ void EngineThreadPool::clearTasks(){
 	}
 }
 
-std::uint32_t EngineThreadPool::nrBusyThreads() const{
+size_t EngineThreadPool::nrBusyThreads() const{
 	return m_nrBusyThreads.load();
 }
 

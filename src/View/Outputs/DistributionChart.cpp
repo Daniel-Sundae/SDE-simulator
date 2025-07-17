@@ -8,7 +8,7 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QBarCategoryAxis>
 
-static std::size_t nrBins = 100;
+static size_t nrBins = 100;
 
 DistributionChart::DistributionChart()
 	: QChart()
@@ -39,14 +39,14 @@ void DistributionChart::plotDistribution(const Distribution& results){
 	assert(m_distributionSet->count() == 0);
 	if(results.empty()) return;
 	const State binWidth = (m_xAxis->max() - m_xAxis->min()) / static_cast<qreal>(nrBins);
-	std::vector<std::size_t> histogram(nrBins, 0);
+	std::vector<size_t> histogram(nrBins, 0);
 	for (double res : results) {
-		std::size_t binIndex = static_cast<std::size_t>((res - m_xAxis->min()) / static_cast<qreal>(binWidth));
+		size_t binIndex = static_cast<size_t>((res - m_xAxis->min()) / static_cast<qreal>(binWidth));
 		histogram[binIndex]++;
 	}
 	double maxHeight = 0.0;
-	for (std::size_t bin = 0; bin < histogram.size(); ++bin) {
-		std::size_t count = histogram[bin];
+	for (size_t bin = 0; bin < histogram.size(); ++bin) {
+		size_t count = histogram[bin];
 		double binHeight = static_cast<double>(count) / results.size();
 		m_distributionSet->append(binHeight);
 		maxHeight = std::max(maxHeight, binHeight);
@@ -101,7 +101,7 @@ void DistributionChart::initializeAxis(){
 	m_xAxis->setRange(-10, 10);
 	m_yAxisRelativeCount->setRange(0, 1);
 	m_yAxisDensity->setRange(0, 1);
-	for (std::size_t i = 0; i < nrBins; ++i) {
+	for (size_t i = 0; i < nrBins; ++i) {
 		m_categoryAxis->append(QString::number(i));
 	}
 	m_categoryAxis->setVisible(false);

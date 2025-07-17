@@ -4,7 +4,7 @@
 
 struct SimulationParameters {
     explicit SimulationParameters() = default;
-    explicit SimulationParameters(SolverType _solver, Time _time, Time _dt, std::size_t _samples)
+    explicit SimulationParameters(SolverType _solver, Time _time, Time _dt, size_t _samples)
         : solver(_solver)
         , time(_time)
         , dt(_dt)
@@ -17,13 +17,13 @@ struct SimulationParameters {
             throw std::invalid_argument("Time and points must be greater than 0");
         }
     }
-    [[nodiscard]] std::size_t points() const{
-        return static_cast<std::size_t>(std::ceil(time / dt));
+    [[nodiscard]] size_t points() const{
+        return static_cast<size_t>(std::ceil(time / dt));
     }
     SolverType solver = DefaultConstants::Simulation::solver;
     Time time = DefaultConstants::Simulation::time;
     Time dt = DefaultConstants::Simulation::dt;
-    std::size_t samples = DefaultConstants::Simulation::samples;
+    size_t samples = DefaultConstants::Simulation::samples;
 };
 
 struct ProcessDefinition {
@@ -52,7 +52,7 @@ struct ProcessDefinition {
 
 struct SettingsParameters{
     bool useThreading;
-    std::pair<bool, std::uint32_t> useSeed;
+    std::pair<bool, size_t> useSeed;
     explicit SettingsParameters()
     : useThreading(true)
     , useSeed({false, 0})

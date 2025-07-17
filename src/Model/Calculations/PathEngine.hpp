@@ -19,7 +19,7 @@ public:
     bool isBusy();
 
 private:
-    std::function<void()> samplePathFunctor(const PathQuery &pathQuery, const std::size_t slot, const std::uint32_t seed);
+    std::function<void()> samplePathFunctor(const PathQuery &pathQuery, const size_t slot, const size_t seed);
 	template <typename F>Path sampleOnePathImpl(const PathQuery &pathQuery, std::mt19937 &generator, F dXt) const;
     State increment(const Drift &drift,
 		const Diffusion &diffusion,
@@ -33,7 +33,7 @@ private:
 	Paths m_pathResults;
 	std::mutex m_pathsMtx;
 	std::atomic<bool> m_cancelRequested;
-	std::atomic<std::size_t> m_completedTasks;
+	std::atomic<size_t> m_completedTasks;
 	std::condition_variable m_completionCv;
 	std::mutex m_completionMtx;
 	SettingsParameters m_engineSettings;

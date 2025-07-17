@@ -3,6 +3,7 @@
 #include "PathQuery.hpp"
 #include "PDF.hpp"
 #include "Constants.hpp"
+#include "Utils.hpp"
 #include <QtCore/QMetaType> // For QMetaType registration (needed for connect)
 
 OutputHandler::OutputHandler(QObject* parent)
@@ -24,8 +25,11 @@ void OutputHandler::onPathsReceived(const Paths& paths){
 	listener()->setStatus(StatusSignal::RENDERING);
 	Distribution distribution;
 	distribution.reserve(paths.size());
-	assert(hasSupport());
-	for (std::size_t i = 0; i < paths.size(); ++i) {
+	if(!hasSupport()){
+        fatalError("No support defined for distribution chart. m_distributionSupport: ({}, {})",
+                   m_distributionSupport.first, m_distributionSupport.second);
+    }
+	for (size_t i = 0; i < paths.size(); ++i) {
 		const Path& p = paths[i];
 		if(i < DefaultConstants::maxPathsToDraw){
 			listener()->plotPath(p);

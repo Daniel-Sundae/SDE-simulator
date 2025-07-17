@@ -22,7 +22,7 @@ void SettingsManager::addMultiThreadCheckBox(){
         multiThreadingCheckbBox,
         &QCheckBox::toggled,
         this,
-        [this](bool checked){Parent()->onSettingsParameterModified<bool>(SettingsWidget::THREADS, checked);}
+        [this](bool checked){Parent()->onSettingsParameterModified(SettingsWidget::THREADS, checked);}
     );
 }
 
@@ -44,9 +44,9 @@ void SettingsManager::addSeedWidget(){
         this,
         [this, seedSpinBox](bool toggled) {
             seedSpinBox->setEnabled(toggled);
-            Parent()->onSettingsParameterModified<std::uint32_t>(
+            Parent()->onSettingsParameterModified(
                 SettingsWidget::FIXSEED,
-                toggled ? static_cast<std::uint32_t>(seedSpinBox->value()) : 0
+                toggled ? static_cast<int>(seedSpinBox->value()) : 0
             );
         }
     );
@@ -56,9 +56,9 @@ void SettingsManager::addSeedWidget(){
         &QSpinBox::valueChanged,
         this,
         [this](int newValue) {
-            Parent()->onSettingsParameterModified<uint32_t>(
+            Parent()->onSettingsParameterModified(
                 SettingsWidget::FIXSEED,
-                static_cast<std::uint32_t>(newValue)
+                newValue
             );
         }
     );

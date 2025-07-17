@@ -21,7 +21,7 @@ void SimulationManager::addComboBoxes(){
     std::pair{SolverType::MILSTEIN, std::pair{"MILSTEIN", "Milstein"}},
     };
     auto* solvers = new QComboBox(this);
-    for (std::size_t i = 0; i < solverTypes.size(); ++i) {
+    for (size_t i = 0; i < solverTypes.size(); ++i) {
         solvers->insertItem(static_cast<int>(i), QString::fromStdString(solverTypes[i].second.first));
         solvers->setItemData(static_cast<int>(i), QString::fromStdString(solverTypes[i].second.second), Qt::ToolTipRole);
     }
@@ -33,7 +33,7 @@ void SimulationManager::addComboBoxes(){
         this,
         [this, solverTypes]() {
             int currentIdx = qobject_cast<QComboBox*>(m_widgets[SimulationWidget::SOLVER])->currentIndex();
-            SolverType newSolver = solverTypes[static_cast<std::size_t>(currentIdx)].first;
+            SolverType newSolver = solverTypes[static_cast<size_t>(currentIdx)].first;
             Parent()->onSolverTypeModified(newSolver);
         }
     );

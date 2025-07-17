@@ -7,11 +7,11 @@
 
 class EngineThreadPool {
 public:
-	explicit EngineThreadPool(std::uint32_t nrThreads = 0);
+	explicit EngineThreadPool(size_t nrThreads = 0);
 	~EngineThreadPool();
 	void enqueue(const std::function<void()> f);
 	void clearTasks();
-    std::uint32_t nrBusyThreads() const;
+    size_t nrBusyThreads() const;
 
 private:
     // Only allow moving object to engine

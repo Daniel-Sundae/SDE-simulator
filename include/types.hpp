@@ -19,7 +19,7 @@ using Task = std::function<void()>;
 template <typename T>
 concept IntOrDouble = std::same_as<T, int> || std::same_as<T, double>;
 template <typename T>
-concept IntOrBool = std::same_as<T, std::uint32_t> || std::same_as<T, bool>;
+concept IntOrBool = std::same_as<T, int> || std::same_as<T, bool>;
 
 enum class ProcessType{
     NONE = 0,
