@@ -26,7 +26,7 @@ void OutputHandler::onPathsReceived(const Paths& paths){
     Distribution distribution;
     distribution.reserve(paths.size());
     if(!hasSupport()){
-        fatalError("No support defined for distribution chart. m_distributionSupport: ({}, {})",
+        Utils::fatalError("No support defined for distribution chart. m_distributionSupport: ({}, {})",
                    m_distributionSupport.first, m_distributionSupport.second);
     }
     for (size_t i = 0; i < paths.size(); ++i) {

@@ -1,6 +1,7 @@
 #include "InputHandler.hpp"
 #include "ProcessData.hpp"
 #include "Transaction.hpp"
+#include "Utils.hpp"
 #include <assert.h>
 
 InputHandler::InputHandler()
@@ -19,33 +20,6 @@ void InputHandler::clear() const{
 
 void InputHandler::cancel() const{
     listener()->cancel();
-}
-
-void InputHandler::onProcessTypeModified(ProcessType newType){
-    m_processDefinition->type = newType;
-}
-
-void InputHandler::onSolverTypeModified(SolverType newType){
-    m_simulationParameters->solver = newType;
-}
-
-void InputHandler::onProcessDefinitionModified(const DefinitionWidget param, double userValue){
-    switch (param) {
-    case DefinitionWidget::PROCESS:
-        throw std::invalid_argument("Use OnProcessTypeModified");
-        break;
-    case DefinitionWidget::MU:
-        m_inputMu = userValue;
-        break;
-    case DefinitionWidget::SIGMA:
-        m_inputSigma = userValue;
-        break;
-    case DefinitionWidget::STARTVALUE:
-        m_processDefinition->startValueData = userValue;
-        break;
-    default:
-        assert(false);
-    }
 }
 
 bool InputHandler::canSample() const{
@@ -86,4 +60,78 @@ PathQuery InputHandler::createDriftQuery(const PathQuery& pQuery) const{
         pQuery.simulationParameters.dt,
         1);
     return PathQuery( definition, simulationParams, pQuery.settingsParameters);
+}
+
+void InputHandler::onSolverTypeModified(SolverType newType){
+    m_simulationParameters->solver = newType;
+}
+
+void InputHandler::onProcessTypeModified(ProcessType newType){
+    m_processDefinition->type = newType;
+}
+
+void InputHandler::onProcessDefinitionModified(const DefinitionWidget param, double userValue){
+    switch (param) {
+    case DefinitionWidget::PROCESS:
+        throw std::invalid_argument("Use OnProcessTypeModified");
+        break;
+    case DefinitionWidget::MU:
+        m_inputMu = userValue;
+        break;
+    case DefinitionWidget::SIGMA:
+        m_inputSigma = userValue;
+        break;
+    case DefinitionWidget::STARTVALUE:
+        m_processDefinition->startValueData = userValue;
+        break;
+    default:
+        assert(false);
+    }
+}
+
+void InputHandler::onSimulationParameterModified(const SimulationWidget param, int userValue) {
+    switch (param) {
+        case SimulationWidget::TIME:
+            m_simulationParameters->time = userValue;
+            break;
+        case SimulationWidget::SAMPLES:
+            m_simulationParameters->samples = userValue;
+            break;
+        default:
+            Utils::fatalError("SimulationWidget parameter: {} does not expect int", static_cast<int>(param));
+    }
+}
+
+void InputHandler::onSimulationParameterModified(const SimulationWidget param, double userValue) {
+    switch (param) {
+        case SimulationWidget::dt:
+            m_simulationParameters->dt = userValue;
+            break;
+        default:
+            Utils::fatalError("SimulationWidget parameter: {} does not expect double", static_cast<int>(param));
+    }
+}
+
+void InputHandler::onSettingsParameterModified(const SettingsWidget param, int userValue) {
+    switch (param) {
+        case SettingsWidget::FIXSEED:
+            if (userValue == 0) {
+                m_settingsParameters->useSeed = {false, 0};
+            } else {
+                m_settingsParameters->useSeed = {true, static_cast<size_t>(userValue)};
+            }
+            break;
+        default:
+            Utils::fatalError("SettingsWidget parameter: {} does not expect int", static_cast<int>(param));
+    }
+}
+
+void InputHandler::onSettingsParameterModified(const SettingsWidget param, bool userValue) {
+    switch (param) {
+        case SettingsWidget::THREADS:
+            m_settingsParameters->useThreading = userValue;
+            break;
+        default:
+            Utils::fatalError("SettingsWidget parameter: {} does not expect bool", static_cast<int>(param));
+    }
 }

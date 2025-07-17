@@ -6,15 +6,16 @@
 #include <memory>
 #include <optional>
 
-
 class InputHandler final : public IPresenterComponent<MainPresenter> {
 public:
     explicit InputHandler();
     void onProcessTypeModified(ProcessType newType);
     void onProcessDefinitionModified(DefinitionWidget param, double userValue);
     void onSolverTypeModified(SolverType newType);
-    template <IntOrDouble T> void onSimulationParameterModified(const SimulationWidget param, T userValue);
-    template <IntOrBool T> void onSettingsParameterModified(const SettingsWidget param, T userValue);
+    void onSimulationParameterModified(const SimulationWidget param, int userValue);
+    void onSimulationParameterModified(const SimulationWidget param, double userValue);
+    void onSettingsParameterModified(const SettingsWidget param, int userValue);
+    void onSettingsParameterModified(const SettingsWidget param, bool userValue);
     void samplePaths();
     void clear() const;
     void cancel() const;
@@ -28,5 +29,3 @@ private:
     double m_inputMu;
     double m_inputSigma;
 };
-
-#include "InputHandler.inl"

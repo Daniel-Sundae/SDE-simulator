@@ -17,26 +17,34 @@ class InputDispatcher : public QWidget
 
 public:
     explicit InputDispatcher(QWidget* parent);
-    void setInputHandler(InputHandler* inputHandler);
-    void onGoButtonClicked() const;
-    void onClearButtonClicked() const;
-    void onCancelButtonClicked() const;
-    void onProcessTypeModified(const ProcessType newType) const;
-    void onProcessDefinitionModified(const DefinitionWidget param, double userValue) const;
-    void onSolverTypeModified(const SolverType newType) const;
-    template<IntOrDouble T>
-    void onSimulationParameterModified(const SimulationWidget param, T userValue) const
-    { m_inputHandler->onSimulationParameterModified(param, userValue); }
-    template<IntOrBool T>
-    void onSettingsParameterModified(const SettingsWidget param, T userValue) const
-    { m_inputHandler->onSettingsParameterModified(param, userValue); }
+    void setInputHandler(InputHandler* inputHandler){ m_inputHandler = inputHandler; };
+    void onGoButtonClicked() const{ m_inputHandler->samplePaths();}
+    void onClearButtonClicked() const{ m_inputHandler->clear(); }
+    void onCancelButtonClicked() const{ m_inputHandler->cancel(); }
+    void onProcessTypeModified(const ProcessType newType) const{
+        m_inputHandler->onProcessTypeModified(newType);
+    }
+    void onProcessDefinitionModified(const DefinitionWidget param, double userValue) const{
+        m_inputHandler->onProcessDefinitionModified(param, userValue);
+    }
+    void onSolverTypeModified(const SolverType newType) const{
+        m_inputHandler->onSolverTypeModified(newType);
+    }
+    template <typename... Args>
+    void onSimulationParameterModified(Args&&... args) const {
+      m_inputHandler->onSimulationParameterModified(std::forward<Args>(args)...);
+    }
+    template <typename... Args>
+    void onSettingsParameterModified(Args&&... args) const {
+      m_inputHandler->onSettingsParameterModified(std::forward<Args>(args)...);
+    }
 
 private:
     ActionManager* m_actionManager;
     DefinitionManager* m_definitionManager;
     SimulationManager* m_simulationManager;
     SettingsManager* m_settingsManager;
-    InputHandler* m_inputHandler;
+    InputHandler* m_inputHandler = nullptr;
 };
 
 class InputDispatcherGroupBox : public QGroupBox {
