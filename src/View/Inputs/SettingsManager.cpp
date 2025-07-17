@@ -7,7 +7,7 @@
 
 
 SettingsManager::SettingsManager(InputDispatcher* parent)
-	: InputDispatcherGroupBox(parent)
+    : InputDispatcherGroupBox(parent)
 {
     addMultiThreadCheckBox();
     addSeedWidget();

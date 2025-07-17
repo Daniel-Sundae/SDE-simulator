@@ -10,12 +10,12 @@ class QDoubleSpinBox; // TODO: Remove?
 
 class ActionManager : public InputDispatcherGroupBox
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	explicit ActionManager(InputDispatcher* parent);
+    explicit ActionManager(InputDispatcher* parent);
 private:
-	void addActionWidgets();
+    void addActionWidgets();
 private:
-	std::unordered_map<ActionWidget, QWidget*> m_widgets;
+    std::unordered_map<ActionWidget, QWidget*> m_widgets;
 };
 

@@ -8,14 +8,14 @@ class MainPresenter;
 
 class AppInitializer {
 public:
-	explicit AppInitializer(QApplication& app);
-	~AppInitializer();
+    explicit AppInitializer(QApplication& app);
+    ~AppInitializer();
 private:
-	void initializeComponents();
+    void initializeComponents();
 
-	void setStyle();
+    void setStyle();
 
-	QApplication& m_app;
-	std::unique_ptr<MainWindow> m_mainWindow;
-	std::unique_ptr<MainPresenter> m_mainPresenter;
+    QApplication& m_app;
+    std::unique_ptr<MainWindow> m_mainWindow;
+    std::unique_ptr<MainPresenter> m_mainPresenter;
 };

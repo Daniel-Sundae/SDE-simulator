@@ -7,7 +7,7 @@
 
 
 SimulationManager::SimulationManager(InputDispatcher* parent)
-	: InputDispatcherGroupBox(parent)
+    : InputDispatcherGroupBox(parent)
 {
     addComboBoxes();
     addSpinBoxes();

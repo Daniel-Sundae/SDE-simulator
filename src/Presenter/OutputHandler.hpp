@@ -12,7 +12,7 @@ class OutputHandler final : public QObject, public IPresenterComponent<OutputDis
     Q_OBJECT
 
 public:
-	explicit OutputHandler(QObject* parent = nullptr);
+    explicit OutputHandler(QObject* parent = nullptr);
     // Method called by worker thread
     void handleWorkerResult(Paths&& paths);
     void onDriftDataReceived(Path &&driftCurve);
@@ -22,7 +22,7 @@ public:
 
 
 public slots:
-	void onPathsReceived(const Paths& paths);
+    void onPathsReceived(const Paths& paths);
 
 signals:
     void internalPathReadySignal(Paths paths);
@@ -33,7 +33,7 @@ private:
     bool isInSupport(const State s) const;
 
 private:
-	Range m_distributionSupport;
-	Paths m_paths;
-	Path m_driftCurve;
+    Range m_distributionSupport;
+    Paths m_paths;
+    Path m_driftCurve;
 };

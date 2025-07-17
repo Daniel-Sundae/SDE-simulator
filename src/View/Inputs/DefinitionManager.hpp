@@ -7,13 +7,13 @@
 
 class DefinitionManager : public InputDispatcherGroupBox
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	explicit DefinitionManager(InputDispatcher* parent);
+    explicit DefinitionManager(InputDispatcher* parent);
 private:
-	void updateWidgetProperties(ProcessType process, bool initialize = false);
-	void addDefinitionWidgets();
-	void initializeDesign();
+    void updateWidgetProperties(ProcessType process, bool initialize = false);
+    void addDefinitionWidgets();
+    void initializeDesign();
 private:
-	std::unordered_map<DefinitionWidget, QWidget*> m_widgets;
+    std::unordered_map<DefinitionWidget, QWidget*> m_widgets;
 };
