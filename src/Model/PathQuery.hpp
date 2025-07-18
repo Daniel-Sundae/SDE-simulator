@@ -27,21 +27,21 @@ struct SimulationParameters {
 };
 
 struct ProcessDefinition {
-    static constexpr ProcessType defaultProcess = ProcessType::BM;
-    ProcessType type = defaultProcess;
-    Drift drift = ProcessData::getDrift(defaultProcess, ProcessData::getMuData(defaultProcess).defaultValue);
-    Diffusion diffusion = ProcessData::getDiffusion(defaultProcess, ProcessData::getSigmaData(defaultProcess).defaultValue);
-    State startValueData = ProcessData::getStartValueData(defaultProcess).defaultValue;
+    constexpr auto process = DefaultConstants::process;
+    ProcessType type = process;
+    Drift drift = ProcessData::getDrift<process>(ProcessData::getMuData<process>().defaultValue);
+    Diffusion diffusion = ProcessData::getDiffusion<process>(ProcessData::getSigmaData<process>().defaultValue);
+    State startValueData = ProcessData::getStartValueData<process>().defaultValue;
 
     explicit ProcessDefinition() = default;
-    ProcessDefinition(const ProcessType t)
-        : type(t)
-        , drift(ProcessData::getDrift(t, ProcessData::getMuData(t).defaultValue))
-        , diffusion(ProcessData::getDiffusion(t, ProcessData::getSigmaData(t).defaultValue))
-        , startValueData(ProcessData::getStartValueData(t).defaultValue)
-    {}
+    // explicit ProcessDefinition(const ProcessType t)
+    //     : type(t)
+    //     , drift(ProcessData::getDrift(t, ProcessData::getMuData(t).defaultValue))
+    //     , diffusion(ProcessData::getDiffusion<t>(ProcessData::getSigmaData<t>().defaultValue))
+    //     , startValueData(ProcessData::getStartValueData(t).defaultValue)
+    // {}
 
-    ProcessDefinition(const ProcessType t, Drift d, Diffusion diff, const State start)
+    explicit ProcessDefinition(const ProcessType t, Drift d, Diffusion diff, const State start)
         : type(t)
         , drift(d)
         , diffusion(diff)

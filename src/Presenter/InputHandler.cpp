@@ -85,7 +85,8 @@ void InputHandler::onProcessDefinitionModified(const DefinitionWidget param, dou
         m_processDefinition->startValueData = userValue;
         break;
     default:
-        assert(false);
+        Utils::fatalError("Modifiying DefinitionWidget parameter: {} is not handled", static_cast<int>(param));
+        break;
     }
 }
 

@@ -2,6 +2,7 @@
 #include "Types.hpp"
 #include <numbers>
 namespace DefaultConstants{
+    constexpr ProcessType process = ProcessType::BM;
     constexpr double PI = std::numbers::pi_v<double>;
     constexpr double pdfThreshold = 1e-6;
     constexpr size_t maxPathsToDraw = 20;

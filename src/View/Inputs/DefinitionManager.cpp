@@ -44,17 +44,26 @@ void DefinitionManager::addDefinitionWidgets(){
         ProcessType::OU,
     };
     auto* processes = new QComboBox(this);
+
+    enum class ProcessType{
+        NONE = 0,
+        CUSTOM,
+        BM,
+        GBM,
+        OU,
+        Levy,
+    };
+
     for (int i = 0; i < static_cast<int>(processTypes.size()); ++i) {
-        processes->insertItem(i, QString::fromStdString(std::string(ProcessData::getAcronym(processTypes[i]))));
-        processes->setItemData(i, QString::fromStdString(std::string(ProcessData::getName(processTypes[i]))), Qt::ToolTipRole);
+        processes->insertItem(i, QString::fromStdString(std::string(ProcessData::getAcronym<ProcessType[i]>)));
+        processes->setItemData(i, QString::fromStdString(std::string(ProcessData::getName<ProcessType[i]>)), Qt::ToolTipRole);
     }
     processes->setCurrentIndex(0);
-    ProcessType defaultProcess = processTypes[0];
     m_widgets[DefinitionWidget::PROCESS] = processes;
     m_widgets[DefinitionWidget::MU] = new QDoubleSpinBox(this);
     m_widgets[DefinitionWidget::SIGMA] = new QDoubleSpinBox(this);
     m_widgets[DefinitionWidget::STARTVALUE] = new QDoubleSpinBox(this);
-    updateWidgetProperties(defaultProcess, true);
+    updateWidgetProperties(DefaultConstants::process, true);
     auto definitionModifiedCb = [this](DefinitionWidget param) {
         return [this, param](double newValue) {
             Parent()->onProcessDefinitionModified(param, newValue);

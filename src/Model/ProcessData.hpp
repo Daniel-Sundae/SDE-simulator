@@ -17,7 +17,59 @@ public:
         const double incrementSize;
     };
 
-    using DiffusionFunction = std::function<Diffusion(const double)>;
+    template <ProcessType Type>
+    struct Fields;
+public:
+    template <ProcessType Type>
+    static std::string_view getName(){
+        return Fields<Type>::name;
+    }
+
+    template <ProcessType Type>
+    static std::string_view getAcronym() {
+        return Fields<Type>::acronym;
+    }
+
+    template <ProcessType Type>
+    static std::string_view getDescription() {
+        return Fields<Type>::description;
+    }
+
+    template <ProcessType Type>
+    static std::string_view getDefinition() {
+        return Fields<Type>::definition;
+    }
+
+    template <ProcessType Type>
+    static Constants getMuData() {
+        return Fields<Type>::muData;
+    }
+
+    template <ProcessType Type>
+    static Constants getSigmaData() {
+        return Fields<Type>::sigmaData;
+    }
+
+    template <ProcessType Type>
+    static Constants getStartValueData() {
+        return Fields<Type>::startValueData;
+    }
+
+    template <ProcessType Type>
+    static Drift getDrift(const double _mu) {
+        return Fields<Type>::drift(_mu);
+    }
+
+    template <ProcessType Type>
+    static Diffusion getDiffusion(const double _sigma) {
+        return Fields<Type>::diffusion(_sigma);
+    }
+
+    template <ProcessType Type>
+    static PDF getPDF(const State startValue, const Time time,
+                      const double _mu, const double _sigma) {
+        return Fields<Type>::pdf(startValue, time, _mu, _sigma);
+    }
 
     template <typename ProcessT>
     struct RequiredFields {
@@ -32,7 +84,8 @@ public:
         }
     };
 
-    struct BM : RequiredFields<BM> {
+    template <>
+    struct Fields<ProcessType::BM> : RequiredFields<Fields<ProcessType::BM>> {
         static constexpr std::string_view name = "Brownian Motion";
         static constexpr std::string_view acronym = "BM";
         static constexpr std::string_view description = "Standard brownian motion.";
@@ -60,7 +113,8 @@ public:
         };
     };
 
-    struct GBM : RequiredFields<GBM> {
+    template <>
+    struct Fields<ProcessType::GBM> : RequiredFields<Fields<ProcessType::GBM>> {
         static constexpr std::string_view name = "Geometric Brownian Motion";
         static constexpr std::string_view acronym = "GBM";
         static constexpr std::string_view description = "Geometric brownian motion.";
@@ -98,7 +152,8 @@ public:
         };
     };
 
-    struct OU : RequiredFields<OU> {
+    template <>
+    struct Fields<ProcessType::OU> : RequiredFields<Fields<ProcessType::OU>> {
         static constexpr std::string_view name = "Ornstein-Uhlenbeck Process";
         static constexpr std::string_view acronym = "OU";
         static constexpr std::string_view description = "Ornstein-Uhlenbeck process (mean-reverting with θ = 1).";
@@ -132,54 +187,4 @@ public:
             return PDF(EV, stddev, _pdf);
         };
     };
-
-private:
-    template <auto Field>
-    static auto getField(ProcessType type){
-        switch (type) {
-        case ProcessType::BM:
-            return Field(ProcessData::BM{});
-        case ProcessType::GBM:
-            return Field(ProcessData::GBM{});
-        case ProcessType::OU:
-           return Field(ProcessData::OU{});
-        default:
-            throw std::runtime_error("Unknown process type");
-        }
-    }
-
-#define GET_PROCESS_FIELD(field) ProcessData::getField<[](auto t) { return decltype(t)::field; }>(type)
-public:
-    static auto getName(ProcessType type) -> std::string_view
-    {
-        return GET_PROCESS_FIELD(name);
-    }
-    static std::string_view getAcronym(ProcessType type){
-        return GET_PROCESS_FIELD(acronym);
-    }
-    static std::string_view getDescription(ProcessType type){
-        return GET_PROCESS_FIELD(description);
-    }
-    static std::string_view getDefinition(ProcessType type){
-        return GET_PROCESS_FIELD(definition);
-    }
-    static Constants getMuData(ProcessType type){
-        return GET_PROCESS_FIELD(muData);
-    }
-    static Constants getSigmaData(ProcessType type){
-        return GET_PROCESS_FIELD(sigmaData);
-    }
-    static Constants getStartValueData(ProcessType type){
-        return GET_PROCESS_FIELD(startValueData);
-    }
-    static Drift getDrift(ProcessType type, const double _mu){
-        return GET_PROCESS_FIELD(drift)(_mu);
-    }
-    static Diffusion getDiffusion(ProcessType type, const double _sigma){
-        return GET_PROCESS_FIELD(diffusion)(_sigma);
-    }
-    static PDF getPDF(ProcessType type, const State startValue, const Time time, const double _mu, const double _sigma){
-        return GET_PROCESS_FIELD(pdf)(startValue, time, _mu, _sigma);
-    }
-#undef GET_PROCESS_FIELD
 };
