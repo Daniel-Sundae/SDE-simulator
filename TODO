@@ -5,13 +5,11 @@ FUNCTIONALITY TODO:
 - Create engine process, use "named pipe" for more simple way to transfer data from engine to p1. (data needs to be copied twice)
 -  
 
-CODE DESIGN TODO:
+CODE TODO:
+- Fix bug with no support. Simplify logic in outputhandler?
+- Use optional instead of useseed pair 
+- in class member initializations
 
-TECH DETAILS TODO:
-
-DESIGN CHOICES MADE:
-
-ERRORS
 
 PRESENTATION:
 - Show bigger increment step -> bigger error.
