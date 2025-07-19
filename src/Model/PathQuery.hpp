@@ -27,11 +27,10 @@ struct SimulationParameters {
 };
 
 struct ProcessDefinition {
-    constexpr auto process = DefaultConstants::process;
-    ProcessType type = process;
-    Drift drift = ProcessData::getDrift<process>(ProcessData::getMuData<process>().defaultValue);
-    Diffusion diffusion = ProcessData::getDiffusion<process>(ProcessData::getSigmaData<process>().defaultValue);
-    State startValueData = ProcessData::getStartValueData<process>().defaultValue;
+    ProcessType type = DefaultConstants::process;
+    Drift drift = ProcessData::getDrift<DefaultConstants::process>(ProcessData::getMuData<DefaultConstants::process>().defaultValue);
+    Diffusion diffusion = ProcessData::getDiffusion<DefaultConstants::process>(ProcessData::getSigmaData<DefaultConstants::process>().defaultValue);
+    State startValueData = ProcessData::getStartValueData<DefaultConstants::process>().defaultValue;
 
     explicit ProcessDefinition() = default;
     // explicit ProcessDefinition(const ProcessType t)

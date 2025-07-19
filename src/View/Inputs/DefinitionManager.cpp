@@ -45,19 +45,13 @@ void DefinitionManager::addDefinitionWidgets(){
     };
     auto* processes = new QComboBox(this);
 
-    enum class ProcessType{
-        NONE = 0,
-        CUSTOM,
-        BM,
-        GBM,
-        OU,
-        Levy,
-    };
+    processes->insertItem(0, QString::fromStdString(std::string(ProcessData::getAcronym<ProcessType::BM>())));
+    processes->setItemData(0, QString::fromStdString(std::string(ProcessData::getName<ProcessType::BM>())), Qt::ToolTipRole);
+    processes->insertItem(1, QString::fromStdString(std::string(ProcessData::getAcronym<ProcessType::GBM>())));
+    processes->setItemData(1, QString::fromStdString(std::string(ProcessData::getName<ProcessType::GBM>())), Qt::ToolTipRole);
+    processes->insertItem(2, QString::fromStdString(std::string(ProcessData::getAcronym<ProcessType::OU>())));
+    processes->setItemData(2, QString::fromStdString(std::string(ProcessData::getName<ProcessType::OU>())), Qt::ToolTipRole);
 
-    for (int i = 0; i < static_cast<int>(processTypes.size()); ++i) {
-        processes->insertItem(i, QString::fromStdString(std::string(ProcessData::getAcronym<ProcessType[i]>)));
-        processes->setItemData(i, QString::fromStdString(std::string(ProcessData::getName<ProcessType[i]>)), Qt::ToolTipRole);
-    }
     processes->setCurrentIndex(0);
     m_widgets[DefinitionWidget::PROCESS] = processes;
     m_widgets[DefinitionWidget::MU] = new QDoubleSpinBox(this);
