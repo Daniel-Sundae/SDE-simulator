@@ -20,7 +20,7 @@ public:
         , fPrime(_fPrime)
     {
     }
-    auto operator()(Time t, State s) const -> double { return f(t, s); }
+    double operator()(Time t, State s) const { return f(t, s); }
     double prime(Time t, State s) const{ return fPrime(t, s); }
 };
 

@@ -9,7 +9,6 @@
 OutputHandler::OutputHandler(QObject* parent)
     : QObject(parent) // Initialize QObject base class
     , IPresenterComponent()
-    , m_distributionSupport(std::make_pair<State>(0,0))
 {
     connect(this, &OutputHandler::internalPathReadySignal,
             this, &OutputHandler::onPathsReceived,
@@ -25,21 +24,11 @@ void OutputHandler::onPathsReceived(const Paths& paths){
     listener()->setStatus(StatusSignal::RENDERING);
     Distribution distribution;
     distribution.reserve(paths.size());
-    if(!hasSupport()){
-        Utils::fatalError("No support defined for distribution chart. m_distributionSupport: ({}, {})",
-                   m_distributionSupport.first, m_distributionSupport.second);
-    }
-    for (size_t i = 0; i < paths.size(); ++i) {
-        const Path& p = paths[i];
-        if(i < DefaultConstants::maxPathsToDraw){
-            listener()->plotPath(p);
-        }
-        if(isInSupport(p.back())) {
-            distribution.push_back(p.back());
-        }
+    for (auto& path : paths) {
+        listener()->plotPath(path);
+        distribution.push_back(path.back());
     }
     listener()->plotDistribution(distribution);
-    deleteSupport();
     listener()->setStatus(StatusSignal::READY);
 }
 
@@ -57,9 +46,8 @@ void OutputHandler::prepareGUI(const PathQuery& pQuery){
     listener()->updatePathChartTitle(DefaultConstants::maxPathsToDraw >= pQuery.simulationParameters.samples);
 }
 
-void OutputHandler::onPDFReceived(const PDF& pdf){
-    m_distributionSupport = pdf.getSupport();
-    listener()->setDistributionChartSupport(m_distributionSupport);
+void OutputHandler::onPDFReceived(PDF&& pdf){
+    listener()->setDistributionChartSupport(pdf.getSupport());
     listener()->updateDistributionChartPDF(pdf.getPDFData());
     listener()->updateDistributionChartEV(pdf.EV());
 }
@@ -68,17 +56,4 @@ void OutputHandler::clear() const{
     listener()->clearStatus();
     listener()->clearPathChart();
     listener()->clearDistributionChart();
-}
-
-bool OutputHandler::hasSupport() const{
-    return m_distributionSupport.first && m_distributionSupport.second ? true : false;
-}
-
-void OutputHandler::deleteSupport(){
-    m_distributionSupport.first = 0;
-    m_distributionSupport.second = 0;
-}
-
-bool OutputHandler::isInSupport(const State s) const{
-    return m_distributionSupport.first < s && s < m_distributionSupport.second ? true : false;
 }

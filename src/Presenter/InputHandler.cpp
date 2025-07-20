@@ -10,8 +10,8 @@ InputHandler::InputHandler()
     , m_simulationParameters(std::make_unique<SimulationParameters>())
     , m_settingsParameters(std::make_unique<SettingsParameters>())
 {
-    m_inputMu = ProcessData::getMuData(m_processDefinition->type).defaultValue;
-    m_inputSigma = ProcessData::getSigmaData(m_processDefinition->type).defaultValue;
+    m_inputMu = getField(FieldTags::muData{}, m_processDefinition->type).defaultValue;
+    m_inputSigma = getField(FieldTags::sigmaData{}, m_processDefinition->type).defaultValue;
 }
 
 void InputHandler::clear() const{
@@ -37,14 +37,13 @@ void InputHandler::samplePaths(){
         return;
     m_processDefinition = std::make_unique<ProcessDefinition>(
         m_processDefinition->type,
-        ProcessData::getDrift(m_processDefinition->type, m_inputMu),
-        ProcessData::getDiffusion(m_processDefinition->type, m_inputSigma),
+        getField(FieldTags::drift{}, m_processDefinition->type, m_inputMu),
+        getField(FieldTags::diffusion{}, m_processDefinition->type, m_inputSigma),
         m_processDefinition->startValueData);
 
     const PathQuery pQuery{ *m_processDefinition, *m_simulationParameters, *m_settingsParameters};
     const PathQuery deterministicQuery = createDriftQuery(pQuery);
-    const PDF pdf = ProcessData::getPDF(pQuery.processDefinition.type, pQuery.processDefinition.startValueData, pQuery.simulationParameters.time, pQuery.processDefinition.drift.mu(), pQuery.processDefinition.diffusion.sigma());
-    listener()->onTransactionReceived(Transaction{std::move(pQuery), std::move(deterministicQuery), std::move(pdf)});
+    listener()->onTransactionReceived(Transaction{std::move(pQuery), std::move(deterministicQuery)});
 }
 
 PathQuery InputHandler::createDriftQuery(const PathQuery& pQuery) const{

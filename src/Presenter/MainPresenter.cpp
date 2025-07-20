@@ -21,7 +21,10 @@ void MainPresenter::samplePaths(const PathQuery& pQuery){
 }
 
 void MainPresenter::sampleDriftCurve(const PathQuery& deterministicQuery){
-    assert(deterministicQuery.simulationParameters.samples == 1);
+    if(deterministicQuery.simulationParameters.samples != 1){
+        Utils::fatalError("Deterministic query should have exactly one sample, got: {}",
+            deterministicQuery.simulationParameters.samples);
+    }
     listener()->onDriftDataReceived(m_engine->sampleOnePath(deterministicQuery));
 }
 
@@ -30,7 +33,14 @@ void MainPresenter::onTransactionReceived(const Transaction&& transaction){
         return;
     }
     listener()->prepareGUI(transaction.pathQuery);
-    listener()->onPDFReceived(transaction.pdf);
+    auto& pq = transaction.pathQuery;
+    listener()->onPDFReceived(getField(FieldTags::pdf{},
+        pq.processDefinition.type,
+        pq.processDefinition.startValueData,
+        pq.simulationParameters.time,
+        pq.processDefinition.drift.mu(),
+        pq.processDefinition.diffusion.sigma()
+    ));
     samplePaths(transaction.pathQuery);
     sampleDriftCurve(transaction.deterministicQuery);
 }

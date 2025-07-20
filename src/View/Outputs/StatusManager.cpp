@@ -46,8 +46,8 @@ void StatusManager::setStatus(const StatusSignal s){
 void StatusManager::setQueryInfo(const PathQuery& pQuery){
     QString infoDefinition;
     QTextStream streamDefinition(&infoDefinition);
-    streamDefinition << "Process: " << QString::fromUtf8(ProcessData::getName(pQuery.processDefinition.type)) << "\n"
-                     << "Definition: " << QString::fromUtf8(ProcessData::getDefinition(pQuery.processDefinition.type));
+    streamDefinition << "Process: " << QString::fromUtf8( getField(FieldTags::name{}, pQuery.processDefinition.type) ) << "\n"
+                     << "Definition: " << QString::fromUtf8( getField(FieldTags::definition{}, pQuery.processDefinition.type) );
     QString infoParams;
     QTextStream streamParams(&infoParams);
     streamParams << "Definition parameters: μ = " << QString::number(pQuery.processDefinition.drift.mu()) << ", σ = " << QString::number(pQuery.processDefinition.diffusion.sigma()) << ", X" << QString::fromUtf8("\u2080") << " = " << QString::number(pQuery.processDefinition.startValueData) << "\n"

@@ -51,7 +51,7 @@ void PathChart::plotDriftCurve(const Path& driftCurve){
 
 void PathChart::plotPath(const Path& path){
     if (path.empty()) return;
-
+    if (series().size() >= DefaultConstants::maxPathsToDraw) return;
     QLineSeries* series = new QLineSeries(this);
     addSeries(series);
     QVector<QPointF> points;

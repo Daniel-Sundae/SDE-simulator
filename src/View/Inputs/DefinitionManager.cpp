@@ -16,17 +16,17 @@ DefinitionManager::DefinitionManager(InputDispatcher *parent)
 
 void DefinitionManager::updateWidgetProperties(ProcessType process, bool initialize){
     auto* muWidget = qobject_cast<QDoubleSpinBox*>(m_widgets[DefinitionWidget::MU]);
-    ProcessData::Constants muData = ProcessData::getMuData(process);
+    Constants muData = getField(FieldTags::muData{}, process);
     muWidget->setRange(muData.allowedValues.first, muData.allowedValues.second);
     muWidget->setSingleStep(muData.incrementSize);
 
     auto* sigmaWidget = qobject_cast<QDoubleSpinBox*>(m_widgets[DefinitionWidget::SIGMA]);
-    ProcessData::Constants sigmaData = ProcessData::getSigmaData(process);
+    Constants sigmaData = getField(FieldTags::sigmaData{}, process);
     sigmaWidget->setRange(sigmaData.allowedValues.first, sigmaData.allowedValues.second);
     sigmaWidget->setSingleStep(sigmaData.incrementSize);
 
     auto* startValueWidget = qobject_cast<QDoubleSpinBox*>(m_widgets[DefinitionWidget::STARTVALUE]);
-    ProcessData::Constants startValueData = ProcessData::getStartValueData(process);
+    Constants startValueData = getField(FieldTags::startValueData{}, process);
     startValueWidget->setRange(startValueData.allowedValues.first, startValueData.allowedValues.second);
     startValueWidget->setSingleStep(startValueData.incrementSize);
 
@@ -45,12 +45,10 @@ void DefinitionManager::addDefinitionWidgets(){
     };
     auto* processes = new QComboBox(this);
 
-    processes->insertItem(0, QString::fromStdString(std::string(ProcessData::getAcronym<ProcessType::BM>())));
-    processes->setItemData(0, QString::fromStdString(std::string(ProcessData::getName<ProcessType::BM>())), Qt::ToolTipRole);
-    processes->insertItem(1, QString::fromStdString(std::string(ProcessData::getAcronym<ProcessType::GBM>())));
-    processes->setItemData(1, QString::fromStdString(std::string(ProcessData::getName<ProcessType::GBM>())), Qt::ToolTipRole);
-    processes->insertItem(2, QString::fromStdString(std::string(ProcessData::getAcronym<ProcessType::OU>())));
-    processes->setItemData(2, QString::fromStdString(std::string(ProcessData::getName<ProcessType::OU>())), Qt::ToolTipRole);
+    for (size_t i = 0; i < processTypes.size(); ++i) {
+        processes->insertItem(static_cast<int>(i), QString::fromStdString(std::string( getField(FieldTags::acronym{}, processTypes[i]) )));
+        processes->setItemData(static_cast<int>(i), QString::fromStdString(std::string( getField(FieldTags::name{}, processTypes[i]) )), Qt::ToolTipRole);
+    }
 
     processes->setCurrentIndex(0);
     m_widgets[DefinitionWidget::PROCESS] = processes;

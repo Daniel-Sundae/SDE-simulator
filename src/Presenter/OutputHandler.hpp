@@ -17,23 +17,12 @@ public:
     void handleWorkerResult(Paths&& paths);
     void onDriftDataReceived(Path &&driftCurve);
     void prepareGUI(const PathQuery &pQuery);
-    void onPDFReceived(const PDF &pdf);
+    void onPDFReceived(PDF&& pdf);
     void clear() const;
-
 
 public slots:
     void onPathsReceived(const Paths& paths);
 
 signals:
     void internalPathReadySignal(Paths paths);
-
-private:
-    bool hasSupport() const;
-    void deleteSupport();
-    bool isInSupport(const State s) const;
-
-private:
-    Range m_distributionSupport;
-    Paths m_paths;
-    Path m_driftCurve;
 };
