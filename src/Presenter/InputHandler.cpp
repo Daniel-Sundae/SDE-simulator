@@ -116,9 +116,10 @@ void InputHandler::onSettingsParameterModified(const SettingsWidget param, int u
     switch (param) {
         case SettingsWidget::FIXSEED:
             if (userValue == 0) {
-                m_settingsParameters->useSeed = {false, 0};
-            } else {
-                m_settingsParameters->useSeed = {true, static_cast<size_t>(userValue)};
+                m_settingsParameters->useSeed = std::nullopt;
+            }
+            else {
+                m_settingsParameters->useSeed = static_cast<size_t>(userValue);
             }
             break;
         default:

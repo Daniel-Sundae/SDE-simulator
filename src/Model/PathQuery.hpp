@@ -1,7 +1,7 @@
 #pragma once
 #include "ProcessData.hpp"
 #include "Constants.hpp"
-
+#include <optional>
 struct SimulationParameters {
     explicit SimulationParameters() = default;
     explicit SimulationParameters(SolverType _solver, Time _time, Time _dt, size_t _samples)
@@ -44,12 +44,8 @@ struct ProcessDefinition {
 };
 
 struct SettingsParameters{
-    bool useThreading;
-    std::pair<bool, size_t> useSeed;
-    explicit SettingsParameters()
-    : useThreading(true)
-    , useSeed({false, 0})
-    {}
+    bool useThreading = true;
+    std::optional<size_t> useSeed = std::nullopt;
 };
 
 struct PathQuery {

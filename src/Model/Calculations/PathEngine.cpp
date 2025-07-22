@@ -39,12 +39,14 @@ std::function<void()> PathEngine::samplePathFunctor(const PathQuery& pathQuery, 
 }
 
 Path PathEngine::sampleOnePath(const PathQuery& pathQuery) const{
-    const size_t seed = pathQuery.settingsParameters.useSeed.first ? pathQuery.settingsParameters.useSeed.second : std::random_device{}();
+    auto& hasSeed = pathQuery.settingsParameters.useSeed;
+    const size_t seed = hasSeed ? hasSeed.value() : std::random_device{}();
     std::mt19937 generator(static_cast<uint32_t>(seed));
     return sampleOnePathImpl(pathQuery, generator, dXtFunctor(pathQuery.simulationParameters.solver));
 }
 
-template <typename F>Path PathEngine::sampleOnePathImpl(const PathQuery& pathQuery, std::mt19937& generator, F dXt) const{
+template <typename F>
+Path PathEngine::sampleOnePathImpl(const PathQuery& pathQuery, std::mt19937& generator, F dXt) const{
     const size_t points = pathQuery.simulationParameters.points();
     const auto& drift = pathQuery.processDefinition.drift;
     const auto& diffusion = pathQuery.processDefinition.diffusion;
@@ -79,8 +81,8 @@ void PathEngine::samplePathsAsync(const PathQuery& pathQuery, std::function<void
         for (size_t i = 0; i < nrSamples; ++i) {
             m_pathResults[i].resize(pathQuery.simulationParameters.points());
             // Provide unique generator for each task
-            const size_t seed = pathQuery.settingsParameters.useSeed.first
-                ? pathQuery.settingsParameters.useSeed.second + i
+            auto& seedOpt = pathQuery.settingsParameters.useSeed;
+            const size_t seed = seedOpt ? seedOpt.value() + i
                 : static_cast<size_t>(std::random_device{}());
             m_engineSettings.useThreading ? m_tp->enqueue(samplePathFunctor(pathQuery, i, seed)) : samplePathFunctor(pathQuery, i, seed)();
         }

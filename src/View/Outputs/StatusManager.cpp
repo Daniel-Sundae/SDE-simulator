@@ -52,7 +52,7 @@ void StatusManager::setQueryInfo(const PathQuery& pQuery){
     QTextStream streamParams(&infoParams);
     streamParams << "Definition parameters: μ = " << QString::number(pQuery.processDefinition.drift.mu()) << ", σ = " << QString::number(pQuery.processDefinition.diffusion.sigma()) << ", X" << QString::fromUtf8("\u2080") << " = " << QString::number(pQuery.processDefinition.startValueData) << "\n"
                  << "Simulation parameters: Solver = " << solverToString.at(pQuery.simulationParameters.solver) << ", Time = " << QString::number(pQuery.simulationParameters.time) << ", dt = " << QString::number(pQuery.simulationParameters.dt) << ", Samples = " << QString::number(pQuery.simulationParameters.samples) << "\n"
-                 << "Settings: Multithreading = " << (pQuery.settingsParameters.useThreading ? "Yes" : "No") << ", Seed: " << (pQuery.settingsParameters.useSeed.first ? QString::number(pQuery.settingsParameters.useSeed.second) : "Random");
+                 << "Settings: Multithreading = " << (pQuery.settingsParameters.useThreading ? "Yes" : "No") << ", Seed: " << (pQuery.settingsParameters.useSeed ? QString::number(pQuery.settingsParameters.useSeed.value()) : "Random");
     m_queryDefinition->findChild<QLabel*>()->setText(infoDefinition);
     m_queryParameters->findChild<QLabel*>()->setText(infoParams);
 }
