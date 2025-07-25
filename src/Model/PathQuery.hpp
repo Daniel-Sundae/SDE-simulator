@@ -17,7 +17,7 @@ struct SimulationParameters {
             throw std::invalid_argument("Time and points must be greater than 0");
         }
     }
-    [[nodiscard]] size_t points() const{
+    size_t points() const{
         return static_cast<size_t>(std::ceil(time / dt));
     }
     SolverType solver = DefaultConstants::Simulation::solver;

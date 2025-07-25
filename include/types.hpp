@@ -15,7 +15,7 @@ using Paths = std::vector<Path>;
 using Distribution = std::vector<State>;
 using PDFData = std::vector<Density>;
 using Range = std::pair<double, double>;
-using Task = std::function<void()>;
+using Task = std::packaged_task<Path()>;
 template <typename T>
 concept IntOrDouble = std::same_as<T, int> || std::same_as<T, double>;
 template <typename T>

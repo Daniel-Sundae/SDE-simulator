@@ -8,11 +8,7 @@ EngineThreadPool::EngineThreadPool(size_t nrThreads)
     , m_taskMtx()
     , m_nrBusyThreads(0)
 {
-    if (!nrThreads) {
-        nrThreads = std::thread::hardware_concurrency();
-    }
-    // Need at least 2 threads. One mainTask thread and 1 worker thread.
-    nrThreads = std::max(nrThreads, static_cast<size_t>(2));
+    nrThreads = std::max(std::thread::hardware_concurrency(), uint32_t(1));
     m_threads.reserve(nrThreads);
     std::stop_token st = m_stopSource.get_token();
     for (size_t i = 0; i < nrThreads; ++i) {
@@ -41,12 +37,15 @@ size_t EngineThreadPool::nrBusyThreads() const{
     return m_nrBusyThreads.load();
 }
 
-void EngineThreadPool::enqueue(std::function<void()> task){
+std::future<Path> EngineThreadPool::enqueue(std::function<Path()> func){
+    std::packaged_task<Path()> task(std::move(func));
+    std::future<Path> future = task.get_future();
     {
         std::unique_lock<std::mutex> lock(m_taskMtx);
         m_tasks.push(std::move(task));
     }
     m_cv.notify_one();
+    return future;
 }
 
 void EngineThreadPool::doTasks(std::stop_token st)
@@ -63,7 +62,7 @@ void EngineThreadPool::doTasks(std::stop_token st)
             m_tasks.pop();
         }
         m_nrBusyThreads++;
-        task();
+        task(); // When finished, promise is fulfilled and future is ready
         m_nrBusyThreads--;
     }
 }

@@ -11,23 +11,6 @@ MainPresenter::MainPresenter()
     , m_engine(std::make_unique<PathEngine>())
 {}
 
-void MainPresenter::samplePaths(const PathQuery& pQuery){
-    m_engine->samplePathsAsync(
-        pQuery,
-        [this](Paths results) mutable {
-            listener()->handleWorkerResult(std::move(results));
-        }
-    );
-}
-
-void MainPresenter::sampleDriftCurve(const PathQuery& deterministicQuery){
-    if(deterministicQuery.simulationParameters.samples != 1){
-        Utils::fatalError("Deterministic query should have exactly one sample, got: {}",
-            deterministicQuery.simulationParameters.samples);
-    }
-    listener()->onDriftDataReceived(m_engine->sampleOnePath(deterministicQuery));
-}
-
 void MainPresenter::onTransactionReceived(const Transaction&& transaction){
     if(m_engine->isBusy()){
         return;
@@ -41,8 +24,8 @@ void MainPresenter::onTransactionReceived(const Transaction&& transaction){
         pq.processDefinition.drift.mu(),
         pq.processDefinition.diffusion.sigma()
     ));
-    samplePaths(transaction.pathQuery);
-    sampleDriftCurve(transaction.deterministicQuery);
+    std::future<Paths> pathsFut = m_engine->samplePathsAsync(transaction.pathQuery);
+    std::future<Paths> driftFut = m_engine->samplePathsAsync(transaction.deterministicQuery);
 }
 
 void MainPresenter::clear() const{
@@ -53,7 +36,7 @@ void MainPresenter::clear() const{
 }
 
 void MainPresenter::cancel() const{
-    m_engine->requestcancel();
+    m_engine->requestCancel();
 }
 
 InputHandler* MainPresenter::getInputHandler() const{

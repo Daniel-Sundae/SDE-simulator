@@ -9,7 +9,7 @@ class EngineThreadPool {
 public:
     explicit EngineThreadPool(size_t nrThreads = 0);
     ~EngineThreadPool();
-    void enqueue(const std::function<void()> f);
+    std::future<Path> enqueue(std::function<Path()> func);
     void clearTasks();
     size_t nrBusyThreads() const;
 

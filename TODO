@@ -6,9 +6,12 @@ FUNCTIONALITY TODO:
 -  
 
 CODE TODO:
-- Fix bug with no support. Simplify logic in outputhandler?
-- Use optional instead of useseed pair 
+- reintroduce threading choice in engine
+- ensure gui thread not blocked (cancelable).
+- double check synchronizations
 - in class member initializations
+
+
 
 
 PRESENTATION:
