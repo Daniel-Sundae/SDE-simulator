@@ -4,30 +4,10 @@
 #include <thread>
 #include <cassert>
 
-PathEngine::PathEngine()
-    : m_tp(std::make_unique<EngineThreadPool>())
-    , m_pathResults()
-    , m_pathsMtx()
-    , m_cancelRequested(false)
-    , m_completedTasks(0)
-    , m_completionCv()
-    , m_completionMtx()
-    , m_engineSettings()
-{ }
-
-std::function<Path()> PathEngine::createPathSamplingFunction(const PathQuery& pQuery, uint32_t seedId) const{
-    const auto seedOpt = pQuery.settingsParameters.useSeed;
-    const auto solver = pQuery.simulationParameters.solver;
-    uint32_t seed = seedOpt ? uint32_t(seedOpt.value()) : std::random_device{}();
-    seed += seedId; // Ensure unique seed for each task
-    return [=]() -> Path {
-        std::mt19937 generator(seed);
-        return sampleOnePathImpl(pQuery, generator, dXtFunctor(solver));
-    };
-}
+static std::atomic<bool> s_cancelRequested{false};
 
 template <typename F>
-Path PathEngine::sampleOnePathImpl(const PathQuery& pathQuery, std::mt19937& generator, F dXt) const{
+static Path sampleOnePathImpl(const PathQuery& pathQuery, std::mt19937& generator, F dXt, std::stop_token stopToken) {
     const auto points = pathQuery.simulationParameters.points();
     const auto& drift = pathQuery.processDefinition.drift;
     const auto& diffusion = pathQuery.processDefinition.diffusion;
@@ -38,7 +18,7 @@ Path PathEngine::sampleOnePathImpl(const PathQuery& pathQuery, std::mt19937& gen
     path.reserve(points);
     path.push_back(startValueData);
     for (size_t i = 1; i < points; ++i) {
-        if (i % 100 == 0 && m_cancelRequested.load()) {
+        if (i % 10 == 0 && stopToken.stop_requested()) {
             return {};
         }
         path.push_back(path.back() + dXt(drift, diffusion, static_cast<Time>(i) * dt, path.back(), dt, generator));
@@ -46,44 +26,42 @@ Path PathEngine::sampleOnePathImpl(const PathQuery& pathQuery, std::mt19937& gen
     return path;
 }
 
-[[nodiscard]] std::future<Paths> PathEngine::samplePathsAsync(const PathQuery& pQuery){
-    assert(!isBusy() && "Cannot query busy engine");
-    m_engineSettings = pQuery.settingsParameters;
-    m_cancelRequested = false;
-    m_completedTasks = 0;
-    
-    auto taskCoordinator = [this, pQuery]() -> Paths{
-        if(size_t threads = m_tp->nrBusyThreads(); threads) {
-            Utils::fatalError("EngineThreadPool has {} busy threads before sampling.", threads);
-        }
+static auto createPathSamplingFunction(const PathQuery& pQuery, uint32_t seedId, std::stop_token stopToken){
+    const auto seedOpt = pQuery.settingsParameters.useSeed;
+    const auto solver = pQuery.simulationParameters.solver;
+    uint32_t seed = seedOpt ? uint32_t(seedOpt.value()) : std::random_device{}();
+    seed += seedId; // Ensure unique seed for each task
+    std::mt19937 generator(seed);
+    return [generator, pQuery, solver, stopToken]() mutable -> Path {
+        return sampleOnePathImpl(pQuery, generator, dXtFunctor(solver), stopToken);
+    };
+}
+
+[[nodiscard]] Job PathEngine::samplePathsAsync(const PathQuery& pQuery){
+    Job job{};
+    job.progress.totalTasks = pQuery.simulationParameters.samples;
+    auto stopToken = job.stop.get_token();
+    job.result = std::async(std::launch::async, [pQuery, stopToken]() mutable -> Paths {
         const size_t nrPaths = pQuery.simulationParameters.samples;
         std::vector<std::future<Path>> pathFutures;
         pathFutures.reserve(nrPaths);
-        for (uint32_t i = 0; i < nrPaths; ++i) {
-            pathFutures.push_back(m_tp->enqueue(createPathSamplingFunction(pQuery, i)));
-        }
-
-        Paths paths;
+        Paths paths{};
         paths.reserve(nrPaths);
+        for (size_t i = 0; i < nrPaths; ++i) {
+            pathFutures.push_back(m_tp->enqueue(createPathSamplingFunction(pQuery, i, stopToken)));
+        }
         for (auto& future : pathFutures) {
             paths.push_back(future.get());
         }
-        if(size_t threads = m_tp->nrBusyThreads(); threads) {
-            Utils::fatalError("EngineThreadPool has {} busy threads after sampling.", threads);
-        }
         return paths;
-    };
-    return std::async(std::launch::async, taskCoordinator);
+    });
+    return job;
 }
 
 void PathEngine::requestCancel(){
-    {
-        std::scoped_lock lock(m_completionMtx); // Ensures mainTask reads updated atomic bool
-        m_cancelRequested = true;
-    }
-    m_completionCv.notify_one();
+    s_cancelRequested = true;
 }
 
 bool PathEngine::isBusy(){
-    return m_tp->nrBusyThreads() ? true : false;
+    return m_tp->nrBusyThreads() != 0;
 }

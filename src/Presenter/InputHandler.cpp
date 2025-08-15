@@ -4,8 +4,8 @@
 #include "Utils.hpp"
 #include <assert.h>
 
-InputHandler::InputHandler()
-    : IPresenterComponent()
+InputHandler::InputHandler(MainPresenter& mainPresenter)
+    : m_mainPresenter(mainPresenter)
     , m_processDefinition(std::make_unique<ProcessDefinition>())
     , m_simulationParameters(std::make_unique<SimulationParameters>())
     , m_settingsParameters(std::make_unique<SettingsParameters>())
@@ -15,11 +15,11 @@ InputHandler::InputHandler()
 }
 
 void InputHandler::clear() const{
-    listener()->clear();
+    m_mainPresenter.clear();
 }
 
 void InputHandler::cancel() const{
-    listener()->cancel();
+    m_mainPresenter.cancel();
 }
 
 bool InputHandler::canSample() const{
@@ -43,14 +43,14 @@ void InputHandler::samplePaths(){
 
     const PathQuery pQuery{ *m_processDefinition, *m_simulationParameters, *m_settingsParameters};
     const PathQuery deterministicQuery = createDriftQuery(pQuery);
-    listener()->onTransactionReceived(Transaction{std::move(pQuery), std::move(deterministicQuery)});
+    m_mainPresenter.onTransactionReceived(Transaction{std::move(pQuery), std::move(deterministicQuery)});
 }
 
 PathQuery InputHandler::createDriftQuery(const PathQuery& pQuery) const{
     auto definition = ProcessDefinition(
         pQuery.processDefinition.type,
         pQuery.processDefinition.drift,
-        // Diffusion function is not needed by deteministic query
+        // Diffusion function is not needed by deterministic query
         {0, [](Time, State){return 0;}},
         pQuery.processDefinition.startValueData);
     auto simulationParams = SimulationParameters(

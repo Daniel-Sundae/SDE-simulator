@@ -1,28 +1,20 @@
 #pragma once
-#include "IPresenterComponent.hpp"
 #include "Types.hpp"
 #include "PathQuery.hpp"
-#include <QtCore/QObject>
 
 class OutputDispatcher;
 struct PathQuery;
 struct PDF;
 
-class OutputHandler final : public QObject, public IPresenterComponent<OutputDispatcher> {
-    Q_OBJECT
-
+class OutputHandler{
 public:
-    explicit OutputHandler(QObject* parent = nullptr);
-    // Method called by worker thread
-    void handleWorkerResult(Paths&& paths);
+    OutputHandler() = default;
+    void onPathsReceived(Paths&& paths);
+    void onPDFReceived(PDF&& pdf);
     void onDriftDataReceived(Path &&driftCurve);
     void prepareGUI(const PathQuery &pQuery);
-    void onPDFReceived(PDF&& pdf);
+    void setOutputDispatcher(OutputDispatcher* outputDispatcher){ m_outputDispatcher = outputDispatcher; };
     void clear() const;
-
-public slots:
-    void onPathsReceived(const Paths& paths);
-
-signals:
-    void internalPathReadySignal(Paths paths);
+private:
+    OutputDispatcher* m_outputDispatcher = nullptr;
 };

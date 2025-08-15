@@ -1,4 +1,7 @@
 FUNCTIONALITY TODO:
+
+- QT gets std::future non blockingly, puts in qfuturewatcher. 
+- progress bar (paths simulated 15/50)
 - Let engine be stand alone process
 - WASM (requires moving away from jthreads)
 - Introduce new tab with live und data and option price and simulated option price

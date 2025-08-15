@@ -15,21 +15,12 @@ AppInitializer::AppInitializer(QApplication& app)
     , m_mainWindow(std::make_unique<MainWindow>())
     , m_mainPresenter(std::make_unique<MainPresenter>())
 {
-    // Register custom type to move data from enginethread to GUI thread
-    qRegisterMetaType<Paths>("Paths");
-
-    initializeComponents();
+    m_mainPresenter->getOutputHandler()->setOutputDispatcher(m_mainWindow->getOutputDispatcher());
+    m_mainWindow->getInputDispatcher()->setInputHandler(m_mainPresenter->getInputHandler());
     setStyle();
 }
 
 AppInitializer::~AppInitializer() = default;
-
-void AppInitializer::initializeComponents(){
-    m_mainPresenter->getOutputHandler()->setlistener(m_mainWindow->getOutputDispatcher());
-    m_mainPresenter->setlistener(m_mainPresenter->getOutputHandler());
-    m_mainPresenter->getInputHandler()->setlistener(m_mainPresenter.get());
-    m_mainWindow->getInputDispatcher()->setInputHandler(m_mainPresenter->getInputHandler());
-}
 
 void AppInitializer::setStyle(){
     m_app.setStyle("Fusion");

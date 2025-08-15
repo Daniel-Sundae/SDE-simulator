@@ -63,6 +63,8 @@ target_link_libraries(StochasticSim PRIVATE
 )
 
 add_custom_command(TARGET StochasticSim POST_BUILD
-    COMMAND "${CMAKE_CURRENT_BINARY_DIR}/vcpkg_installed/x64-windows/tools/Qt6/bin/$<IF:$<CONFIG:Debug>,windeployqt.debug.bat,windeployqt.exe>" "$<TARGET_FILE:StochasticSim>"
-    COMMENT "Deploying Qt libraries ($<IF:$<CONFIG:Debug>,Debug script,Release script> at ${CMAKE_CURRENT_BINARY_DIR}/vcpkg_installed/x64-windows/tools/Qt6/bin/$<IF:$<CONFIG:Debug>,windeployqt.debug.bat,windeployqt.exe>)"
+  COMMAND "$<IF:$<CONFIG:Debug>,${VCPKG_INSTALLED_DIR}/x64-windows/tools/qt6/bin/windeployqt.debug.bat,${VCPKG_INSTALLED_DIR}/x64-windows/tools/qt6/bin/windeployqt.exe>"
+          "$<TARGET_FILE:StochasticSim>"
+          "--$<LOWER_CASE:$<CONFIG>>"
+  COMMENT "Deploying Qt runtime"
 )
