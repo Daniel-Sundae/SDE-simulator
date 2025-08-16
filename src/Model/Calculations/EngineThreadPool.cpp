@@ -33,14 +33,11 @@ size_t EngineThreadPool::nrBusyThreads() const{
     return m_nrBusyThreads.load();
 }
 
-std::expected<std::future<Path>, ThreadPoolError> EngineThreadPool::enqueue(std::function<Path()> func){
+std::future<Path> EngineThreadPool::enqueue(std::function<Path()> func){
     std::packaged_task<Path()> task(std::move(func));
     std::future<Path> future = task.get_future();
     {
         std::scoped_lock lock(m_taskMtx);
-        if (m_shutdownInProgress) {
-            return std::unexpected(ThreadPoolError::ShutdownInProgress);
-        }
         m_tasks.push(std::move(task));
         m_cv.notify_one();
     }

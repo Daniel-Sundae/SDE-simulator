@@ -6,16 +6,11 @@
 #include <thread>
 #include <expected>
 
-enum class ThreadPoolError {
-    None,
-    ShutdownInProgress
-};
-
 class EngineThreadPool {
 public:
     explicit EngineThreadPool(size_t nrThreads = 0);
     ~EngineThreadPool();
-    std::expected<std::future<Path>, ThreadPoolError> enqueue(std::function<Path()> func);
+    std::future<Path> enqueue(std::function<Path()> func);
     void clearTasks();
     size_t nrBusyThreads() const;
 

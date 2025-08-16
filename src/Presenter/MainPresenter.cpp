@@ -7,17 +7,12 @@
 
 MainPresenter::MainPresenter()
     : QObject()
-    , m_inputHandler(std::make_unique<InputHandler>(*this))
-    , m_outputHandler(std::make_unique<OutputHandler>())
-    , m_engine(std::make_unique<PathEngine>())
-    , m_pathsWatcher(new QFutureWatcher<Paths>(this))
-    , m_driftWatcher(new QFutureWatcher<Path>(this))
 {
     // Pass ready engine results to output handler
-    QObject::connect(m_pathsWatcher, &QFutureWatcher<Paths>::finished, this, [this]{
+    QObject::connect(m_pathsWatcher, &QFutureWatcher<Job>::finished, this, [this]{
         m_outputHandler->onPathsReceived(m_pathsWatcher->result());
     });
-    QObject::connect(m_driftWatcher, &QFutureWatcher<Path>::finished, this, [this]{
+    QObject::connect(m_driftWatcher, &QFutureWatcher<Job>::finished, this, [this]{
         m_outputHandler->onDriftDataReceived(m_driftWatcher->result());
     });
 }
@@ -25,7 +20,7 @@ MainPresenter::MainPresenter()
 MainPresenter::~MainPresenter() = default;
 
 void MainPresenter::onTransactionReceived(const Transaction&& transaction){
-    if(m_engine->isBusy()){
+    if(m_runningJobs){
         return;
     }
     m_outputHandler->prepareGUI(transaction.pathQuery);
@@ -37,14 +32,12 @@ void MainPresenter::onTransactionReceived(const Transaction&& transaction){
         pq.processDefinition.drift.mu(),
         pq.processDefinition.diffusion.sigma()
     ));
-    QFuture<Path> driftFuture = QtConcurrent::run([f2 = m_engine->samplePathsAsync(transaction.deterministicQuery)]() mutable -> Path {
-        return f2.get().front();
+    m_runningJobs = m_engine->processTransaction(transaction);
+    QFuture<std::array<Job, Transaction::numQueries>> jobs = QtConcurrent::run([jobs = m_runningJobs]() mutable -> Path {
+        deterministicJob = jobs[0].getResult();
+        stochasticJob = jobs[1].getResult();
     });
-    QFuture<Paths> pathFuture = QtConcurrent::run([f = m_engine->samplePathsAsync(transaction.pathQuery)]() mutable -> Paths {
-        return f.get();
-    });
-    m_driftWatcher->setFuture(std::move(driftFuture));
-    m_pathsWatcher->setFuture(std::move(pathFuture));
+    m_driftWatcher->setFuture(std::move(jobs));
 }
 
 void MainPresenter::clear() const{
@@ -55,7 +48,7 @@ void MainPresenter::clear() const{
 }
 
 void MainPresenter::cancel() const{
-    m_engine->requestCancel();
+    m_engine->cancelJobs();
 }
 
 InputHandler* MainPresenter::getInputHandler() const{

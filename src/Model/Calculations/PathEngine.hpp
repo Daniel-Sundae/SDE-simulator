@@ -6,25 +6,46 @@
 #include <optional>
 #include <functional>
 #include <random>
+#include <array>
 #include <cmath>
 
 struct PathQuery;
+struct Transaction;
 struct Job {
+    enum class Type {
+        Deterministic,
+        Stochastic,
+    };
+    enum class Status {
+        Pending,
+        Running,
+        Completed,
+        Cancelled
+    };
+    explicit Job(size_t _totalPaths, Type _type)
+    : totalPaths(_totalPaths)
+    , type(_type)
+    {}
+    const size_t totalPaths{};
+    const Type type{};
+private:
     std::future<Paths> result;
-    std::stop_source stop;
-    struct Progress {
-        size_t totalTasks = 0;
-        std::atomic<size_t> completedTasks = 0;
-    } progress;
+public:
+    // Shared pointer allows modification via copy
+    std::shared_ptr<std::atomic<Job::Status>> status = std::make_shared<std::atomic<Job::Status>>(Job::Status::Pending);
+    std::shared_ptr<std::atomic<size_t>> pathsCompleted = std::make_shared<std::atomic<size_t>>(0);
+    std::stop_source stop{};
     bool isCancelled() const { return stop.stop_requested(); }
     bool doCancel()  { return stop.request_stop(); }
-    bool isDone() const { return progress.completedTasks == progress.totalTasks; }
+    bool isDone() const { return pathsCompleted->load() == totalPaths; }
+    Paths getResult() { return std::move(result.get()); }
+    void setResult(std::future<Paths> newResult) { result = std::move(newResult); }
 };
 class PathEngine{
 public:
     explicit PathEngine() = default;
-    [[nodiscard]] Job samplePathsAsync(const PathQuery& pQuery);
-    void requestCancel();
+    [[nodiscard]] std::array<Job, Transaction::numQueries> processTransaction(const Transaction& transaction);
+    void cancelJobs();
     bool isBusy();
 
 private:
@@ -38,5 +59,4 @@ private:
 private:
     std::unique_ptr<EngineThreadPool> m_tp =
         std::make_unique<EngineThreadPool>();
-    std::atomic<bool> m_cancelRequested{false};
 };
