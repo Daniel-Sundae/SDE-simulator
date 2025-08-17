@@ -6,11 +6,11 @@
 #include "Utils.hpp"
 #include <QtCore/QMetaType> // For QMetaType registration (needed for connect)
 
-void OutputHandler::onPathsReceived(Paths&& paths){
+void OutputHandler::onPathsReceived(const Paths& paths){
     m_outputDispatcher->setStatus(StatusSignal::RENDERING);
     Distribution distribution;
     distribution.reserve(paths.size());
-    for (auto& path : paths) {
+    for (const auto& path : paths) {
         m_outputDispatcher->plotPath(path);
         distribution.push_back(path.back());
     }
@@ -18,11 +18,11 @@ void OutputHandler::onPathsReceived(Paths&& paths){
     m_outputDispatcher->setStatus(StatusSignal::READY);
 }
 
-void OutputHandler::onDriftDataReceived(Path&& driftCurve){
+void OutputHandler::onDriftDataReceived(const Path& driftCurve){
     m_outputDispatcher->plotPathChartDriftData(driftCurve);
 }
 
-void OutputHandler::onPDFReceived(PDF&& pdf){
+void OutputHandler::onPDFReceived(const PDF& pdf){
     m_outputDispatcher->setDistributionChartSupport(pdf.getSupport());
     m_outputDispatcher->updateDistributionChartPDF(pdf.getPDFData());
     m_outputDispatcher->updateDistributionChartEV(pdf.EV());

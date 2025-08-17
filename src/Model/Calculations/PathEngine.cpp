@@ -41,34 +41,30 @@ static auto createPathSamplingFunction(const PathQuery& query, uint32_t seedId, 
 
 static std::future<Paths> launchPathSampling(const Job& job, const PathQuery& query, EngineThreadPool* threadpool){
     return std::async(std::launch::async,
-        [job, query, threadpool]() mutable -> Paths {
-            *job.status = Job::Status::Running;
+        [jobStatus = job.status, stopToken = job.stop.get_token(), pathsCompleted = job.pathsCompleted, query, threadpool]() mutable -> Paths {
+            *jobStatus = Job::Status::Running;
             const size_t nrPaths = query.simulationParameters.samples;
             std::vector<std::future<Path>> pathFutures;
             pathFutures.reserve(nrPaths);
             Paths paths{};
             paths.reserve(nrPaths);
-            std::stop_token token = job.stop.get_token();
-            for (size_t i = 0; i < nrPaths; ++i) {
-                pathFutures.push_back(threadpool->enqueue(createPathSamplingFunction(query, i, token, job.pathsCompleted)));
+            for (uint32_t i = 0; i < nrPaths; ++i) {
+                pathFutures.push_back(threadpool->enqueue(createPathSamplingFunction(query, i, stopToken, pathsCompleted)));
             }
             for (auto& future : pathFutures) {
                 paths.push_back(future.get());
             }
-            *job.status = token.stop_requested() ? Job::Status::Cancelled : Job::Status::Completed;
+            *jobStatus = stopToken.stop_requested() ? Job::Status::Cancelled : Job::Status::Completed;
             return paths;
     });
 }
 
-[[nodiscard]] std::array<Job, Transaction::numQueries> PathEngine::processTransaction(const Transaction& transaction) {
-    Job deterministicJob{
-        transaction.deterministicQuery.simulationParameters.samples,
-        Job::Type::Deterministic};
-    deterministicJob.setResult(launchPathSampling(deterministicJob, transaction.deterministicQuery, m_tp.get()));
-    Job stochasticJob{
-        transaction.pathQuery.simulationParameters.samples, Job::Type::Stochastic};
-    stochasticJob.setResult(launchPathSampling(stochasticJob, transaction.pathQuery, m_tp.get()));
-    return {deterministicJob, stochasticJob};
+[[nodiscard]] Job PathEngine::processPathQuery(const PathQuery& pathQuery) {
+    Job job{
+        pathQuery.simulationParameters.samples,
+        pathQuery.processDefinition.diffusion.isZero() ? Job::Type::Deterministic : Job::Type::Stochastic};
+    job.setResult(launchPathSampling(job, pathQuery, m_tp.get()));
+    return job;
 }
 
 bool PathEngine::isBusy(){

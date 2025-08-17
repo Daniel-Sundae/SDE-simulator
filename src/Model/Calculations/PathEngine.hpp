@@ -36,16 +36,16 @@ public:
     std::shared_ptr<std::atomic<size_t>> pathsCompleted = std::make_shared<std::atomic<size_t>>(0);
     std::stop_source stop{};
     bool isCancelled() const { return stop.stop_requested(); }
-    bool doCancel()  { return stop.request_stop(); }
+    void doCancel()  { stop.request_stop(); }
     bool isDone() const { return pathsCompleted->load() == totalPaths; }
-    Paths getResult() { return std::move(result.get()); }
+    Paths get() { return result.get(); }
     void setResult(std::future<Paths> newResult) { result = std::move(newResult); }
 };
+
 class PathEngine{
 public:
     explicit PathEngine() = default;
-    [[nodiscard]] std::array<Job, Transaction::numQueries> processTransaction(const Transaction& transaction);
-    void cancelJobs();
+    [[nodiscard]] Job processPathQuery(const PathQuery &pathQuery);
     bool isBusy();
 
 private:

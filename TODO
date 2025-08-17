@@ -1,6 +1,4 @@
 FUNCTIONALITY TODO:
-
-- QT gets std::future non blockingly, puts in qfuturewatcher. 
 - progress bar (paths simulated 15/50)
 - Let engine be stand alone process
 - WASM (requires moving away from jthreads)
@@ -9,7 +7,7 @@ FUNCTIONALITY TODO:
 -  
 
 CODE TODO:
-- reintroduce threading choice in engine
+- Check m_runningJob is same adress, always.
 - ensure gui thread not blocked (cancelable).
 - double check synchronizations
 - in class member initializations

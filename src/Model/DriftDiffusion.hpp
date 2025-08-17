@@ -22,6 +22,7 @@ public:
     }
     double operator()(Time t, State s) const { return f(t, s); }
     double prime(Time t, State s) const{ return fPrime(t, s); }
+    bool isZero() const { return parameter == 0.0; }
 };
 
 class Drift : public FunctionWrapper {

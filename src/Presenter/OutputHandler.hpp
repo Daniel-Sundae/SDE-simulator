@@ -9,9 +9,9 @@ struct PDF;
 class OutputHandler{
 public:
     OutputHandler() = default;
-    void onPathsReceived(Paths&& paths);
-    void onPDFReceived(PDF&& pdf);
-    void onDriftDataReceived(Path &&driftCurve);
+    void onPathsReceived(const Paths& paths);
+    void onPDFReceived(const PDF& pdf);
+    void onDriftDataReceived(const Path& driftCurve);
     void prepareGUI(const PathQuery &pQuery);
     void setOutputDispatcher(OutputDispatcher* outputDispatcher){ m_outputDispatcher = outputDispatcher; };
     void clear() const;
