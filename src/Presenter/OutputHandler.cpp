@@ -22,6 +22,10 @@ void OutputHandler::onDriftDataReceived(const Path& driftCurve){
     m_outputDispatcher->plotPathChartDriftData(driftCurve);
 }
 
+void OutputHandler::raiseError(ErrorType error){
+    m_outputDispatcher->setError(error);
+}
+
 void OutputHandler::onPDFReceived(const PDF& pdf){
     m_outputDispatcher->setDistributionChartSupport(pdf.getSupport());
     m_outputDispatcher->updateDistributionChartPDF(pdf.getPDFData());
@@ -29,7 +33,8 @@ void OutputHandler::onPDFReceived(const PDF& pdf){
 }
 
 void OutputHandler::prepareGUI(const PathQuery& pQuery){
-    clear();
+    m_outputDispatcher->clearPathChart();
+    m_outputDispatcher->clearDistributionChart();
     m_outputDispatcher->setStatus(StatusSignal::SAMPLING);
     m_outputDispatcher->setQueryInfo(pQuery);
     m_outputDispatcher->clearPathChart(false);
@@ -38,7 +43,7 @@ void OutputHandler::prepareGUI(const PathQuery& pQuery){
     m_outputDispatcher->updatePathChartTitle(DefaultConstants::maxPathsToDraw >= pQuery.simulationParameters.samples);
 }
 
-void OutputHandler::clear() const{
+void OutputHandler::clearGUI() const{
     m_outputDispatcher->clearStatus();
     m_outputDispatcher->clearPathChart();
     m_outputDispatcher->clearDistributionChart();

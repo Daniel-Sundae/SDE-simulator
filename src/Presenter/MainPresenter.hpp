@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <semaphore>
 #include "OutputHandler.hpp"
 #include "PathEngine.hpp"
 #include <QtCore/QFutureWatcher>
@@ -23,8 +24,10 @@ private:
     std::unique_ptr<InputHandler> m_inputHandler;
     std::unique_ptr<OutputHandler> m_outputHandler;
     std::unique_ptr<PathEngine> m_engine;
-    std::optional<Job> m_runningJob = std::nullopt;
+    std::atomic<std::shared_ptr<Job>> m_runningJob;
+    std::binary_semaphore m_jobAvailable{0};
+    std::jthread m_jobMonitorer;
 signals:
-    void updateProgress(size_t pathsFinished);
-    void resultDone();
+    void updateProgress(size_t pathsFinished, size_t totalPaths);
+    void consumePaths(Paths paths);
 };

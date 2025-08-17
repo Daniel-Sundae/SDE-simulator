@@ -29,7 +29,7 @@ struct Job {
     const size_t totalPaths{};
     const Type type{};
 private:
-    std::future<Paths> result;
+    mutable std::future<Paths> result;
 public:
     // Shared pointer allows modification via copy
     std::shared_ptr<std::atomic<Job::Status>> status = std::make_shared<std::atomic<Job::Status>>(Job::Status::Pending);
@@ -38,7 +38,7 @@ public:
     bool isCancelled() const { return stop.stop_requested(); }
     void doCancel()  { stop.request_stop(); }
     bool isDone() const { return pathsCompleted->load() == totalPaths; }
-    Paths get() { return result.get(); }
+    Paths get() const { return result.get(); }
     void setResult(std::future<Paths> newResult) { result = std::move(newResult); }
 };
 

@@ -66,3 +66,9 @@ enum class StatusSignal{
     SAMPLING,
     RENDERING
 };
+
+enum class ErrorType{
+    NONE = 0,
+    BUSY_ENGINE,
+    INVALID_INPUT
+};

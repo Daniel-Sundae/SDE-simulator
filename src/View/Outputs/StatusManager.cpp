@@ -60,4 +60,5 @@ void StatusManager::setQueryInfo(const PathQuery& pQuery){
 void StatusManager::clearStatus(){
     m_queryDefinition->findChild<QLabel*>()->setText("");
     m_queryParameters->findChild<QLabel*>()->setText("");
+    setStatus(StatusSignal::READY);
 }

@@ -1,5 +1,6 @@
 FUNCTIONALITY TODO:
 - progress bar (paths simulated 15/50)
+- implement error message
 - Let engine be stand alone process
 - WASM (requires moving away from jthreads)
 - Introduce new tab with live und data and option price and simulated option price
@@ -7,7 +8,7 @@ FUNCTIONALITY TODO:
 -  
 
 CODE TODO:
-- Check m_runningJob is same adress, always.
+- 
 - ensure gui thread not blocked (cancelable).
 - double check synchronizations
 - in class member initializations

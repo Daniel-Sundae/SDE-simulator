@@ -24,6 +24,11 @@ public:
     void setStatus(const StatusSignal signal) const{
         m_statusManager->setStatus(signal);
     }
+    void setError(const ErrorType error) const{
+        // m_statusManager->setError(error);
+        int TODO = 1;
+        (void)TODO;
+    }
     void clearStatus() const{
         m_statusManager->clearStatus();
     }

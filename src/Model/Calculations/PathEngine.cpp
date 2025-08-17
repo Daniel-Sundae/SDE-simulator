@@ -34,7 +34,7 @@ static auto createPathSamplingFunction(const PathQuery& query, uint32_t seedId, 
         pathsCompleted]
         () mutable -> Path {
             auto path = sampleOnePathImpl(query, generator, dXtFunctor(query.simulationParameters.solver), token);
-            if (path) pathsCompleted->fetch_add(1, std::memory_order_relaxed);
+            pathsCompleted->fetch_add(1, std::memory_order_relaxed);
             return path.value_or(Path{});
     };
 }
