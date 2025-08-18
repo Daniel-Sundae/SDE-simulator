@@ -1,5 +1,3 @@
-# Qt discovery and AUTOMOC are now handled globally in the root CMakeLists.txt
-
 file(GLOB_RECURSE PRESENTER_SOURCES "*.cpp")
 file(GLOB_RECURSE PRESENTER_HEADERS "*.hpp")
 

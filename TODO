@@ -8,12 +8,12 @@ FUNCTIONALITY TODO:
 -  
 
 CODE TODO:
-- 
-- ensure gui thread not blocked (cancelable).
-- double check synchronizations
-- in class member initializations
-
-
+- test with spamming sample
+this assert fails sometimes...
+void DistributionChart::plotDistribution(const Distribution& results){
+    assert(m_distributionSet->count() == 0);)
+- test cancel many times
+- make sure can queue both deterministic and stochastic jobs. counting_sem with capacity 2.
 
 
 PRESENTATION:

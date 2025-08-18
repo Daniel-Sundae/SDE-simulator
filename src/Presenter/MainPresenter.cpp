@@ -2,6 +2,8 @@
 #include "PathEngine.hpp"
 #include "InputHandler.hpp"
 #include "Transaction.hpp"
+#include "JobHandler.hpp"
+#include "Utils.hpp"
 #include <cassert>
 #include <QtConcurrent/QtConcurrentRun>
 
@@ -10,49 +12,38 @@ MainPresenter::MainPresenter()
     , m_inputHandler(std::make_unique<InputHandler>(*this))
     , m_outputHandler(std::make_unique<OutputHandler>())
     , m_engine(std::make_unique<PathEngine>())
-    , m_runningJob(nullptr)
+    , m_jobHandler(std::make_unique<JobHandler>())
 {
     // Pass ready engine results to output handler
-    QObject::connect(this, &MainPresenter::updateProgress,
+    QObject::connect(m_jobHandler.get(), &JobHandler::jobProgress,
         this, [this](size_t pathsFinished, size_t totalPaths){
             std::println("Finished {} out of {} paths", pathsFinished, totalPaths);
         }, Qt::QueuedConnection);
-    QObject::connect(this, &MainPresenter::consumePaths,
-        this, [this](Paths paths){
-            m_outputHandler->onPathsReceived(std::move(paths));
+    QObject::connect(m_jobHandler.get(), &JobHandler::jobStatus,
+        this, [this](Job::Status status){
+            std::println("Job status updated: {}", std::to_underlying(status));
         }, Qt::QueuedConnection);
-    m_jobMonitorer = std::jthread([this](std::stop_token token) -> void {
-        while(true){
-            m_jobAvailable.acquire();
-            if(token.stop_requested()) return;
-            auto job = m_runningJob.load();
-            if(!job) {
-                Utils::fatalError("Expected job to be present");
+    QObject::connect(m_jobHandler.get(), &JobHandler::jobDone,
+        this, [this](Paths paths, Job::Type type){
+            switch (type) {
+            case Job::Type::Deterministic:
+                m_outputHandler->onDriftDataReceived(std::move(paths.at(0)));
+                break;
+            case Job::Type::Stochastic:
+                m_outputHandler->onPathsReceived(std::move(paths));
+                break;  
+            default:
+                Utils::fatalError("Unknown job type received in MainPresenter");
+                break;
             }
-            while(!job->isDone()) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(DefaultConstants::loadingbarUpdateRate));
-                emit updateProgress(job->pathsCompleted->load(), job->totalPaths);
-            }
-            if(!job->isCancelled()){
-                emit consumePaths(job->get());
-            }
-            if(!m_runningJob.exchange(nullptr)) {
-                Utils::fatalError("Some other thread removed the job");
-            }
-        }
-    });
+        }, Qt::QueuedConnection);
 }
 
-MainPresenter::~MainPresenter(){
-    m_jobMonitorer.request_stop();
-    m_jobAvailable.release(); // Ensure monitorer wakes up
-    m_jobMonitorer.join();
-    m_runningJob = nullptr;
-}
+MainPresenter::~MainPresenter() = default;
 
-void MainPresenter::onTransactionReceived(const Transaction&& transaction){
-    if(m_runningJob.load()) {
-        m_outputHandler->raiseError(ErrorType::BUSY_ENGINE);
+void MainPresenter::onTransactionReceived(Transaction&& transaction){
+    if(m_jobHandler->jobRunning()) {
+        m_outputHandler->setError(ErrorType::BUSY_ENGINE);
         return;
     }
     m_outputHandler->prepareGUI(transaction.pathQuery);
@@ -64,11 +55,9 @@ void MainPresenter::onTransactionReceived(const Transaction&& transaction){
         pq.processDefinition.drift.mu(),
         pq.processDefinition.diffusion.sigma()
     ));
-    // Block for drift path
-    m_outputHandler->onDriftDataReceived(m_engine->processPathQuery(transaction.deterministicQuery).get().at(0));
-    m_runningJob.store(std::make_shared<Job>(m_engine->processPathQuery(transaction.pathQuery)));
-    // Notify monitorer thread that job exists
-    m_jobAvailable.release();
+    m_jobHandler->postJob(m_engine->processPathQuery(transaction.deterministicQuery));
+    std::this_thread::sleep_for(std::chrono::milliseconds(100)); // TEMP SLEEP SINCE BUFFER IS OF SIZE 1
+    m_jobHandler->postJob(m_engine->processPathQuery(transaction.pathQuery));
 }
 
 void MainPresenter::clear() const{
@@ -76,16 +65,14 @@ void MainPresenter::clear() const{
 }
 
 void MainPresenter::cancel() {
-    // Copy to prevent untimely pointer reset
-    if(auto job = m_runningJob.load()){
-        job->doCancel();
-    }
     m_outputHandler->clearGUI();
+    m_jobHandler->cancel();    
 }
 
 InputHandler* MainPresenter::getInputHandler() const{
     return m_inputHandler.get();
 }
+
 OutputHandler* MainPresenter::getOutputHandler() const{
     return m_outputHandler.get();
 }

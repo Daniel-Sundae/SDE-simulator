@@ -12,7 +12,7 @@ public:
     void onPathsReceived(const Paths& paths);
     void onPDFReceived(const PDF& pdf);
     void onDriftDataReceived(const Path& driftCurve);
-    void raiseError(ErrorType error);
+    void setError(ErrorType error);
     void prepareGUI(const PathQuery &pQuery);
     void setOutputDispatcher(OutputDispatcher* outputDispatcher){ m_outputDispatcher = outputDispatcher; };
     void clearGUI() const;

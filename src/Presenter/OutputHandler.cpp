@@ -4,7 +4,6 @@
 #include "PDF.hpp"
 #include "Constants.hpp"
 #include "Utils.hpp"
-#include <QtCore/QMetaType> // For QMetaType registration (needed for connect)
 
 void OutputHandler::onPathsReceived(const Paths& paths){
     m_outputDispatcher->setStatus(StatusSignal::RENDERING);
@@ -22,7 +21,7 @@ void OutputHandler::onDriftDataReceived(const Path& driftCurve){
     m_outputDispatcher->plotPathChartDriftData(driftCurve);
 }
 
-void OutputHandler::raiseError(ErrorType error){
+void OutputHandler::setError(ErrorType error){
     m_outputDispatcher->setError(error);
 }
 
