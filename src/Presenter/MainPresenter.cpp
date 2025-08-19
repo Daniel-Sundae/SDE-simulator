@@ -24,12 +24,14 @@ MainPresenter::MainPresenter()
             std::println("Job status updated: {}", std::to_underlying(status));
         }, Qt::QueuedConnection);
     QObject::connect(m_jobHandler.get(), &JobHandler::jobDone,
-        this, [this](Paths paths, Job::Type type){
+        this, [this](Paths paths, Job::Type type, size_t jobNr){
             switch (type) {
             case Job::Type::Deterministic:
+                if(jobNr != Job::s_deterministicJobCounter.load()) return; // Drop stale job
                 m_outputHandler->onDriftDataReceived(std::move(paths.at(0)));
                 break;
             case Job::Type::Stochastic:
+                if(jobNr != Job::s_stochasticJobCounter.load()) return; // Drop stale job
                 m_outputHandler->onPathsReceived(std::move(paths));
                 break;  
             default:

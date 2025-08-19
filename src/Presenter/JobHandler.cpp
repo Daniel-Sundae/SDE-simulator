@@ -1,5 +1,6 @@
 #include "JobHandler.hpp"
 #include "Constants.hpp"
+#include "Utils.hpp"
 #include <chrono>
 
 
@@ -41,16 +42,19 @@ void JobHandler::handleJobs(std::stop_token token) {
             return;
         }
         std::shared_ptr<Job> job = m_currentJob.load();
-        while (!job->isDone()) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(DefaultConstants::loadingbarUpdateRate));
+        while (job->result.wait_for(std::chrono::milliseconds(DefaultConstants::loadingbarUpdateRate)) != std::future_status::ready) {
             emit jobProgress(job->pathsCompleted->load(), job->totalPaths);
             emit jobStatus(job->status->load());
         }
-        emit jobProgress(job->pathsCompleted->load(), job->totalPaths);
+        size_t pathsCompleted = job->pathsCompleted->load();
+        size_t totalPaths = job->totalPaths;
+        if(pathsCompleted != totalPaths){
+            Utils::fatalError("Expected completed paths: {} to equal total paths: {}", pathsCompleted, totalPaths);
+        }
+        emit jobProgress(pathsCompleted, totalPaths);
         emit jobStatus(job->status->load());
-        emit jobDone(job->get(), job->type);
-        job.reset();
+        emit jobDone(job->result.get(), job->type, job->jobNr);
         m_currentJob.store(nullptr);
         m_slotsAvailable.release();
-    }
+    } // Job freed here
 }

@@ -10,6 +10,7 @@ void OutputHandler::onPathsReceived(const Paths& paths){
     Distribution distribution;
     distribution.reserve(paths.size());
     for (const auto& path : paths) {
+        if(path.empty()) break; // Job cancelled
         m_outputDispatcher->plotPath(path);
         distribution.push_back(path.back());
     }
@@ -33,6 +34,7 @@ void OutputHandler::onPDFReceived(const PDF& pdf){
 
 void OutputHandler::prepareGUI(const PathQuery& pQuery){
     m_outputDispatcher->clearPathChart();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     m_outputDispatcher->clearDistributionChart();
     m_outputDispatcher->setStatus(StatusSignal::SAMPLING);
     m_outputDispatcher->setQueryInfo(pQuery);
@@ -45,5 +47,6 @@ void OutputHandler::prepareGUI(const PathQuery& pQuery){
 void OutputHandler::clearGUI() const{
     m_outputDispatcher->clearStatus();
     m_outputDispatcher->clearPathChart();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     m_outputDispatcher->clearDistributionChart();
 }

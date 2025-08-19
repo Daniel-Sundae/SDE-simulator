@@ -23,7 +23,7 @@ private:
 signals:
     void jobProgress(size_t pathsFinished, size_t totalPaths);
     void jobStatus(Job::Status status);
-    void jobDone(Paths paths, Job::Type type);
+    void jobDone(Paths paths, Job::Type type, size_t jobNr);
 private:
     std::jthread m_jobConsumer;
     std::binary_semaphore m_jobAvailable{0};

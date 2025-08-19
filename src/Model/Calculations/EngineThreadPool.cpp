@@ -33,7 +33,8 @@ size_t EngineThreadPool::nrBusyThreads() const{
     return m_nrBusyThreads.load();
 }
 
-std::future<Path> EngineThreadPool::enqueue(std::function<Path()> func){
+template<typename F, typename... Args>
+std::future<Path> EngineThreadPool::enqueue(F&& func, Args&&... args){
     std::packaged_task<Path()> task(std::move(func));
     std::future<Path> future = task.get_future();
     {

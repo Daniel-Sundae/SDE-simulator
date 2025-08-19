@@ -25,7 +25,7 @@ static std::optional<Path> sampleOnePathImpl(const PathQuery& pathQuery, std::mt
     return path;
 }
 
-static auto createPathSamplingFunction(const PathQuery& query, uint32_t seedId, std::stop_token token, std::shared_ptr<std::atomic<size_t>> pathsCompleted) {
+static auto samplePath(const PathQuery& query, uint32_t seedId, std::stop_token token, std::shared_ptr<std::atomic<size_t>> pathsCompleted) {
     uint32_t seed = query.settingsParameters.useSeed ? uint32_t(query.settingsParameters.useSeed.value()) : std::random_device{}();
     seed += seedId; // Ensure unique seed for each task
     return [generator = std::mt19937(seed),
@@ -39,31 +39,34 @@ static auto createPathSamplingFunction(const PathQuery& query, uint32_t seedId, 
     };
 }
 
-static std::future<Paths> launchPathSampling(const Job& job, const PathQuery& query, EngineThreadPool* threadpool){
-    return std::async(std::launch::async,
-        [jobStatus = job.status, stopToken = job.stop.get_token(), pathsCompleted = job.pathsCompleted, query, threadpool]() mutable -> Paths {
-            *jobStatus = Job::Status::Running;
-            const size_t nrPaths = query.simulationParameters.samples;
-            std::vector<std::future<Path>> pathFutures;
-            pathFutures.reserve(nrPaths);
-            Paths paths{};
-            paths.reserve(nrPaths);
-            for (uint32_t i = 0; i < nrPaths; ++i) {
-                pathFutures.push_back(threadpool->enqueue(createPathSamplingFunction(query, i, stopToken, pathsCompleted)));
-            }
-            for (auto& future : pathFutures) {
-                paths.push_back(future.get());
-            }
-            *jobStatus = stopToken.stop_requested() ? Job::Status::Cancelled : Job::Status::Completed;
-            return paths;
-    });
+static Paths samplePaths(
+        const PathQuery& query,
+        std::shared_ptr<std::atomic<Job::Status>> jobStatus,
+        std::shared_ptr<std::atomic<size_t>> pathsCompleted,
+        std::stop_token stopToken,
+        EngineThreadPool* threadpool){
+    *jobStatus = Job::Status::Running;
+    const size_t nrPaths = query.simulationParameters.samples;
+    std::vector<std::future<Path>> pathFutures;
+    pathFutures.reserve(nrPaths);
+    Paths paths{};
+    paths.reserve(nrPaths);
+    for (uint32_t i = 0; i < nrPaths; ++i) {
+        pathFutures.push_back(threadpool->enqueue(samplePath(query, i, stopToken, pathsCompleted)));
+    }
+    for (auto& future : pathFutures) {
+        paths.push_back(future.get());
+    }
+    *jobStatus = stopToken.stop_requested() ? Job::Status::Cancelled : Job::Status::Completed;
+    return paths;
 }
 
 [[nodiscard]] Job PathEngine::processPathQuery(const PathQuery& pathQuery) {
     Job job{
         pathQuery.simulationParameters.samples,
-        pathQuery.processDefinition.diffusion.isZero() ? Job::Type::Deterministic : Job::Type::Stochastic};
-    job.setResult(launchPathSampling(job, pathQuery, m_tp.get()));
+        pathQuery.processDefinition.diffusion.isZero() ? Job::Type::Deterministic : Job::Type::Stochastic,
+        std::async(std::launch::async, samplePaths, job, pathQuery, m_tp.get())
+    };
     return job;
 }
 

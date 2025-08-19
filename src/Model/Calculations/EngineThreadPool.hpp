@@ -10,7 +10,8 @@ class EngineThreadPool {
 public:
     explicit EngineThreadPool(size_t nrThreads = 0);
     ~EngineThreadPool();
-    std::future<Path> enqueue(std::function<Path()> func);
+    template<typename F, typename... Args>
+    std::future<Path> enqueue(F&& func, Args&&... args);
     void clearTasks();
     size_t nrBusyThreads() const;
 
