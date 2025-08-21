@@ -12,4 +12,11 @@ namespace Utils {
         std::println(stderr, "Stack trace:\n{}", stack);
         std::abort();
     }
+
+    template <typename... Args>
+    void assertTrue(bool condition, std::format_string<Args...> fmt, Args&&... args) {
+        if (!condition) {
+            fatalError(fmt, std::forward<Args>(args)...);
+        }
+    }
 }

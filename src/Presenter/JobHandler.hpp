@@ -8,6 +8,7 @@
 #include <atomic>
 #include <memory>
 #include <mutex>
+#include <utility>
 #include <QObject>
 
 class JobHandler : public QObject{
@@ -17,17 +18,17 @@ public:
     ~JobHandler();
     bool jobRunning() const;
     void cancel();
-    void postJob(Job &&job);
+    void postJobs(std::pair<Job, Job>&& jobs);
 private:
     void handleJobs(std::stop_token token);
 signals:
-    void jobProgress(size_t pathsFinished, size_t totalPaths);
+    void jobProgress(size_t pathsFinished);
     void jobStatus(Job::Status status);
-    void jobDone(Paths paths, Job::Type type, size_t jobNr);
+    void jobDone(std::shared_ptr<Job> job);
 private:
     std::jthread m_jobConsumer;
-    std::binary_semaphore m_jobAvailable{0};
-    std::counting_semaphore<1> m_slotsAvailable{1}; // Make 2 later
-    std::mutex m_jobMtx;
-    std::atomic<std::shared_ptr<Job>> m_currentJob = nullptr;
+    std::binary_semaphore m_jobsAvailable{0};
+    std::atomic<bool> m_handlingJobs = false;
+    std::atomic<bool> m_doCancel = false;
+    std::optional<std::pair<Job, Job>> m_currentJobs;
 };

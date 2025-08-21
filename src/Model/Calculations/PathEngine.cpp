@@ -6,7 +6,7 @@
 #include <cassert>
 
 template <typename F>
-static std::optional<Path> sampleOnePathImpl(const PathQuery& pathQuery, std::mt19937& generator, F dXt, std::stop_token stopToken) {
+static Path samplePath(const PathQuery& pathQuery, std::mt19937& generator, F dXt, std::stop_token stopToken) {
     const auto points = pathQuery.simulationParameters.points();
     const auto& drift = pathQuery.processDefinition.drift;
     const auto& diffusion = pathQuery.processDefinition.diffusion;
@@ -17,42 +17,35 @@ static std::optional<Path> sampleOnePathImpl(const PathQuery& pathQuery, std::mt
     path.reserve(points);
     path.push_back(startValueData);
     for (size_t i = 1; i < points; ++i) {
-        if (i % 10 == 0 && stopToken.stop_requested()){
-            return std::nullopt;
-        }
+        if (i % 10 == 0 && stopToken.stop_requested()) return {};
         path.push_back(path.back() + dXt(drift, diffusion, static_cast<Time>(i) * dt, path.back(), dt, generator));
     }
     return path;
 }
 
-static auto samplePath(const PathQuery& query, uint32_t seedId, std::stop_token token, std::shared_ptr<std::atomic<size_t>> pathsCompleted) {
-    uint32_t seed = query.settingsParameters.useSeed ? uint32_t(query.settingsParameters.useSeed.value()) : std::random_device{}();
-    seed += seedId; // Ensure unique seed for each task
-    return [generator = std::mt19937(seed),
-        query,
-        token,
-        pathsCompleted]
-        () mutable -> Path {
-            auto path = sampleOnePathImpl(query, generator, dXtFunctor(query.simulationParameters.solver), token);
-            pathsCompleted->fetch_add(1, std::memory_order_relaxed);
-            return path.value_or(Path{});
-    };
-}
-
 static Paths samplePaths(
         const PathQuery& query,
+        EngineThreadPool* threadpool,
         std::shared_ptr<std::atomic<Job::Status>> jobStatus,
         std::shared_ptr<std::atomic<size_t>> pathsCompleted,
-        std::stop_token stopToken,
-        EngineThreadPool* threadpool){
+        std::stop_token stopToken){
     *jobStatus = Job::Status::Running;
     const size_t nrPaths = query.simulationParameters.samples;
     std::vector<std::future<Path>> pathFutures;
     pathFutures.reserve(nrPaths);
     Paths paths{};
     paths.reserve(nrPaths);
-    for (uint32_t i = 0; i < nrPaths; ++i) {
-        pathFutures.push_back(threadpool->enqueue(samplePath(query, i, stopToken, pathsCompleted)));
+    uint32_t seed = query.settingsParameters.useSeed ? uint32_t(query.settingsParameters.useSeed.value()) : std::random_device{}();
+    auto dXt = dXtFunctor(query.simulationParameters.solver);
+    for (uint32_t _ = 0; _ < nrPaths; ++_) {
+        seed += 1; // Ensure unique seed for each task
+        pathFutures.push_back(threadpool->enqueue(
+            [query, generator = std::mt19937(seed), dXt, stopToken, pathsCompleted]() mutable -> Path {
+                Path path = stopToken.stop_requested() ? Path{} : samplePath(query, generator, dXt, stopToken);
+                pathsCompleted->fetch_add(1, std::memory_order_relaxed);
+                return path;
+            }
+        ));
     }
     for (auto& future : pathFutures) {
         paths.push_back(future.get());
@@ -64,9 +57,10 @@ static Paths samplePaths(
 [[nodiscard]] Job PathEngine::processPathQuery(const PathQuery& pathQuery) {
     Job job{
         pathQuery.simulationParameters.samples,
-        pathQuery.processDefinition.diffusion.isZero() ? Job::Type::Deterministic : Job::Type::Stochastic,
-        std::async(std::launch::async, samplePaths, job, pathQuery, m_tp.get())
+        pathQuery.processDefinition.diffusion.isZero() ? Job::Type::Deterministic : Job::Type::Stochastic
     };
+    job.result = std::move(std::async(std::launch::async, samplePaths,
+        pathQuery, m_tp.get(), job.status, job.pathsCompleted, job.stop.get_token()));
     return job;
 }
 

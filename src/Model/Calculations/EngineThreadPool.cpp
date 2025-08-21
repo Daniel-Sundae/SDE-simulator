@@ -11,15 +11,17 @@ EngineThreadPool::EngineThreadPool(size_t nrThreads)
 
 EngineThreadPool::~EngineThreadPool()
 {
-    std::scoped_lock lock(m_taskMtx);
-    while (!m_tasks.empty()) m_tasks.pop();
     m_shutdownInProgress = true;
+    {
+        std::scoped_lock lock(m_taskMtx);
+        while (!m_tasks.empty()) m_tasks.pop();
+        m_cv.notify_all();
+    }
     for (auto& thread : m_threads) {
         if (thread.joinable()) {
             thread.join();
         }
     }
-    m_cv.notify_all();
 }
 
 void EngineThreadPool::clearTasks(){
@@ -33,15 +35,14 @@ size_t EngineThreadPool::nrBusyThreads() const{
     return m_nrBusyThreads.load();
 }
 
-template<typename F, typename... Args>
-std::future<Path> EngineThreadPool::enqueue(F&& func, Args&&... args){
+std::future<Path> EngineThreadPool::enqueue(std::function<Path()> func){
     std::packaged_task<Path()> task(std::move(func));
     std::future<Path> future = task.get_future();
     {
         std::scoped_lock lock(m_taskMtx);
         m_tasks.push(std::move(task));
-        m_cv.notify_one();
     }
+    m_cv.notify_one();
     return future;
 }
 

@@ -7,7 +7,7 @@ namespace DefaultConstants{
     constexpr double pdfThreshold = 1e-6;
     constexpr size_t pdfPoints = static_cast<size_t>(1e3);
     constexpr size_t maxPathsToDraw = 20;
-    constexpr size_t loadingbarUpdateRate = 20; // Update every 20ms
+    constexpr size_t guiUpdateRate = 20; // milliseconds
     constexpr double OUthetaData = 1.0; // Mean-reversion coefficient for OU process (Hard coded for now...)
     namespace Simulation {
         constexpr SolverType solver = SolverType::EULER_MARUYAMA;

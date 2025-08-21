@@ -5,7 +5,9 @@
 #include "JobHandler.hpp"
 #include "Utils.hpp"
 #include <cassert>
-#include <QtConcurrent/QtConcurrentRun>
+#include <iostream>
+
+static std::atomic<size_t> s_currentTransaction{0};
 
 MainPresenter::MainPresenter()
     : QObject()
@@ -16,24 +18,38 @@ MainPresenter::MainPresenter()
 {
     // Pass ready engine results to output handler
     QObject::connect(m_jobHandler.get(), &JobHandler::jobProgress,
-        this, [this](size_t pathsFinished, size_t totalPaths){
-            std::println("Finished {} out of {} paths", pathsFinished, totalPaths);
+        this, [this](size_t pathsFinished){
+            std::println("Finished {} paths", pathsFinished);
         }, Qt::QueuedConnection);
     QObject::connect(m_jobHandler.get(), &JobHandler::jobStatus,
         this, [this](Job::Status status){
             std::println("Job status updated: {}", std::to_underlying(status));
         }, Qt::QueuedConnection);
     QObject::connect(m_jobHandler.get(), &JobHandler::jobDone,
-        this, [this](Paths paths, Job::Type type, size_t jobNr){
-            switch (type) {
+        this, [this](std::shared_ptr<Job> job){
+
+            if(job->pathsCompleted->load() != job->totalPaths) {
+                Utils::fatalError("Expected completed paths: {} to equal total paths: {}", job->pathsCompleted->load(), job->totalPaths);
+            }
+            if(job->result.wait_for(std::chrono::seconds(0)) != std::future_status::ready){
+                Utils::fatalError("Expected jobs to be ready");
+            }
+            if(job->status->load() == Job::Status::Cancelled) return;
+            if (size_t currentTransaction = s_currentTransaction.load(); currentTransaction != job->transactionNr) {
+                std::clog << "Dropping stale transaction" << std::endl;
+                std::clog << "Stale transaction: " << job->transactionNr << std::endl;
+                std::clog << "Current transaction: " << currentTransaction << std::endl;
+                return;
+            }
+
+            Paths paths = job->result.get();
+            switch (job->type) {
             case Job::Type::Deterministic:
-                if(jobNr != Job::s_deterministicJobCounter.load()) return; // Drop stale job
                 m_outputHandler->onDriftDataReceived(std::move(paths.at(0)));
                 break;
             case Job::Type::Stochastic:
-                if(jobNr != Job::s_stochasticJobCounter.load()) return; // Drop stale job
                 m_outputHandler->onPathsReceived(std::move(paths));
-                break;  
+                break;
             default:
                 Utils::fatalError("Unknown job type received in MainPresenter");
                 break;
@@ -49,7 +65,7 @@ void MainPresenter::onTransactionReceived(Transaction&& transaction){
         return;
     }
     m_outputHandler->prepareGUI(transaction.pathQuery);
-    auto& pq = transaction.pathQuery;
+    const auto& pq = transaction.pathQuery;
     m_outputHandler->onPDFReceived(getField(FieldTags::pdf{},
         pq.processDefinition.type,
         pq.processDefinition.startValueData,
@@ -57,9 +73,12 @@ void MainPresenter::onTransactionReceived(Transaction&& transaction){
         pq.processDefinition.drift.mu(),
         pq.processDefinition.diffusion.sigma()
     ));
-    m_jobHandler->postJob(m_engine->processPathQuery(transaction.deterministicQuery));
-    std::this_thread::sleep_for(std::chrono::milliseconds(100)); // TEMP SLEEP SINCE BUFFER IS OF SIZE 1
-    m_jobHandler->postJob(m_engine->processPathQuery(transaction.pathQuery));
+    Job deterministicJob = m_engine->processPathQuery(transaction.deterministicQuery);
+    Job stochasticJob = m_engine->processPathQuery(transaction.pathQuery);
+    const size_t transactionNr = ++s_currentTransaction;
+    deterministicJob.transactionNr = transactionNr;
+    stochasticJob.transactionNr = transactionNr;
+    m_jobHandler->postJobs({std::move(deterministicJob), std::move(stochasticJob)});
 }
 
 void MainPresenter::clear() const{
