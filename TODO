@@ -1,6 +1,8 @@
 FUNCTIONALITY TODO:
 - progress bar (paths simulated 15/50)
+- implement progress deterministic query first
 - implement error message
+- implement memory usage
 - Let engine be stand alone process
 - WASM (requires moving away from jthreads)
 - Introduce new tab with live und data and option price and simulated option price
@@ -9,11 +11,7 @@ FUNCTIONALITY TODO:
 
 CODE TODO:
 - test with spamming sample
-this assert fails sometimes...
-void DistributionChart::plotDistribution(const Distribution& results){
-    assert(m_distributionSet->count() == 0);)
 - test cancel many times
-- make sure can queue both deterministic and stochastic jobs. counting_sem with capacity 2.
 
 
 PRESENTATION:

@@ -98,8 +98,7 @@ void PathChart::updateYAxisIfNeeded(State min_Y, State max_Y){
     qreal hysteresis = std::max(1.0, currentYRange * 0.05);  // 5% hysteresis
     if (desiredYMin < currentYMin - hysteresis || desiredYMax > currentYMax + hysteresis) {
         adjustY = true;
-    }
-    else if (currentYRange > 5.0 * dataYRange && dataYRange > 0) {
+    } else if (currentYRange > 5.0 * dataYRange && dataYRange > 0) {
         adjustY = true;
     }
     if (adjustY) {

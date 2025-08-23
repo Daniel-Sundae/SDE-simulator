@@ -44,21 +44,17 @@ void JobHandler::handleJobs(std::stop_token token) {
         Job& stochasticJob = m_currentJobs->second;
         while (true) {
             if(m_doCancel.load()){
-                deterministicJob.doCancel();
-                stochasticJob.doCancel();
+                deterministicJob.stop.request_stop();
+                stochasticJob.stop.request_stop();
             }
             const bool dDone = deterministicJob.result.wait_for(std::chrono::milliseconds(DefaultConstants::guiUpdateRate)) == std::future_status::ready;
             const bool sDone = stochasticJob.result.wait_for(std::chrono::milliseconds(DefaultConstants::guiUpdateRate)) == std::future_status::ready;
             if (dDone && sDone) break;
-            if (!sDone) {
-                emit jobProgress(stochasticJob.pathsCompleted->load());
-                emit jobStatus(stochasticJob.status->load());
-            }
+            if (!sDone) emit jobProgress(stochasticJob.pathsCompleted->load());
         }
         emit jobProgress(stochasticJob.pathsCompleted->load());
-        emit jobStatus(stochasticJob.status->load());
-        emit jobDone(std::make_shared<Job>(std::move(deterministicJob)));
-        emit jobDone(std::make_shared<Job>(std::move(stochasticJob)));
+        if(!deterministicJob.stop.stop_requested()) emit jobDone(std::make_shared<Job>(std::move(deterministicJob)));
+        if(!stochasticJob.stop.stop_requested()) emit jobDone(std::make_shared<Job>(std::move(stochasticJob)));
         m_currentJobs = std::nullopt;
         m_handlingJobs.store(false);
     }

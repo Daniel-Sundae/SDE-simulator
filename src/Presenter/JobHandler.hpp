@@ -15,6 +15,10 @@ class JobHandler : public QObject{
     Q_OBJECT
 public:
     explicit JobHandler();
+    JobHandler(const JobHandler&) = delete;
+    JobHandler(JobHandler&&) = delete;
+    JobHandler& operator=(const JobHandler&) = delete;
+    JobHandler& operator=(JobHandler&&) = delete;
     ~JobHandler();
     bool jobRunning() const;
     void cancel();
@@ -23,7 +27,6 @@ private:
     void handleJobs(std::stop_token token);
 signals:
     void jobProgress(size_t pathsFinished);
-    void jobStatus(Job::Status status);
     void jobDone(std::shared_ptr<Job> job);
 private:
     std::jthread m_jobConsumer;

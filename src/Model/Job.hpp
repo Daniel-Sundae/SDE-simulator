@@ -11,12 +11,6 @@ struct Job {
         Deterministic,
         Stochastic,
     };
-    enum class Status {
-        Pending,
-        Running,
-        Completed,
-        Cancelled
-    };
     explicit Job(size_t _totalPaths, Type _type)
     : totalPaths(_totalPaths)
     , type(_type)
@@ -26,8 +20,6 @@ struct Job {
     const Type type{};
     std::future<Paths> result{};
     size_t transactionNr{};
-    std::shared_ptr<std::atomic<Job::Status>> status = std::make_shared<std::atomic<Job::Status>>(Job::Status::Pending);
     std::shared_ptr<std::atomic<size_t>> pathsCompleted = std::make_shared<std::atomic<size_t>>(0);
     std::stop_source stop{};
-    void doCancel() { stop.request_stop(); }
 };

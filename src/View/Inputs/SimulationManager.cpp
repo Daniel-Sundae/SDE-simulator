@@ -49,20 +49,18 @@ auto SimulationManager::simulationModifiedCb(SimulationWidget param) const{
 void SimulationManager::addSpinBoxes(){
     auto* timeWidget = new QSpinBox(this);
     timeWidget->setValue(static_cast<uint64_t>(DefaultConstants::Simulation::time));
-    timeWidget->setMinimum(1);
-    timeWidget->setMaximum(30);
+    timeWidget->setRange(1, 50);
     timeWidget->setSingleStep(5);
     m_widgets[SimulationWidget::TIME] = timeWidget;
     auto* dtWidget = new QDoubleSpinBox(this);
     dtWidget->setValue(DefaultConstants::Simulation::dt);
-    dtWidget->setMinimum(0);
-    dtWidget->setMaximum(0.5);
-    dtWidget->setSingleStep(0.01);
+    dtWidget->setDecimals(3);
+    dtWidget->setRange(0.0, 0.5); 
+    dtWidget->setSingleStep(0.001);
     m_widgets[SimulationWidget::dt] = dtWidget;
     auto* samplesWidget = new QSpinBox(this);
     samplesWidget->setValue(1);
-    samplesWidget->setMinimum(1);
-    samplesWidget->setMaximum(1000000);
+    samplesWidget->setRange(1, 1000000);
     samplesWidget->setSingleStep(10);
     m_widgets[SimulationWidget::SAMPLES] = samplesWidget;
 

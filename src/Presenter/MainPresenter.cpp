@@ -21,30 +21,28 @@ MainPresenter::MainPresenter()
         this, [this](size_t pathsFinished){
             std::println("Finished {} paths", pathsFinished);
         }, Qt::QueuedConnection);
-    QObject::connect(m_jobHandler.get(), &JobHandler::jobStatus,
-        this, [this](Job::Status status){
-            std::println("Job status updated: {}", std::to_underlying(status));
-        }, Qt::QueuedConnection);
     QObject::connect(m_jobHandler.get(), &JobHandler::jobDone,
         this, [this](std::shared_ptr<Job> job){
 
-            if(job->pathsCompleted->load() != job->totalPaths) {
-                Utils::fatalError("Expected completed paths: {} to equal total paths: {}", job->pathsCompleted->load(), job->totalPaths);
-            }
-            if(job->result.wait_for(std::chrono::seconds(0)) != std::future_status::ready){
-                Utils::fatalError("Expected jobs to be ready");
-            }
-            if(job->status->load() == Job::Status::Cancelled) return;
-            if (size_t currentTransaction = s_currentTransaction.load(); currentTransaction != job->transactionNr) {
+            Utils::assertTrue(job->pathsCompleted->load() == job->totalPaths,
+                "Expected completed paths: {} to equal total paths: {}",
+                job->pathsCompleted->load(), job->totalPaths);
+            Utils::assertTrue(job->result.wait_for(std::chrono::seconds(0)) == std::future_status::ready,
+                "Expected job result to be ready");
+            Utils::assertTrue(!job->stop.stop_requested(),
+                "Expect job to not be stopped");
+            if(job->transactionNr != s_currentTransaction.load()) {
                 std::clog << "Dropping stale transaction" << std::endl;
                 std::clog << "Stale transaction: " << job->transactionNr << std::endl;
-                std::clog << "Current transaction: " << currentTransaction << std::endl;
+                std::clog << "Current transaction: " << s_currentTransaction.load() << std::endl;
                 return;
             }
 
             Paths paths = job->result.get();
             switch (job->type) {
             case Job::Type::Deterministic:
+                Utils::assertTrue(paths.size() == 1,
+                    "Expected deterministic job to return exactly one path, got: {}", paths.size());
                 m_outputHandler->onDriftDataReceived(std::move(paths.at(0)));
                 break;
             case Job::Type::Stochastic:

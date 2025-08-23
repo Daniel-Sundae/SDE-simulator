@@ -5,13 +5,13 @@
 #include <thread>
 #include <cassert>
 
-template <typename F>
-static Path samplePath(const PathQuery& pathQuery, std::mt19937& generator, F dXt, std::stop_token stopToken) {
-    const auto points = pathQuery.simulationParameters.points();
-    const auto& drift = pathQuery.processDefinition.drift;
-    const auto& diffusion = pathQuery.processDefinition.diffusion;
-    const Time dt = pathQuery.simulationParameters.dt;
-    const State startValueData = pathQuery.processDefinition.startValueData;
+static Path samplePath(const PathQuery& query, std::mt19937& generator, std::stop_token stopToken) {
+    const auto points = query.simulationParameters.points();
+    const auto& drift = query.processDefinition.drift;
+    const auto& diffusion = query.processDefinition.diffusion;
+    const Time dt = query.simulationParameters.dt;
+    const State startValueData = query.processDefinition.startValueData;
+    auto dXt = dXtFunctor(query.simulationParameters.solver);
     Path path = {};
     assert(points != 0);
     path.reserve(points);
@@ -25,32 +25,37 @@ static Path samplePath(const PathQuery& pathQuery, std::mt19937& generator, F dX
 
 static Paths samplePaths(
         const PathQuery& query,
-        EngineThreadPool* threadpool,
-        std::shared_ptr<std::atomic<Job::Status>> jobStatus,
+        EngineThreadPool& threadpool,
         std::shared_ptr<std::atomic<size_t>> pathsCompleted,
         std::stop_token stopToken){
-    *jobStatus = Job::Status::Running;
-    const size_t nrPaths = query.simulationParameters.samples;
-    std::vector<std::future<Path>> pathFutures;
-    pathFutures.reserve(nrPaths);
+    const size_t samples = query.simulationParameters.samples;
     Paths paths{};
-    paths.reserve(nrPaths);
-    uint32_t seed = query.settingsParameters.useSeed ? uint32_t(query.settingsParameters.useSeed.value()) : std::random_device{}();
-    auto dXt = dXtFunctor(query.simulationParameters.solver);
-    for (uint32_t _ = 0; _ < nrPaths; ++_) {
-        seed += 1; // Ensure unique seed for each task
-        pathFutures.push_back(threadpool->enqueue(
-            [query, generator = std::mt19937(seed), dXt, stopToken, pathsCompleted]() mutable -> Path {
-                Path path = stopToken.stop_requested() ? Path{} : samplePath(query, generator, dXt, stopToken);
-                pathsCompleted->fetch_add(1, std::memory_order_relaxed);
-                return path;
-            }
-        ));
+    paths.reserve(samples);
+    const uint32_t baseSeed = query.settingsParameters.useSeed
+        ? uint32_t(query.settingsParameters.useSeed.value())
+        : std::random_device{}();
+    auto _samplePath = [query, baseSeed, stopToken, pathsCompleted](uint32_t seedOffset) mutable -> Path {
+        std::seed_seq seq{ baseSeed, seedOffset };
+        std::mt19937 generator(seq);
+        Path path = stopToken.stop_requested() ? Path{} : samplePath(query, generator, stopToken);
+        pathsCompleted->fetch_add(1, std::memory_order_relaxed);
+        return path;
+    };
+    if(query.settingsParameters.useThreading){
+        std::vector<std::future<Path>> pathFutures;
+        pathFutures.reserve(samples);
+        for (uint32_t i = 0; i < samples; ++i) {
+            pathFutures.push_back(threadpool.enqueue([_samplePath, i]() mutable {return _samplePath(i);}));
+        }
+        for (auto& future : pathFutures) {
+            paths.push_back(future.get());
+        }
+    } else {
+        for (uint32_t i = 0; i < samples; ++i) {
+            paths.push_back(_samplePath(i));
+        }
     }
-    for (auto& future : pathFutures) {
-        paths.push_back(future.get());
-    }
-    *jobStatus = stopToken.stop_requested() ? Job::Status::Cancelled : Job::Status::Completed;
+
     return paths;
 }
 
@@ -60,7 +65,7 @@ static Paths samplePaths(
         pathQuery.processDefinition.diffusion.isZero() ? Job::Type::Deterministic : Job::Type::Stochastic
     };
     job.result = std::move(std::async(std::launch::async, samplePaths,
-        pathQuery, m_tp.get(), job.status, job.pathsCompleted, job.stop.get_token()));
+        pathQuery, std::ref(*m_tp), job.pathsCompleted, job.stop.get_token()));
     return job;
 }
 
