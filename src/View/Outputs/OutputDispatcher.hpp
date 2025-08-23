@@ -21,16 +21,25 @@ public:
     void setQueryInfo(const PathQuery& pQuery) const{
         m_statusManager->setQueryInfo(pQuery);
     }
-    void setStatus(const StatusSignal signal) const{
-        m_statusManager->setStatus(signal);
+    void setProgress(size_t pathsCompleted) const{
+        m_statusManager->setProgress(pathsCompleted);
+    }
+    void prepareStatusInfo(const size_t totalPaths) const{
+        m_statusManager->prepareStatusInfo(totalPaths);
     }
     void setError(const ErrorType error) const{
         // m_statusManager->setError(error);
         int TODO = 1;
         (void)TODO;
     }
-    void clearStatus() const{
-        m_statusManager->clearStatus();
+    void setReady() const{
+        m_statusManager->setReady();
+    }
+    void clearStatusBar() const{
+        m_statusManager->clear();
+    }
+    void cancelStatusBar() const{
+        m_statusManager->cancel();
     }
 
     // PathChart

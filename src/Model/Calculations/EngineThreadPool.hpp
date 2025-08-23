@@ -11,7 +11,6 @@ public:
     explicit EngineThreadPool(size_t nrThreads = 0);
     ~EngineThreadPool();
     std::future<Path> enqueue(std::function<Path()> func);
-    void clearTasks();
     size_t nrBusyThreads() const;
 
 private:

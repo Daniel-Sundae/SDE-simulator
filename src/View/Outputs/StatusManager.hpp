@@ -2,20 +2,31 @@
 #include "Types.hpp"
 #include "PathQuery.hpp"
 #include <QtWidgets/QWidget>
+#include <QtWidgets/QGroupBox>
 
-class QGroupBox;
+class QProgressBar;
+class QLabel;
+
 class StatusManager : public QWidget
 {
     Q_OBJECT
+private:
+    struct StatusInfo : public QGroupBox {
+        explicit StatusInfo(QWidget* parent);
+        QLabel* currentStatus;
+        QLabel* errorStatus;
+        QProgressBar* progressBar;
+    };
 public:
     explicit StatusManager(QWidget* parent);
-    void setStatus(const StatusSignal s);
-    void setQueryInfo(const PathQuery &pQuery);
-    void clearStatus();
+    void setProgress(const size_t completed);
+    void setReady();
+    void prepareStatusInfo(const size_t totalPaths);
+    void setQueryInfo(const PathQuery& pQuery);
+    void clear();
+    void cancel();
 
 private:
-    QGroupBox* m_queryDefinition;
-    QGroupBox* m_queryParameters;
-    QGroupBox* m_statusInfo;
-    StatusSignal m_status;
+    QGroupBox* m_queryInfo;
+    StatusInfo* m_statusInfo;
 };

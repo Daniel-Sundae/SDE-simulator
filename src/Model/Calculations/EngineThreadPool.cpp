@@ -24,13 +24,6 @@ EngineThreadPool::~EngineThreadPool()
     }
 }
 
-void EngineThreadPool::clearTasks(){
-    std::scoped_lock lock(m_taskMtx);
-    while (!m_tasks.empty()) {
-        m_tasks.pop();
-    }
-}
-
 size_t EngineThreadPool::nrBusyThreads() const{
     return m_nrBusyThreads.load();
 }

@@ -17,7 +17,7 @@ public:
     explicit MainPresenter();
     ~MainPresenter(); // Out-of-line destructor for QT
     void clear() const;
-    void cancel();
+    void cancel() const;
     InputHandler* getInputHandler() const;
     OutputHandler* getOutputHandler() const;
     void onTransactionReceived(Transaction&& transaction);

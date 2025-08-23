@@ -9,6 +9,7 @@ struct SimulationParameters {
         , time(_time)
         , dt(_dt)
         , samples(_samples)
+        , nrPathsToDraw(std::min(_samples, DefaultConstants::maxPathsToDraw))
     {
         assertValidParameters();
     }
@@ -24,6 +25,7 @@ struct SimulationParameters {
     Time time = DefaultConstants::Simulation::time;
     Time dt = DefaultConstants::Simulation::dt;
     size_t samples = DefaultConstants::Simulation::samples;
+    size_t nrPathsToDraw = 0;
 };
 
 struct ProcessDefinition {

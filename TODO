@@ -1,7 +1,9 @@
 FUNCTIONALITY TODO:
 - progress bar (paths simulated 15/50)
 - implement progress deterministic query first
+- looks like rendering takes time. Move to thread? Clean up implementation in gui.
 - implement error message
+- cancelling takes a long time since std::vectors need to be created
 - implement memory usage
 - Let engine be stand alone process
 - WASM (requires moving away from jthreads)
@@ -10,6 +12,8 @@ FUNCTIONALITY TODO:
 -  
 
 CODE TODO:
+- ensure cancel after sampling done not doing anything
+- ensure 
 - test with spamming sample
 - test cancel many times
 
@@ -18,3 +22,7 @@ PRESENTATION:
 - Show bigger increment step -> bigger error.
 - Show time vs cpu usage tradeoff w.r.t multithreading.
 - Different solvers
+
+Build note:
+cmake --preset release
+cmake --build --preset release

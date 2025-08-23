@@ -21,13 +21,21 @@ if(NOT MSVC)
 endif()
 
 add_compile_options(
-    /W4            # Warning level 4
-    # /WX            # Treat warnings as errors
-    /permissive-   # Strict standards conformance
-    /MP            # Multi-processor compilation
+  /W4 /permissive- /MP
+  $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:CXX>>:/Zi>
+  $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:CXX>>:/sdl>
+  $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:CXX>>:/analyze>
+
+  $<$<AND:$<CONFIG:Release>,$<COMPILE_LANGUAGE:CXX>>:/O2>
+  $<$<AND:$<CONFIG:Release>,$<COMPILE_LANGUAGE:CXX>>:/Oi>
+  $<$<AND:$<CONFIG:Release>,$<COMPILE_LANGUAGE:CXX>>:/GL>
+  $<$<AND:$<CONFIG:Release>,$<COMPILE_LANGUAGE:CXX>>:/Zi>
 )
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Zi /sdl /analyze /guard:cf")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O2 /Oi /Ot /GL")
+add_link_options(
+  $<$<CONFIG:Release>:/DEBUG>
+  $<$<CONFIG:Release>:/LTCG>
+  $<$<CONFIG:Release>:/INCREMENTAL:NO>
+)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Charts OpenGL OpenGLWidgets)
 find_package(GTest REQUIRED)

@@ -18,7 +18,8 @@ struct Job {
     }
     const size_t totalPaths{};
     const Type type{};
-    std::future<Paths> result{};
+    std::future<Paths> fullPaths{};
+    std::future<Distribution> distribution{};
     size_t transactionNr{};
     std::shared_ptr<std::atomic<size_t>> pathsCompleted = std::make_shared<std::atomic<size_t>>(0);
     std::stop_source stop{};

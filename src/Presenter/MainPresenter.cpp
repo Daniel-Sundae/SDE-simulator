@@ -19,11 +19,10 @@ MainPresenter::MainPresenter()
     // Pass ready engine results to output handler
     QObject::connect(m_jobHandler.get(), &JobHandler::jobProgress,
         this, [this](size_t pathsFinished){
-            std::println("Finished {} paths", pathsFinished);
+            m_outputHandler->jobProgress(pathsFinished);
         }, Qt::QueuedConnection);
     QObject::connect(m_jobHandler.get(), &JobHandler::jobDone,
         this, [this](std::shared_ptr<Job> job){
-
             Utils::assertTrue(job->pathsCompleted->load() == job->totalPaths,
                 "Expected completed paths: {} to equal total paths: {}",
                 job->pathsCompleted->load(), job->totalPaths);
@@ -83,9 +82,9 @@ void MainPresenter::clear() const{
     m_outputHandler->clearGUI();
 }
 
-void MainPresenter::cancel() {
-    m_outputHandler->clearGUI();
-    m_jobHandler->cancel();    
+void MainPresenter::cancel() const {
+    m_outputHandler->cancelGUI();
+    m_jobHandler->cancel();
 }
 
 InputHandler* MainPresenter::getInputHandler() const{

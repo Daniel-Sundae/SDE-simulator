@@ -41,9 +41,7 @@ void DistributionChart::plotDistribution(const Distribution& results){
     const State binWidth = (m_xAxis->max() - m_xAxis->min()) / static_cast<qreal>(nrBins);
     std::vector<size_t> histogram(nrBins, 0);
     for (double res : results) {
-        static int skippedSamples = 0;
         if (res < m_xAxis->min() || res > m_xAxis->max()){
-            skippedSamples++;
             continue;
         }
         size_t binIndex = static_cast<size_t>((res - m_xAxis->min()) / static_cast<qreal>(binWidth));

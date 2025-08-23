@@ -4,13 +4,6 @@
 #include <QtCore/QString>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QGroupBox>
-
-static const std::unordered_map<StatusSignal, QString> statusToString = {
-    {StatusSignal::READY, QString("Ready")},
-    {StatusSignal::SAMPLING, QString("Sampling...")},
-    {StatusSignal::RENDERING, QString("Rendering...")}
-};
 
 static const std::unordered_map<SolverType, QString> solverToString = {
     std::pair{SolverType::EULER_MARUYAMA, QString("Euler-Maruyama")},
@@ -18,47 +11,78 @@ static const std::unordered_map<SolverType, QString> solverToString = {
     std::pair{SolverType::MILSTEIN, QString("Milstein")}
 };
 
+StatusManager::StatusInfo::StatusInfo(QWidget* parent)
+    : QGroupBox(parent)
+    , currentStatus(new QLabel(this))
+    , errorStatus(new QLabel(this))
+    , progressBar(new QProgressBar(this))
+{
+    progressBar->setFormat("%v/%m");
+    auto layout = new QVBoxLayout(this);
+    layout->addWidget(currentStatus);
+    layout->addWidget(errorStatus);
+    layout->addWidget(progressBar);
+    setLayout(layout);
+}
+
 StatusManager::StatusManager(QWidget* parent)
 : QWidget(parent)
-, m_queryDefinition(new QGroupBox(this))
-, m_queryParameters(new QGroupBox(this))
-, m_statusInfo(new QGroupBox(this))
-, m_status(StatusSignal::READY)
+, m_queryInfo(new QGroupBox(this))
+, m_statusInfo(new StatusInfo(this))
 {
     auto layout = new QHBoxLayout(this);
-    auto qdefLayout = new QVBoxLayout(m_queryDefinition);
-    auto qparLayout = new QVBoxLayout(m_queryParameters);
-    auto statusLayout = new QVBoxLayout(m_statusInfo);
-    qdefLayout->addWidget(new QLabel("", this));
-    qparLayout->addWidget(new QLabel("", this));
-    statusLayout->addWidget(new QLabel("Ready", this));
-    layout->addWidget(m_queryDefinition, 3);
-    layout->addWidget(m_queryParameters, 5);
+    auto infoLayout = new QVBoxLayout(m_queryInfo);
+    infoLayout->addWidget(new QLabel("", this));
+    layout->addWidget(m_queryInfo, 3);
     layout->addWidget(m_statusInfo, 1);
     setStyleSheet(GUI::groupBoxDescription());
+    setReady();
 }
 
-void StatusManager::setStatus(const StatusSignal s){
-    m_status = s;
-    m_statusInfo->findChild<QLabel*>()->setText(statusToString.at(s));
+void StatusManager::setProgress(const size_t pathsCompleted){
+    m_statusInfo->progressBar->setValue(static_cast<int>(pathsCompleted));
+    if(pathsCompleted == m_statusInfo->progressBar->maximum()){
+        m_statusInfo->currentStatus->setText("Rendering...");
+        m_statusInfo->currentStatus->repaint();
+    }
 }
 
-void StatusManager::setQueryInfo(const PathQuery& pQuery){
+void StatusManager::setReady(){
+    m_statusInfo->currentStatus->setText("Ready");
+}
+
+void StatusManager::prepareStatusInfo(const size_t totalPaths){
+    m_statusInfo->progressBar->setRange(0, totalPaths);
+    m_statusInfo->progressBar->setValue(0);
+    m_statusInfo->currentStatus->setText("Sampling...");
+}
+
+void StatusManager::setQueryInfo(const PathQuery& query){
     QString infoDefinition;
-    QTextStream streamDefinition(&infoDefinition);
-    streamDefinition << "Process: " << QString::fromUtf8( getField(FieldTags::name{}, pQuery.processDefinition.type) ) << "\n"
-                     << "Definition: " << QString::fromUtf8( getField(FieldTags::definition{}, pQuery.processDefinition.type) );
     QString infoParams;
     QTextStream streamParams(&infoParams);
-    streamParams << "Definition parameters: μ = " << QString::number(pQuery.processDefinition.drift.mu()) << ", σ = " << QString::number(pQuery.processDefinition.diffusion.sigma()) << ", X" << QString::fromUtf8("\u2080") << " = " << QString::number(pQuery.processDefinition.startValueData) << "\n"
-                 << "Simulation parameters: Solver = " << solverToString.at(pQuery.simulationParameters.solver) << ", Time = " << QString::number(pQuery.simulationParameters.time) << ", dt = " << QString::number(pQuery.simulationParameters.dt) << ", Samples = " << QString::number(pQuery.simulationParameters.samples) << "\n"
-                 << "Settings: Multithreading = " << (pQuery.settingsParameters.useThreading ? "Yes" : "No") << ", Seed: " << (pQuery.settingsParameters.useSeed ? QString::number(pQuery.settingsParameters.useSeed.value()) : "Random");
-    m_queryDefinition->findChild<QLabel*>()->setText(infoDefinition);
-    m_queryParameters->findChild<QLabel*>()->setText(infoParams);
+    streamParams
+                << "Process: " << QString::fromUtf8( getField(FieldTags::name{}, query.processDefinition.type) ) << " "
+                << QString::fromUtf8( getField(FieldTags::definition{}, query.processDefinition.type) ) << "\n"
+                << "μ = " << QString::number(query.processDefinition.drift.mu()) << ", "
+                << "σ = " << QString::number(query.processDefinition.diffusion.sigma()) << ", "
+                << "X" << QString::fromUtf8("\u2080") << " = " << QString::number(query.processDefinition.startValueData) << "\n"
+                << "Solver = " << solverToString.at(query.simulationParameters.solver) << ", "
+                << "T = " << QString::number(query.simulationParameters.time) << ", "
+                << "dt = " << QString::number(query.simulationParameters.dt) << ", "
+                << "Samples = " << QString::number(query.simulationParameters.samples) << "\n"
+                << "Multithreading = " << (query.settingsParameters.useThreading ? "Yes" : "No") << ", "
+                << "Seed: " << (query.settingsParameters.useSeed ? QString::number(query.settingsParameters.useSeed.value()) : "Random");
+    m_queryInfo->findChild<QLabel*>()->setText(infoParams);
 }
 
-void StatusManager::clearStatus(){
-    m_queryDefinition->findChild<QLabel*>()->setText("");
-    m_queryParameters->findChild<QLabel*>()->setText("");
-    setStatus(StatusSignal::READY);
+void StatusManager::clear(){
+    m_queryInfo->findChild<QLabel*>()->setText("");
+    setReady();
+    m_statusInfo->progressBar->setRange(0, 1);
+    m_statusInfo->progressBar->setValue(0);
+}
+
+void StatusManager::cancel(){
+    m_statusInfo->currentStatus->setText("Cancelling...");
 }
