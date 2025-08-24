@@ -14,7 +14,7 @@
 class JobHandler : public QObject{
     Q_OBJECT
 public:
-    explicit JobHandler();
+    explicit JobHandler() = default;
     JobHandler(const JobHandler&) = delete;
     JobHandler(JobHandler&&) = delete;
     JobHandler& operator=(const JobHandler&) = delete;
@@ -22,16 +22,19 @@ public:
     ~JobHandler();
     bool jobRunning() const;
     void cancel();
-    void postJobs(std::pair<Job, Job>&& jobs);
+    void postJobs(Job&& deterministicJob, Job&& stochasticJob);
+
 private:
-    void handleJobs(std::stop_token token);
+    void handleDeterministicJob(Job dJob);
+    void handleStochasticJob(Job sJob);
 signals:
     void jobProgress(size_t pathsFinished);
-    void jobDone(std::shared_ptr<Job> job);
+    void fullPathsDone(std::shared_ptr<Job> job);
+    void distributionDone(std::shared_ptr<Job> job);
 private:
-    std::jthread m_jobConsumer;
-    std::binary_semaphore m_jobsAvailable{0};
-    std::atomic<bool> m_handlingJobs = false;
+    std::thread m_deterministicJobThread;
+    std::thread m_stochasticJobThread;
+    std::atomic<bool> m_deterministicJobRunning = false;
+    std::atomic<bool> m_stochasticJobRunning = false;
     std::atomic<bool> m_doCancel = false;
-    std::optional<std::pair<Job, Job>> m_currentJobs;
 };

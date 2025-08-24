@@ -22,7 +22,7 @@ public:
     void setProgress(const size_t completed);
     void setReady();
     void prepareStatusInfo(const size_t totalPaths);
-    void setQueryInfo(const PathQuery& pQuery);
+    void setQueryInfo(const PathQuery& query);
     void clear();
     void cancel();
 

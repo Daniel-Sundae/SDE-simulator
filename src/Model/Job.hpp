@@ -11,16 +11,20 @@ struct Job {
         Deterministic,
         Stochastic,
     };
-    explicit Job(size_t _totalPaths, Type _type)
+    struct Atomics {
+        std::atomic<size_t> pathsCompleted;
+        // State maxPathEndVal;
+    };
+    explicit Job(size_t _totalPaths)
     : totalPaths(_totalPaths)
-    , type(_type)
     {
     }
     const size_t totalPaths{};
-    const Type type{};
+    Type type{};
     std::future<Paths> fullPaths{};
     std::future<Distribution> distribution{};
     size_t transactionNr{};
-    std::shared_ptr<std::atomic<size_t>> pathsCompleted = std::make_shared<std::atomic<size_t>>(0);
+    std::shared_ptr<Job::Atomics> atomicData =
+        std::make_shared<Job::Atomics>();
     std::stop_source stop{};
 };

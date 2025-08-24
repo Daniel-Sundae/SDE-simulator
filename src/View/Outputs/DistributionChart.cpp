@@ -1,6 +1,7 @@
 ﻿#include "DistributionChart.hpp"
 #include "ViewUtils.hpp"
 #include "PathQuery.hpp"
+#include "Utils.hpp"
 #include <algorithm>
 #include <QtCharts/QBarSet>
 #include <QtCharts/QBarSeries>
@@ -36,8 +37,8 @@ void DistributionChart::updateTitle(const ProcessType type){
 }
 
 void DistributionChart::plotDistribution(const Distribution& results){
-    assert(m_distributionSet->count() == 0);
-    if(results.empty()) return;
+    Utils::assertTrue(m_distributionSet->count() == 0, "Distribution set is not empty");
+    if (results.empty()) return;
     const State binWidth = (m_xAxis->max() - m_xAxis->min()) / static_cast<qreal>(nrBins);
     std::vector<size_t> histogram(nrBins, 0);
     for (double res : results) {

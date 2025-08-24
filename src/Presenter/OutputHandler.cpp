@@ -5,16 +5,26 @@
 #include "Constants.hpp"
 #include "Utils.hpp"
 
-void OutputHandler::onPathsReceived(const Paths& paths){
-    Distribution distribution;
-    distribution.reserve(paths.size());
-    for (const auto& path : paths) {
-        if(path.empty()) break; // Job cancelled
-        m_outputDispatcher->plotPath(path);
-        distribution.push_back(path.back());
+void OutputHandler::signalReadyIfNeeded() const {
+    if (m_pathsReceived && m_distributionReceived){
+        m_outputDispatcher->setReady();
     }
+}
+
+void OutputHandler::onPathsReceived(const Paths& paths){
+    Utils::assertTrue(paths.size() <= DefaultConstants::maxPathsToDraw,
+        "Expected paths to be at most {} but got {}", DefaultConstants::maxPathsToDraw, paths.size());
+    for (const auto& path : paths) {
+        m_outputDispatcher->plotPath(path);
+    }
+    m_pathsReceived = true;
+    signalReadyIfNeeded();
+}
+
+void OutputHandler::onDistributionReceived(const Distribution& distribution){
     m_outputDispatcher->plotDistribution(distribution);
-    m_outputDispatcher->setReady();
+    m_distributionReceived = true;
+    signalReadyIfNeeded();
 }
 
 void OutputHandler::onDriftDataReceived(const Path& driftCurve){
@@ -33,6 +43,12 @@ void OutputHandler::onPDFReceived(const PDF& pdf){
     m_outputDispatcher->setDistributionChartSupport(pdf.getSupport());
     m_outputDispatcher->updateDistributionChartPDF(pdf.getPDFData());
     m_outputDispatcher->updateDistributionChartEV(pdf.EV());
+}
+
+void OutputHandler::onStartTransaction(const PathQuery& query){
+    prepareGUI(query);
+    m_pathsReceived = false;
+    m_distributionReceived = false;
 }
 
 void OutputHandler::prepareGUI(const PathQuery& query){
@@ -54,6 +70,4 @@ void OutputHandler::clearGUI() const{
 
 void OutputHandler::cancelGUI() const{
     m_outputDispatcher->cancelStatusBar();
-    m_outputDispatcher->clearPathChart();
-    m_outputDispatcher->clearDistributionChart();
 }

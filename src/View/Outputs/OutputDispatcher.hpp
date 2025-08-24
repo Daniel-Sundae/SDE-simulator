@@ -18,8 +18,8 @@ public:
     explicit OutputDispatcher(QWidget* parent = nullptr);
 
     // StatusManager
-    void setQueryInfo(const PathQuery& pQuery) const{
-        m_statusManager->setQueryInfo(pQuery);
+    void setQueryInfo(const PathQuery& query) const{
+        m_statusManager->setQueryInfo(query);
     }
     void setProgress(size_t pathsCompleted) const{
         m_statusManager->setProgress(pathsCompleted);

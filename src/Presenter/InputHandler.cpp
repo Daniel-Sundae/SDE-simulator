@@ -2,7 +2,6 @@
 #include "ProcessData.hpp"
 #include "Transaction.hpp"
 #include "Utils.hpp"
-#include <assert.h>
 
 InputHandler::InputHandler(MainPresenter& mainPresenter)
     : m_mainPresenter(mainPresenter)
@@ -33,32 +32,32 @@ bool InputHandler::canSample() const{
 }
 
 void InputHandler::samplePaths(){
-    if(!canSample())
+    if (!canSample())
         return;
     m_processDefinition = std::make_unique<ProcessDefinition>(
         m_processDefinition->type,
         getField(FieldTags::drift{}, m_processDefinition->type, m_inputMu),
         getField(FieldTags::diffusion{}, m_processDefinition->type, m_inputSigma),
-        m_processDefinition->startValueData);
+        m_processDefinition->startValue);
 
-    const PathQuery pQuery{ *m_processDefinition, *m_simulationParameters, *m_settingsParameters};
-    const PathQuery deterministicQuery = createDriftQuery(pQuery);
-    m_mainPresenter.onTransactionReceived(Transaction{std::move(pQuery), std::move(deterministicQuery)});
+    const PathQuery stochasticQuery{ *m_processDefinition, *m_simulationParameters, *m_settingsParameters};
+    const PathQuery deterministicQuery = createDriftQuery(stochasticQuery);
+    m_mainPresenter.onTransactionReceived(Transaction{std::move(stochasticQuery), std::move(deterministicQuery)});
 }
 
-PathQuery InputHandler::createDriftQuery(const PathQuery& pQuery) const{
+PathQuery InputHandler::createDriftQuery(const PathQuery& stochasticQuery) const{
     auto definition = ProcessDefinition(
-        pQuery.processDefinition.type,
-        pQuery.processDefinition.drift,
+        stochasticQuery.processDefinition.type,
+        stochasticQuery.processDefinition.drift,
         // Diffusion function is not needed by deterministic query
         {0, [](Time, State){return 0;}},
-        pQuery.processDefinition.startValueData);
+        stochasticQuery.processDefinition.startValue);
     auto simulationParams = SimulationParameters(
-        pQuery.simulationParameters.solver,
-        pQuery.simulationParameters.time,
-        pQuery.simulationParameters.dt,
+        stochasticQuery.simulationParameters.solver,
+        stochasticQuery.simulationParameters.time,
+        stochasticQuery.simulationParameters.dt,
         1);
-    return PathQuery( definition, simulationParams, pQuery.settingsParameters);
+    return PathQuery( definition, simulationParams, stochasticQuery.settingsParameters);
 }
 
 void InputHandler::onSolverTypeModified(SolverType newType){
@@ -81,7 +80,7 @@ void InputHandler::onProcessDefinitionModified(const DefinitionWidget param, dou
         m_inputSigma = userValue;
         break;
     case DefinitionWidget::STARTVALUE:
-        m_processDefinition->startValueData = userValue;
+        m_processDefinition->startValue = userValue;
         break;
     default:
         Utils::fatalError("Modifiying DefinitionWidget parameter: {} is not handled", static_cast<int>(param));
@@ -116,9 +115,9 @@ void InputHandler::onSettingsParameterModified(const SettingsWidget param, int u
     switch (param) {
         case SettingsWidget::FIXSEED:
             if (userValue == 0) {
-                m_settingsParameters->useSeed = std::nullopt;
+                m_settingsParameters->seed = std::nullopt;
             } else {
-                m_settingsParameters->useSeed = static_cast<size_t>(userValue);
+                m_settingsParameters->seed = static_cast<size_t>(userValue);
             }
             break;
         default:

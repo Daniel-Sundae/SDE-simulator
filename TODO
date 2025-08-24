@@ -1,10 +1,14 @@
 FUNCTIONALITY TODO:
-- progress bar (paths simulated 15/50)
-- implement progress deterministic query first
-- looks like rendering takes time. Move to thread? Clean up implementation in gui.
+- looks like rendering takes time. Limit points in the path drawn (noone cares about 0.0001 dt, do 0.001 as smallest for rendering)
+- super laggy to resize window when chart is populated with a lot of dense paths
+- auto detect squishiness (e.g. exp beh gbm)
+- introduce meta data for jobs. Would allow for clean distribution and path plot.
+  Info needed: size_t pathsCompleted, State largestEndVal, State smallestEndVal, State largestSeenState, State smallestSeenState
+  Perhaps shared pointer to atomic inner POD struct instead?
+- fix so "Cancelling..." only shows if job active.
 - implement error message
-- cancelling takes a long time since std::vectors need to be created
 - implement memory usage
+- implement icon for the process
 - Let engine be stand alone process
 - WASM (requires moving away from jthreads)
 - Introduce new tab with live und data and option price and simulated option price
@@ -12,10 +16,21 @@ FUNCTIONALITY TODO:
 -  
 
 CODE TODO:
-- ensure cancel after sampling done not doing anything
-- ensure 
 - test with spamming sample
 - test cancel many times
+- search for TODO in codebase
+- rename pathQuery to stochasticQuery in ontransactionreceived
+
+WRITE TESTS:
+- one long simple path
+- no vol, no drift
+- seed
+- multithread
+- cancel
+- solvers roughly same val
+- processes
+- exp val
+
 
 
 PRESENTATION:
@@ -26,3 +41,11 @@ PRESENTATION:
 Build note:
 cmake --preset release
 cmake --build --preset release
+
+Readme:
+Write about cancellation feature
+Write about progress bar
+multithreading and seedin options
+
+technical readme:
+Memory optimization (only keep the full paths of the drawn paths)

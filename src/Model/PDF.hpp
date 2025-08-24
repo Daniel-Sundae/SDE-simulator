@@ -70,7 +70,7 @@ private:
                 break;
             }
         }
-        if(m_support.first > m_support.second){
+        if (m_support.first > m_support.second){
             Utils::fatalError("Failed to generate PDF support: (start, end) is ({}, {})",
                 m_support.first, m_support.second);
         }

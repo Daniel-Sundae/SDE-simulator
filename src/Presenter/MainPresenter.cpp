@@ -21,34 +21,40 @@ MainPresenter::MainPresenter()
         this, [this](size_t pathsFinished){
             m_outputHandler->jobProgress(pathsFinished);
         }, Qt::QueuedConnection);
-    QObject::connect(m_jobHandler.get(), &JobHandler::jobDone,
+    QObject::connect(m_jobHandler.get(), &JobHandler::fullPathsDone,
         this, [this](std::shared_ptr<Job> job){
-            Utils::assertTrue(job->pathsCompleted->load() == job->totalPaths,
-                "Expected completed paths: {} to equal total paths: {}",
-                job->pathsCompleted->load(), job->totalPaths);
-            Utils::assertTrue(job->result.wait_for(std::chrono::seconds(0)) == std::future_status::ready,
-                "Expected job result to be ready");
-            Utils::assertTrue(!job->stop.stop_requested(),
-                "Expect job to not be stopped");
-            if(job->transactionNr != s_currentTransaction.load()) {
+            Paths paths = job->fullPaths.get();
+            switch (job->type) {
+            case Job::Type::Deterministic:
+                Utils::assertTrue(paths.size() == 1,
+                    "Expected deterministic job to return exactly one path, got: {}", paths.size());
+                m_outputHandler->onDriftDataReceived(paths.front());
+                break;
+            case Job::Type::Stochastic:
+                m_outputHandler->onPathsReceived(paths);
+                break;
+            default:
+                Utils::fatalError("Unknown job type received in MainPresenter");
+                break;
+            }
+        }, Qt::QueuedConnection);
+    QObject::connect(m_jobHandler.get(), &JobHandler::distributionDone,
+        this, [this](std::shared_ptr<Job> job){
+            Utils::assertTrue(job->distribution.wait_for(std::chrono::seconds(0)) == std::future_status::ready,
+                "Expected distribution to be ready");
+            if (job->transactionNr != s_currentTransaction.load()) {
                 std::clog << "Dropping stale transaction" << std::endl;
                 std::clog << "Stale transaction: " << job->transactionNr << std::endl;
                 std::clog << "Current transaction: " << s_currentTransaction.load() << std::endl;
                 return;
             }
 
-            Paths paths = job->result.get();
+            Distribution distribution = job->distribution.get();
             switch (job->type) {
-            case Job::Type::Deterministic:
-                Utils::assertTrue(paths.size() == 1,
-                    "Expected deterministic job to return exactly one path, got: {}", paths.size());
-                m_outputHandler->onDriftDataReceived(std::move(paths.at(0)));
-                break;
             case Job::Type::Stochastic:
-                m_outputHandler->onPathsReceived(std::move(paths));
+                m_outputHandler->onDistributionReceived(std::move(distribution));
                 break;
             default:
-                Utils::fatalError("Unknown job type received in MainPresenter");
                 break;
             }
         }, Qt::QueuedConnection);
@@ -56,26 +62,28 @@ MainPresenter::MainPresenter()
 
 MainPresenter::~MainPresenter() = default;
 
-void MainPresenter::onTransactionReceived(Transaction&& transaction){
-    if(m_jobHandler->jobRunning()) {
+void MainPresenter::onTransactionReceived(const Transaction& transaction){
+    if (m_jobHandler->jobRunning()) {
         m_outputHandler->setError(ErrorType::BUSY_ENGINE);
         return;
     }
-    m_outputHandler->prepareGUI(transaction.pathQuery);
+    m_outputHandler->onStartTransaction(transaction.pathQuery);
     const auto& pq = transaction.pathQuery;
     m_outputHandler->onPDFReceived(getField(FieldTags::pdf{},
         pq.processDefinition.type,
-        pq.processDefinition.startValueData,
+        pq.processDefinition.startValue,
         pq.simulationParameters.time,
         pq.processDefinition.drift.mu(),
         pq.processDefinition.diffusion.sigma()
     ));
     Job deterministicJob = m_engine->processPathQuery(transaction.deterministicQuery);
+    deterministicJob.type = Job::Type::Deterministic;
     Job stochasticJob = m_engine->processPathQuery(transaction.pathQuery);
+    stochasticJob.type = Job::Type::Stochastic;
     const size_t transactionNr = ++s_currentTransaction;
     deterministicJob.transactionNr = transactionNr;
     stochasticJob.transactionNr = transactionNr;
-    m_jobHandler->postJobs({std::move(deterministicJob), std::move(stochasticJob)});
+    m_jobHandler->postJobs(std::move(deterministicJob), std::move(stochasticJob));
 }
 
 void MainPresenter::clear() const{
@@ -83,6 +91,7 @@ void MainPresenter::clear() const{
 }
 
 void MainPresenter::cancel() const {
+    if (!m_jobHandler->jobRunning()) return;
     m_outputHandler->cancelGUI();
     m_jobHandler->cancel();
 }

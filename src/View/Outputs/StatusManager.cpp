@@ -41,7 +41,7 @@ StatusManager::StatusManager(QWidget* parent)
 
 void StatusManager::setProgress(const size_t pathsCompleted){
     m_statusInfo->progressBar->setValue(static_cast<int>(pathsCompleted));
-    if(pathsCompleted == m_statusInfo->progressBar->maximum()){
+    if (pathsCompleted == m_statusInfo->progressBar->maximum()){
         m_statusInfo->currentStatus->setText("Rendering...");
         m_statusInfo->currentStatus->repaint();
     }
@@ -52,7 +52,7 @@ void StatusManager::setReady(){
 }
 
 void StatusManager::prepareStatusInfo(const size_t totalPaths){
-    m_statusInfo->progressBar->setRange(0, totalPaths);
+    m_statusInfo->progressBar->setRange(0, static_cast<int>(totalPaths));
     m_statusInfo->progressBar->setValue(0);
     m_statusInfo->currentStatus->setText("Sampling...");
 }
@@ -62,17 +62,17 @@ void StatusManager::setQueryInfo(const PathQuery& query){
     QString infoParams;
     QTextStream streamParams(&infoParams);
     streamParams
-                << "Process: " << QString::fromUtf8( getField(FieldTags::name{}, query.processDefinition.type) ) << " "
+                << QString::fromUtf8( getField(FieldTags::name{}, query.processDefinition.type) ) << ": "
                 << QString::fromUtf8( getField(FieldTags::definition{}, query.processDefinition.type) ) << "\n"
                 << "μ = " << QString::number(query.processDefinition.drift.mu()) << ", "
                 << "σ = " << QString::number(query.processDefinition.diffusion.sigma()) << ", "
-                << "X" << QString::fromUtf8("\u2080") << " = " << QString::number(query.processDefinition.startValueData) << "\n"
+                << "X" << QString::fromUtf8("\u2080") << " = " << QString::number(query.processDefinition.startValue) << "\n"
                 << "Solver = " << solverToString.at(query.simulationParameters.solver) << ", "
                 << "T = " << QString::number(query.simulationParameters.time) << ", "
                 << "dt = " << QString::number(query.simulationParameters.dt) << ", "
                 << "Samples = " << QString::number(query.simulationParameters.samples) << "\n"
                 << "Multithreading = " << (query.settingsParameters.useThreading ? "Yes" : "No") << ", "
-                << "Seed: " << (query.settingsParameters.useSeed ? QString::number(query.settingsParameters.useSeed.value()) : "Random");
+                << "Seed: " << (query.settingsParameters.seed ? QString::number(query.settingsParameters.seed.value()) : "Random");
     m_queryInfo->findChild<QLabel*>()->setText(infoParams);
 }
 
@@ -85,4 +85,5 @@ void StatusManager::clear(){
 
 void StatusManager::cancel(){
     m_statusInfo->currentStatus->setText("Cancelling...");
+    m_statusInfo->currentStatus->repaint();
 }

@@ -20,7 +20,7 @@ public:
     void cancel() const;
     InputHandler* getInputHandler() const;
     OutputHandler* getOutputHandler() const;
-    void onTransactionReceived(Transaction&& transaction);
+    void onTransactionReceived(const Transaction& transaction);
 private:
     std::unique_ptr<InputHandler> m_inputHandler;
     std::unique_ptr<OutputHandler> m_outputHandler;

@@ -5,9 +5,6 @@
 #include "InputDispatcher.hpp"
 #include <unordered_map>
 
-class QPushButton; // TODO: Remove?
-class QDoubleSpinBox; // TODO: Remove?
-
 class ActionManager : public InputDispatcherGroupBox
 {
     Q_OBJECT

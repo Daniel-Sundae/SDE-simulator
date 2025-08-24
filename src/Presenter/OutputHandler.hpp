@@ -9,16 +9,21 @@ struct PDF;
 class OutputHandler{
 public:
     OutputHandler() = default;
-    void onPathsReceived(const Paths& paths);
-    void onPDFReceived(const PDF& pdf);
-    void onDriftDataReceived(const Path& driftCurve);
+    void onPathsReceived(const Paths &paths);
+    void onDistributionReceived(const Distribution &distribution);
+    void onPDFReceived(const PDF &pdf);
+    void onStartTransaction(const PathQuery &query);
+    void onDriftDataReceived(const Path &driftCurve);
     void jobProgress(size_t pathsCompleted);
     void setError(ErrorType error);
-    void prepareGUI(const PathQuery &pQuery);
     void setOutputDispatcher(OutputDispatcher* outputDispatcher){ m_outputDispatcher = outputDispatcher; };
     void clearGUI() const;
     void cancelGUI() const;
-
+    
 private:
+    void signalReadyIfNeeded() const;
+    void prepareGUI(const PathQuery &query);
     OutputDispatcher* m_outputDispatcher = nullptr;
+    bool m_pathsReceived = false;
+    bool m_distributionReceived = false;
 };

@@ -1,6 +1,7 @@
 #pragma once
 #include "ProcessData.hpp"
 #include "Constants.hpp"
+#include "Utils.hpp"
 #include <optional>
 struct SimulationParameters {
     explicit SimulationParameters() = default;
@@ -9,30 +10,26 @@ struct SimulationParameters {
         , time(_time)
         , dt(_dt)
         , samples(_samples)
-        , nrPathsToDraw(std::min(_samples, DefaultConstants::maxPathsToDraw))
     {
-        assertValidParameters();
-    }
-    void assertValidParameters() const{
-        if (dt <= 0 || time <= 0) {
-            throw std::invalid_argument("Time and points must be greater than 0");
-        }
+        Utils::assertTrue(dt > 0 && time > 0, "Time and points must be greater than 0");
     }
     size_t points() const{
         return static_cast<size_t>(std::ceil(time / dt));
+    }
+    size_t nrPathsToDraw() const {
+        return std::min(samples, DefaultConstants::maxPathsToDraw);
     }
     SolverType solver = DefaultConstants::Simulation::solver;
     Time time = DefaultConstants::Simulation::time;
     Time dt = DefaultConstants::Simulation::dt;
     size_t samples = DefaultConstants::Simulation::samples;
-    size_t nrPathsToDraw = 0;
 };
 
 struct ProcessDefinition {
     ProcessType type = DefaultConstants::process;
     Drift drift = getField(FieldTags::drift{}, DefaultConstants::process, 0.0);
     Diffusion diffusion = getField(FieldTags::diffusion{}, DefaultConstants::process, 0.0);
-    State startValueData = getField(FieldTags::startValueData{}, DefaultConstants::process).defaultValue;
+    State startValue = getField(FieldTags::startValue{}, DefaultConstants::process).defaultValue;
 
     explicit ProcessDefinition() = default;
 
@@ -40,14 +37,14 @@ struct ProcessDefinition {
         : type(t)
         , drift(d)
         , diffusion(diff)
-        , startValueData(start)
+        , startValue(start)
     {
     }
 };
 
 struct SettingsParameters{
     bool useThreading = true;
-    std::optional<size_t> useSeed = std::nullopt;
+    std::optional<size_t> seed = std::nullopt;
 };
 
 struct PathQuery {

@@ -26,14 +26,14 @@ void DefinitionManager::updateWidgetProperties(ProcessType process, bool initial
     sigmaWidget->setSingleStep(sigmaData.incrementSize);
 
     auto* startValueWidget = qobject_cast<QDoubleSpinBox*>(m_widgets[DefinitionWidget::STARTVALUE]);
-    Constants startValueData = getField(FieldTags::startValueData{}, process);
-    startValueWidget->setRange(startValueData.allowedValues.first, startValueData.allowedValues.second);
-    startValueWidget->setSingleStep(startValueData.incrementSize);
+    Constants startValue = getField(FieldTags::startValue{}, process);
+    startValueWidget->setRange(startValue.allowedValues.first, startValue.allowedValues.second);
+    startValueWidget->setSingleStep(startValue.incrementSize);
 
     if (initialize){
         muWidget->setValue(muData.defaultValue);
         sigmaWidget->setValue(sigmaData.defaultValue);
-        startValueWidget->setValue(startValueData.defaultValue);
+        startValueWidget->setValue(startValue.defaultValue);
     }
 }
 

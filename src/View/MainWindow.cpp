@@ -11,7 +11,7 @@ MainWindow::MainWindow()
 {
     setCentralWidget(m_centralWidget);
     setWindowTitle("SDE Simulator");
-    resize(1300, 600);
+    resize(1500, 700);
     addWidgets();
     show();
 }

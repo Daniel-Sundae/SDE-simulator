@@ -28,20 +28,9 @@ size_t EngineThreadPool::nrBusyThreads() const{
     return m_nrBusyThreads.load();
 }
 
-std::future<Path> EngineThreadPool::enqueue(std::function<Path()> func){
-    std::packaged_task<Path()> task(std::move(func));
-    std::future<Path> future = task.get_future();
-    {
-        std::scoped_lock lock(m_taskMtx);
-        m_tasks.push(std::move(task));
-    }
-    m_cv.notify_one();
-    return future;
-}
-
 void EngineThreadPool::doTasks()
 {
-    Task task;
+    std::move_only_function<void()> task;
     while (true) {
         {
             std::unique_lock<std::mutex> lock(m_taskMtx);
@@ -51,7 +40,7 @@ void EngineThreadPool::doTasks()
             m_tasks.pop();
         }
         m_nrBusyThreads++;
-        task(); // When finished, future is ready
+        task(); // Sets value on promise
         m_nrBusyThreads--;
     }
 }
