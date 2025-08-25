@@ -17,11 +17,17 @@ void OutputHandler::onPathsReceived(const Paths& paths){
     for (const auto& path : paths) {
         m_outputDispatcher->plotPath(path);
     }
-    m_pathsReceived = true;
+    m_pathsReceived = true; 
     signalReadyIfNeeded();
 }
 
-void OutputHandler::onDistributionReceived(const Distribution& distribution){
+void OutputHandler::onDistributionReceived(const Distribution& distribution, const Range support){
+    Utils::assertTrue(!m_currentPDF.data.has_value(), "Data has incorrectly already been generated");
+    Utils::assertTrue(m_currentPDF.pdf != nullptr, "PDF has not been created");
+    m_currentPDF.generatePDFData(support);
+    m_outputDispatcher->setDistributionChartSupport({support.first - m_currentPDF.stddev, support.second + m_currentPDF.stddev});
+    m_outputDispatcher->updateDistributionChartPDF(m_currentPDF.data.value());
+    m_outputDispatcher->updateDistributionChartEV(m_currentPDF.EV);
     m_outputDispatcher->plotDistribution(distribution);
     m_distributionReceived = true;
     signalReadyIfNeeded();
@@ -39,14 +45,15 @@ void OutputHandler::setError(ErrorType error){
     m_outputDispatcher->setError(error);
 }
 
-void OutputHandler::onPDFReceived(const PDF& pdf){
-    m_outputDispatcher->setDistributionChartSupport(pdf.getSupport());
-    m_outputDispatcher->updateDistributionChartPDF(pdf.getPDFData());
-    m_outputDispatcher->updateDistributionChartEV(pdf.EV());
-}
-
 void OutputHandler::onStartTransaction(const PathQuery& query){
     prepareGUI(query);
+    m_currentPDF = getField(FieldTags::pdf{},
+        query.processDefinition.type,
+        query.processDefinition.startValue,
+        query.simulationParameters.time,
+        query.processDefinition.drift.mu(),
+        query.processDefinition.diffusion.sigma()
+    );
     m_pathsReceived = false;
     m_distributionReceived = false;
 }

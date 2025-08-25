@@ -57,16 +57,34 @@ static Paths samplePaths(
     return paths;
 }
 
+// Interesting contention data
+static std::atomic<size_t> d_minUpdatesFailed = 0;
+static std::atomic<size_t> d_maxUpdatesFailed = 0;
+
+static void updateJobData(std::shared_ptr<Job::Atomics> jobData, const State endValue) {
+    jobData->pathsCompleted.fetch_add(1, std::memory_order_relaxed);
+    State currentMin = jobData->minPathEndVal.load();
+    State currentMax = jobData->maxPathEndVal.load();
+    // If loaded min/max is stale, update it, increment the failure counter and try again (if needed)
+    while(endValue < currentMin && !jobData->minPathEndVal.compare_exchange_strong(
+        currentMin, endValue, std::memory_order_relaxed, std::memory_order_relaxed)
+    ){
+        d_minUpdatesFailed.fetch_add(1, std::memory_order_relaxed);
+    }
+    while(endValue > currentMax && !jobData->maxPathEndVal.compare_exchange_strong(
+        currentMax, endValue, std::memory_order_relaxed, std::memory_order_relaxed)
+    ){
+        d_maxUpdatesFailed.fetch_add(1, std::memory_order_relaxed);
+    }
+}
+
 static std::optional<State> samplePathEndValue(
         const PathQuery& query,
         std::seed_seq seq,
         std::stop_token stopToken,
         std::shared_ptr<Job::Atomics> jobData) {
     // Worker threads should always start by checking for user cancellation
-    if (stopToken.stop_requested()){
-        jobData->pathsCompleted.fetch_add(1, std::memory_order_relaxed);
-        return std::nullopt;
-    }
+    if (stopToken.stop_requested()) return std::nullopt;
     const auto points = query.simulationParameters.points();
     const auto& drift = query.processDefinition.drift;
     const auto& diffusion = query.processDefinition.diffusion;
@@ -76,11 +94,12 @@ static std::optional<State> samplePathEndValue(
     std::mt19937 generator(seq);
     Utils::assertTrue(points != 0, "Expected points to be non-zero");
     for (size_t i = 1; i < points; ++i) {
-        if (stopToken.stop_requested()) [[unlikely]] break;
+        if (stopToken.stop_requested()) [[unlikely]] return std::nullopt;
         X += dXt(drift, diffusion, static_cast<Time>(i) * dt, X, dt, generator);
     }
-    jobData->pathsCompleted.fetch_add(1, std::memory_order_relaxed);
-    return stopToken.stop_requested() ? std::nullopt : std::make_optional(X);
+
+    updateJobData(jobData, X);
+    return std::make_optional(X);
 }
 
 static Distribution sampleDistribution(

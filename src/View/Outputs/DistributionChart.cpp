@@ -9,7 +9,7 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QBarCategoryAxis>
 
-static size_t nrBins = 100;
+inline static constexpr size_t s_nrBins = 100;
 
 DistributionChart::DistributionChart()
     : QChart()
@@ -30,8 +30,9 @@ void DistributionChart::updateTitle(const ProcessType type){
     QString title;
     QTextStream ts(&title);
     ts << "Sampled distribution";
-    if (getField(FieldTags::pdf{}, type, 0, 0, 0, 0)){
-        ts << " vs theoretical Probability Density Function";
+    const std::string_view name = getField(FieldTags::name{}, type);
+    if (!name.empty()){
+        ts << " vs " << QString::fromUtf8(name.data(), int(name.size())) << " theoretical Probability Density Function";
     }
     setTitle(title);
 }
@@ -39,23 +40,27 @@ void DistributionChart::updateTitle(const ProcessType type){
 void DistributionChart::plotDistribution(const Distribution& results){
     Utils::assertTrue(m_distributionSet->count() == 0, "Distribution set is not empty");
     if (results.empty()) return;
-    const State binWidth = (m_xAxis->max() - m_xAxis->min()) / static_cast<qreal>(nrBins);
-    std::vector<size_t> histogram(nrBins, 0);
+    const State xMin = m_xAxis->min();
+    const State xMax = m_xAxis->max();
+    const State range = xMax - xMin;
+    Utils::assertTrue(range > 0, "x-axis range must be positive");
+    const State binWidth = range / static_cast<qreal>(s_nrBins);
+    Utils::assertTrue(binWidth > 0, "Bin width must be positive");
+    std::vector<size_t> histogram(s_nrBins, 0);
     for (double res : results) {
-        if (res < m_xAxis->min() || res > m_xAxis->max()){
-            continue;
-        }
-        size_t binIndex = static_cast<size_t>((res - m_xAxis->min()) / static_cast<qreal>(binWidth));
+        Utils::assertTrue(m_xAxis->min() < res && res < m_xAxis->max(), "Result is out of bounds");
+        const size_t binIndex = static_cast<size_t>((res - xMin) / binWidth); // Assumes doubles won't be equal :p
         histogram[binIndex]++;
     }
-    double maxHeight = 0.0;
+    // Relative count is the percent of the total path endpoints that fall into each bin
+    State maxBinRelativeCount = 0.0;
     for (size_t bin = 0; bin < histogram.size(); ++bin) {
         size_t count = histogram[bin];
-        double binHeight = static_cast<double>(count) / results.size();
-        m_distributionSet->append(binHeight);
-        maxHeight = std::max(maxHeight, binHeight);
+        double binRelativeCount = static_cast<double>(count) / results.size() * 100.0;
+        m_distributionSet->append(binRelativeCount);
+        maxBinRelativeCount = std::max(maxBinRelativeCount, binRelativeCount);
     }
-    m_yAxisRelativeCount->setRange(0, maxHeight * 1.1);
+    m_yAxisRelativeCount->setRange(0, maxBinRelativeCount * 1.1);
 }
 
 void DistributionChart::clearDistributionChart(){
@@ -68,9 +73,12 @@ void DistributionChart::updateDistributionChartPDF(const PDFData& pdfData){
     if (pdfData.empty()) return;
     QVector<QPointF> points;
     points.reserve(static_cast<qsizetype>(pdfData.size()));
-
     Density maxDensity = 0.0;
-    const double increment = (m_xAxis->max()-m_xAxis->min())/static_cast<qreal>(pdfData.size());
+    const State xMin = m_xAxis->min();
+    const State xMax = m_xAxis->max();
+    const State range = xMax - xMin;
+    Utils::assertTrue(range > 0, "x-axis range must be positive");
+    const double increment = range/static_cast<qreal>(pdfData.size());
     for (size_t i = 0; i < pdfData.size(); ++i) {
         points.append(QPointF(m_xAxis->min() + static_cast<double>(i)*increment, pdfData[i]));
         maxDensity = std::max(maxDensity, pdfData[i]);
@@ -80,11 +88,9 @@ void DistributionChart::updateDistributionChartPDF(const PDFData& pdfData){
 }
 
 void DistributionChart::plotExpValLine(const State EV){
-    QVector<QPointF> points;
-    points.reserve(2);
-    points.append(QPointF(EV, 0));
-    points.append(QPointF(EV, m_yAxisDensity->max()*1.1));
-    m_expValLine->replace(points);
+    const auto y0 = m_yAxisDensity->min();
+    const auto y1 = m_yAxisDensity->max();
+    m_expValLine->replace({ QPointF(EV, y0), QPointF(EV, y1) });
 }
 
 void DistributionChart::setDistributionChartSupport(const Range range){
@@ -105,7 +111,7 @@ void DistributionChart::initializeAxis(){
     m_xAxis->setRange(-10, 10);
     m_yAxisRelativeCount->setRange(0, 1);
     m_yAxisDensity->setRange(0, 1);
-    for (size_t i = 0; i < nrBins; ++i) {
+    for (size_t i = 0; i < s_nrBins; ++i) {
         m_categoryAxis->append(QString::number(i));
     }
     m_categoryAxis->setVisible(false);
@@ -119,7 +125,7 @@ void DistributionChart::initializeDistributionChart(){
     m_pdf->attachAxis(m_xAxis);
     m_pdf->attachAxis(m_yAxisDensity);
     m_pdf->setName("Probability Density Function");
-    m_expValLine->setPen(QPen(Qt::gray, 3.0, Qt::DashLine));
+    m_expValLine->setPen(QPen(Qt::green, 2.0, Qt::DashLine));
     m_expValLine->attachAxis(m_xAxis);
     m_expValLine->attachAxis(m_yAxisDensity);
     m_expValLine->setName("Expected Value");

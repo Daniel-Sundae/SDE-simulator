@@ -31,42 +31,48 @@ struct FieldTags {
     struct pdf {};
 };
 
-template <typename FieldTag, typename... Args>
-auto getField(FieldTag tag, ProcessType p, Args &&...args) {
-    auto _getField = [&]<ProcessType p>(FieldTag) {
-        if constexpr (std::is_same_v<FieldTag, FieldTags::name>) {
-            return Fields<p>::name;
-        } else if constexpr (std::is_same_v<FieldTag, FieldTags::acronym>) {
-            return Fields<p>::acronym;
-        } else if constexpr (std::is_same_v<FieldTag, FieldTags::description>) {
-            return Fields<p>::description;
-        } else if constexpr (std::is_same_v<FieldTag, FieldTags::definition>) {
-            return Fields<p>::definition;
-        } else if constexpr (std::is_same_v<FieldTag, FieldTags::muData>) {
-            return Fields<p>::muData;
-        } else if constexpr (std::is_same_v<FieldTag, FieldTags::sigmaData>) {
-            return Fields<p>::sigmaData;
-        } else if constexpr (std::is_same_v<FieldTag, FieldTags::startValue>) {
-            return Fields<p>::startValue;
-        } else if constexpr (std::is_same_v<FieldTag, FieldTags::drift>) {
-            return Fields<p>::drift(std::forward<Args>(args)...);
-        } else if constexpr (std::is_same_v<FieldTag, FieldTags::diffusion>) {
-            return Fields<p>::diffusion(std::forward<Args>(args)...);
-        } else if constexpr (std::is_same_v<FieldTag, FieldTags::pdf>) {
-            return Fields<p>::pdf(std::forward<Args>(args)...);
-        }
-    };
+template<ProcessType P>
+decltype(auto) pick(FieldTags::name) { return Fields<P>::name; }
 
+template<ProcessType P>
+decltype(auto) pick(FieldTags::acronym) { return Fields<P>::acronym; }
+
+template<ProcessType P>
+decltype(auto) pick(FieldTags::description) { return Fields<P>::description; }
+
+template<ProcessType P>
+decltype(auto) pick(FieldTags::definition) { return Fields<P>::definition; }
+
+template<ProcessType P>
+decltype(auto) pick(FieldTags::muData) { return Fields<P>::muData; }
+
+template<ProcessType P>
+decltype(auto) pick(FieldTags::sigmaData) { return Fields<P>::sigmaData; }
+
+template<ProcessType P>
+decltype(auto) pick(FieldTags::startValue) { return Fields<P>::startValue; }
+
+template<ProcessType P, class... Args>
+decltype(auto) pick(FieldTags::drift, Args&&... args) { return Fields<P>::drift(std::forward<Args>(args)...); }
+
+template<ProcessType P, class... Args>
+decltype(auto) pick(FieldTags::diffusion, Args&&... args) { return Fields<P>::diffusion(std::forward<Args>(args)...); }
+
+template<ProcessType P, class... Args>
+decltype(auto) pick(FieldTags::pdf, Args&&... args) { return Fields<P>::pdf(std::forward<Args>(args)...); }
+
+template <typename FieldTag, typename... Args>
+decltype(auto) getField(FieldTag, ProcessType p, Args&&... args) {
     switch (p) {
-        case ProcessType::BM:
-            return _getField.template operator()<ProcessType::BM>(tag);
-        case ProcessType::GBM:
-            return _getField.template operator()<ProcessType::GBM>(tag);
-        case ProcessType::OU:
-            return _getField.template operator()<ProcessType::OU>(tag);
-        default:
-            Utils::fatalError("Unknown process type: {}", static_cast<int>(p));
-        }
+    case ProcessType::BM:
+        return pick<ProcessType::BM>(FieldTag{}, std::forward<Args>(args)...);
+    case ProcessType::GBM:
+        return pick<ProcessType::GBM>(FieldTag{}, std::forward<Args>(args)...);
+    case ProcessType::OU:
+        return pick<ProcessType::OU>(FieldTag{}, std::forward<Args>(args)...);
+    default:
+        Utils::fatalError("Unknown process type: {}", static_cast<int>(p));
+    }
 }
 
 template <typename ProcessT>
@@ -88,9 +94,9 @@ struct Fields<ProcessType::BM> : RequiredFields<Fields<ProcessType::BM>> {
     static constexpr std::string_view acronym = "BM";
     static constexpr std::string_view description = "Standard brownian motion.";
     static constexpr std::string_view definition = "dX = μdt + σdB";
-    static constexpr Constants muData{ {-0.5,0.5},0,0.1 };
-    static constexpr Constants sigmaData{ {0,1.2},0.2,0.1 };
-    static constexpr Constants startValue{ {-100, 100}, 0,1 };
+    static constexpr Constants muData{ {-0.5, 0.5}, 0, 0.1 };
+    static constexpr Constants sigmaData{ {0, 1.2}, 0.2, 0.1 };
+    static constexpr Constants startValue{ {-100, 100}, 0, 1 };
     static auto drift(const double _mu) -> Drift {
         return Drift(_mu, [_mu](Time, State) { return _mu; });
     };
@@ -107,7 +113,7 @@ struct Fields<ProcessType::BM> : RequiredFields<Fields<ProcessType::BM>> {
             const double exponent = expNumerator / expDenominator;
             return (1 / denominator) * std::exp(exponent);
             };
-        return PDF::create(EV, stddev, _pdf);
+        return PDF(EV, stddev, _pdf);
     };
 };
 
@@ -117,9 +123,9 @@ struct Fields<ProcessType::GBM> : RequiredFields<Fields<ProcessType::GBM>> {
     static constexpr std::string_view acronym = "GBM";
     static constexpr std::string_view description = "Geometric brownian motion.";
     static constexpr std::string_view definition = "dX = μXdt + σXdB";
-    static constexpr Constants muData{ {-0.5,0.5},0,0.1 };
-    static constexpr Constants sigmaData{ {0,1},0.2,0.1 };
-    static constexpr Constants startValue{ {0.1, 100},1,1 };
+    static constexpr Constants muData{ {-0.5, 0.5}, 0, 0.1 };
+    static constexpr Constants sigmaData{ {0, 1}, 0.2, 0.1 };
+    static constexpr Constants startValue{ {0.1, 100}, 1, 1 };
     static auto drift(const double _mu) -> Drift {
         return Drift(
             _mu,
@@ -146,7 +152,7 @@ struct Fields<ProcessType::GBM> : RequiredFields<Fields<ProcessType::GBM>> {
             const double denominator = std::sqrt(2 * DefaultConstants::PI * time) * endValue * _sigma;
             return (1 / denominator) * std::exp(expNumerator / expDenominator);
         };
-        return PDF::create(EV, stddev, _pdf);
+        return PDF(EV, stddev, _pdf);
     };
 };
 
@@ -182,6 +188,6 @@ struct Fields<ProcessType::OU> : RequiredFields<Fields<ProcessType::OU>> {
             const double denominator = std::sqrt(2.0 * DefaultConstants::PI * _privateRepeatedVal);
             return (1.0 / denominator) * std::exp(expNumerator / expDenominator);
         };
-        return PDF::create(EV, stddev, _pdf);
+        return PDF(EV, stddev, _pdf);
     };
 };

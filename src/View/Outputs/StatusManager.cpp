@@ -49,6 +49,7 @@ void StatusManager::setProgress(const size_t pathsCompleted){
 
 void StatusManager::setReady(){
     m_statusInfo->currentStatus->setText("Ready");
+    m_statusInfo->currentStatus->repaint();
 }
 
 void StatusManager::prepareStatusInfo(const size_t totalPaths){

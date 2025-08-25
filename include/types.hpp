@@ -13,7 +13,7 @@ using Path = std::vector<State>;
 using Paths = std::vector<Path>;
 using Distribution = std::vector<State>;
 using PDFData = std::vector<Density>;
-using Range = std::pair<double, double>;
+using Range = std::pair<State, State>;
 using Job = struct Job;
 template <typename T>
 concept IntOrDouble = std::same_as<T, int> || std::same_as<T, double>;

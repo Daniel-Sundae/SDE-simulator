@@ -13,7 +13,8 @@ struct Job {
     };
     struct Atomics {
         std::atomic<size_t> pathsCompleted;
-        // State maxPathEndVal;
+        std::atomic<State> minPathEndVal;
+        std::atomic<State> maxPathEndVal;
     };
     explicit Job(size_t _totalPaths)
     : totalPaths(_totalPaths)
@@ -25,6 +26,6 @@ struct Job {
     std::future<Distribution> distribution{};
     size_t transactionNr{};
     std::shared_ptr<Job::Atomics> atomicData =
-        std::make_shared<Job::Atomics>();
+        std::make_shared<Job::Atomics>(0, 0, 0);
     std::stop_source stop{};
 };

@@ -43,16 +43,14 @@ MainPresenter::MainPresenter()
             Utils::assertTrue(job->distribution.wait_for(std::chrono::seconds(0)) == std::future_status::ready,
                 "Expected distribution to be ready");
             if (job->transactionNr != s_currentTransaction.load()) {
-                std::clog << "Dropping stale transaction" << std::endl;
-                std::clog << "Stale transaction: " << job->transactionNr << std::endl;
-                std::clog << "Current transaction: " << s_currentTransaction.load() << std::endl;
-                return;
+                m_outputHandler->setError(ErrorType::STALE_QUERY);
             }
 
             Distribution distribution = job->distribution.get();
             switch (job->type) {
             case Job::Type::Stochastic:
-                m_outputHandler->onDistributionReceived(std::move(distribution));
+                m_outputHandler->onDistributionReceived(std::move(distribution),
+                    std::pair{job->atomicData->minPathEndVal.load(), job->atomicData->maxPathEndVal.load()});
                 break;
             default:
                 break;
@@ -68,14 +66,6 @@ void MainPresenter::onTransactionReceived(const Transaction& transaction){
         return;
     }
     m_outputHandler->onStartTransaction(transaction.pathQuery);
-    const auto& pq = transaction.pathQuery;
-    m_outputHandler->onPDFReceived(getField(FieldTags::pdf{},
-        pq.processDefinition.type,
-        pq.processDefinition.startValue,
-        pq.simulationParameters.time,
-        pq.processDefinition.drift.mu(),
-        pq.processDefinition.diffusion.sigma()
-    ));
     Job deterministicJob = m_engine->processPathQuery(transaction.deterministicQuery);
     deterministicJob.type = Job::Type::Deterministic;
     Job stochasticJob = m_engine->processPathQuery(transaction.pathQuery);

@@ -1,5 +1,6 @@
 FUNCTIONALITY TODO:
 - looks like rendering takes time. Limit points in the path drawn (noone cares about 0.0001 dt, do 0.001 as smallest for rendering)
+- implement signal from outputhandler and connect to lambda in inputviewer for enabled logic.
 - super laggy to resize window when chart is populated with a lot of dense paths
 - auto detect squishiness (e.g. exp beh gbm)
 - introduce meta data for jobs. Would allow for clean distribution and path plot.
@@ -13,13 +14,13 @@ FUNCTIONALITY TODO:
 - WASM (requires moving away from jthreads)
 - Introduce new tab with live und data and option price and simulated option price
 - Create engine process, use "named pipe" for more simple way to transfer data from engine to p1. (data needs to be copied twice)
--  
+-
 
 CODE TODO:
 - test with spamming sample
 - test cancel many times
 - search for TODO in codebase
-- rename pathQuery to stochasticQuery in ontransactionreceived
+- remove clangtidy from repo?
 
 WRITE TESTS:
 - one long simple path
@@ -30,8 +31,6 @@ WRITE TESTS:
 - solvers roughly same val
 - processes
 - exp val
-
-
 
 PRESENTATION:
 - Show bigger increment step -> bigger error.
