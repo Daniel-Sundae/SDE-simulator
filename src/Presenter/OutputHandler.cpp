@@ -24,8 +24,9 @@ void OutputHandler::onPathsReceived(const Paths& paths){
 void OutputHandler::onDistributionReceived(const Distribution& distribution, const Range support){
     Utils::assertTrue(!m_currentPDF.data.has_value(), "Data has incorrectly already been generated");
     Utils::assertTrue(m_currentPDF.pdf != nullptr, "PDF has not been created");
-    m_currentPDF.generatePDFData(support);
-    m_outputDispatcher->setDistributionChartSupport({support.first - m_currentPDF.stddev, support.second + m_currentPDF.stddev});
+    auto GUIsupport = std::pair{support.first - m_currentPDF.stddev, support.second + m_currentPDF.stddev};
+    m_currentPDF.generatePDFData(GUIsupport);
+    m_outputDispatcher->setDistributionChartSupport(GUIsupport);
     m_outputDispatcher->updateDistributionChartPDF(m_currentPDF.data.value());
     m_outputDispatcher->updateDistributionChartEV(m_currentPDF.EV);
     m_outputDispatcher->plotDistribution(distribution);
