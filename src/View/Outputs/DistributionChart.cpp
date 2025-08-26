@@ -48,19 +48,20 @@ void DistributionChart::plotDistribution(const Distribution& results){
     Utils::assertTrue(binWidth > 0, "Bin width must be positive");
     std::vector<size_t> histogram(s_nrBins, 0);
     for (double res : results) {
-        Utils::assertTrue(m_xAxis->min() < res && res < m_xAxis->max(), "Result is out of bounds");
-        const size_t binIndex = static_cast<size_t>((res - xMin) / binWidth); // Assumes doubles won't be equal :p
+        Utils::assertTrue(xMin <= res && res <= xMax, "Result is out of bounds");
+        size_t binIndex = static_cast<size_t>((res - xMin) / binWidth);
+        if(binIndex == s_nrBins) binIndex--; // Put rightmost point in last bin
         histogram[binIndex]++;
     }
     // Relative count is the percent of the total path endpoints that fall into each bin
-    State maxBinRelativeCount = 0.0;
-    for (size_t bin = 0; bin < histogram.size(); ++bin) {
+    State maxBinRelativeCountInPercent = 0.0;
+    for (size_t bin = 0; bin < s_nrBins; ++bin) {
         size_t count = histogram[bin];
-        double binRelativeCount = static_cast<double>(count) / results.size() * 100.0;
-        m_distributionSet->append(binRelativeCount);
-        maxBinRelativeCount = std::max(maxBinRelativeCount, binRelativeCount);
+        double binRelativeCountInPercent = static_cast<double>(count) / results.size() * 100.0;
+        m_distributionSet->append(binRelativeCountInPercent);
+        maxBinRelativeCountInPercent = std::max(maxBinRelativeCountInPercent, binRelativeCountInPercent);
     }
-    m_yAxisRelativeCount->setRange(0, maxBinRelativeCount * 1.1);
+    m_yAxisRelativeCount->setRange(0, maxBinRelativeCountInPercent * 1.1);
 }
 
 void DistributionChart::clearDistributionChart(){
@@ -80,7 +81,7 @@ void DistributionChart::updateDistributionChartPDF(const PDFData& pdfData){
     Utils::assertTrue(range > 0, "x-axis range must be positive");
     const double increment = range/static_cast<qreal>(pdfData.size());
     for (size_t i = 0; i < pdfData.size(); ++i) {
-        points.append(QPointF(m_xAxis->min() + static_cast<double>(i)*increment, pdfData[i]));
+        points.append(QPointF(xMin + static_cast<double>(i)*increment, pdfData[i]));
         maxDensity = std::max(maxDensity, pdfData[i]);
     }
     m_pdf->replace(points);

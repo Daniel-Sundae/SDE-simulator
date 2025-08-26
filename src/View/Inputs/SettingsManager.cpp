@@ -8,6 +8,8 @@
 
 SettingsManager::SettingsManager(InputDispatcher* parent)
     : InputDispatcherGroupBox(parent)
+    , m_multiThreadingCheckBox(new QCheckBox(this))
+    , m_seedWidget(new QWidget(this))
 {
     addMultiThreadCheckBox();
     addSeedWidget();
@@ -15,11 +17,9 @@ SettingsManager::SettingsManager(InputDispatcher* parent)
 }
 
 void SettingsManager::addMultiThreadCheckBox(){
-    auto* multiThreadingCheckbBox = new QCheckBox(this);
-    m_widgets[SettingsWidget::THREADS] = multiThreadingCheckbBox;
-    multiThreadingCheckbBox->setChecked(true);
+    m_multiThreadingCheckBox->setChecked(true);
     connect(
-        multiThreadingCheckbBox,
+        m_multiThreadingCheckBox,
         &QCheckBox::toggled,
         this,
         [this](bool checked){Parent()->onSettingsParameterModified(SettingsWidget::THREADS, checked);}
@@ -27,11 +27,10 @@ void SettingsManager::addMultiThreadCheckBox(){
 }
 
 void SettingsManager::addSeedWidget(){
-    auto* seedWidget = new QWidget(this);
-    m_widgets[SettingsWidget::FIXSEED] = seedWidget;
-    auto* seedCheckBox = new QCheckBox(seedWidget);
+    m_seedWidget = new QWidget(this);
+    auto* seedCheckBox = new QCheckBox(m_seedWidget);
     seedCheckBox->setChecked(false);
-    auto* seedSpinBox = new QSpinBox(seedWidget);
+    auto* seedSpinBox = new QSpinBox(m_seedWidget);
     seedSpinBox->setValue(1);
     seedSpinBox->setMinimum(1);
     seedSpinBox->setMaximum(10000);
@@ -39,10 +38,8 @@ void SettingsManager::addSeedWidget(){
     seedSpinBox->setEnabled(false);
 
     connect(
-        seedCheckBox,
-        &QCheckBox::toggled,
-        this,
-        [this, seedSpinBox](bool toggled) {
+        seedCheckBox, &QCheckBox::toggled,
+        this, [this, seedSpinBox](bool toggled) {
             seedSpinBox->setEnabled(toggled);
             Parent()->onSettingsParameterModified(
                 SettingsWidget::FIXSEED,
@@ -52,10 +49,8 @@ void SettingsManager::addSeedWidget(){
     );
 
     connect(
-        seedSpinBox,
-        &QSpinBox::valueChanged,
-        this,
-        [this](int newValue) {
+        seedSpinBox, &QSpinBox::valueChanged,
+        this, [this](int newValue) {
             Parent()->onSettingsParameterModified(
                 SettingsWidget::FIXSEED,
                 newValue
@@ -63,7 +58,7 @@ void SettingsManager::addSeedWidget(){
         }
     );
 
-    auto* seedLayout = new QHBoxLayout(seedWidget);
+    auto* seedLayout = new QHBoxLayout(m_seedWidget);
     seedLayout->addWidget(seedCheckBox);
     seedLayout->addWidget(seedSpinBox);
     seedLayout->setContentsMargins(0, 0, 0, 0);
@@ -75,8 +70,8 @@ void SettingsManager::initializeDesign(){
     auto* simulationLayout = new QFormLayout(this);
     auto* multiThreadingLabel = new QLabel("Multithreading:", this);
     multiThreadingLabel->setToolTip("Toggle multithreading to compare performance.");
-    simulationLayout->addRow(multiThreadingLabel, m_widgets[SettingsWidget::THREADS]);
+    simulationLayout->addRow(multiThreadingLabel, m_multiThreadingCheckBox);
     auto* fixSeedLabel = new QLabel("Fix seed:", this);
     fixSeedLabel->setToolTip("Set source of randomness.");
-    simulationLayout->addRow(fixSeedLabel, m_widgets[SettingsWidget::FIXSEED]);
+    simulationLayout->addRow(fixSeedLabel, m_seedWidget);
 }

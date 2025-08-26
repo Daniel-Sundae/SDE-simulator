@@ -41,6 +41,9 @@ public:
     void cancelStatusBar() const{
         m_statusManager->cancel();
     }
+    StatusManager* getStatusManager() const {
+        return m_statusManager;
+    }
 
     // PathChart
     void plotPath(const Path& path) const{

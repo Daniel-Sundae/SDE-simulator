@@ -50,6 +50,7 @@ void StatusManager::setProgress(const size_t pathsCompleted){
 void StatusManager::setReady(){
     m_statusInfo->currentStatus->setText("Ready");
     m_statusInfo->currentStatus->repaint();
+    emit signalReady();
 }
 
 void StatusManager::prepareStatusInfo(const size_t totalPaths){
@@ -79,9 +80,9 @@ void StatusManager::setQueryInfo(const PathQuery& query){
 
 void StatusManager::clear(){
     m_queryInfo->findChild<QLabel*>()->setText("");
-    setReady();
     m_statusInfo->progressBar->setRange(0, 1);
     m_statusInfo->progressBar->setValue(0);
+    setReady();
 }
 
 void StatusManager::cancel(){

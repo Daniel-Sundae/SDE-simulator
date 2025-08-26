@@ -1,7 +1,9 @@
 #pragma once
 #include "Types.hpp"
 #include "InputDispatcher.hpp"
-#include <QtWidgets/QGroupBox>
+
+class QCheckBox;
+class QWidget;
 
 class SettingsManager : public InputDispatcherGroupBox
 {
@@ -13,5 +15,6 @@ private:
     void addSeedWidget();
     void initializeDesign();
 private:
-    std::unordered_map<SettingsWidget, QWidget*> m_widgets;
+    QCheckBox* m_multiThreadingCheckBox;
+    QWidget* m_seedWidget;
 };

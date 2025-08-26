@@ -10,7 +10,7 @@ class OutputHandler{
 public:
     OutputHandler() = default;
     void onPathsReceived(const Paths& paths);
-    void onDistributionReceived(const Distribution& distribution, const Range support);
+    void onDistributionReceived(const Distribution& distribution, State min, State max);
     void onStartTransaction(const PathQuery& query);
     void onDriftDataReceived(const Path& driftCurve);
     void jobProgress(size_t pathsCompleted);

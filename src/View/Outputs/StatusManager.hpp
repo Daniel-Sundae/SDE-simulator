@@ -25,6 +25,8 @@ public:
     void setQueryInfo(const PathQuery& query);
     void clear();
     void cancel();
+signals:
+    void signalReady();
 
 private:
     QGroupBox* m_queryInfo;

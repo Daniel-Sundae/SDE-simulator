@@ -9,32 +9,30 @@
 
 DefinitionManager::DefinitionManager(InputDispatcher *parent)
     : InputDispatcherGroupBox(parent)
+    , m_process(new QComboBox(this))
+    , m_muWidget(new QDoubleSpinBox(this))
+    , m_sigmaWidget(new QDoubleSpinBox(this))
+    , m_startValueWidget(new QDoubleSpinBox(this))
 {
     addDefinitionWidgets();
     initializeDesign();
 }
 
-void DefinitionManager::updateWidgetProperties(ProcessType process, bool initialize){
-    auto* muWidget = qobject_cast<QDoubleSpinBox*>(m_widgets[DefinitionWidget::MU]);
+void DefinitionManager::updateWidgetProperties(ProcessType process){
     Constants muData = getField(FieldTags::muData{}, process);
-    muWidget->setRange(muData.allowedValues.first, muData.allowedValues.second);
-    muWidget->setSingleStep(muData.incrementSize);
+    m_muWidget->setRange(muData.allowedValues.first, muData.allowedValues.second);
+    m_muWidget->setValue(muData.defaultValue);
+    m_muWidget->setSingleStep(muData.incrementSize);
 
-    auto* sigmaWidget = qobject_cast<QDoubleSpinBox*>(m_widgets[DefinitionWidget::SIGMA]);
     Constants sigmaData = getField(FieldTags::sigmaData{}, process);
-    sigmaWidget->setRange(sigmaData.allowedValues.first, sigmaData.allowedValues.second);
-    sigmaWidget->setSingleStep(sigmaData.incrementSize);
+    m_sigmaWidget->setRange(sigmaData.allowedValues.first, sigmaData.allowedValues.second);
+    m_sigmaWidget->setValue(sigmaData.defaultValue);
+    m_sigmaWidget->setSingleStep(sigmaData.incrementSize);
 
-    auto* startValueWidget = qobject_cast<QDoubleSpinBox*>(m_widgets[DefinitionWidget::STARTVALUE]);
     Constants startValue = getField(FieldTags::startValue{}, process);
-    startValueWidget->setRange(startValue.allowedValues.first, startValue.allowedValues.second);
-    startValueWidget->setSingleStep(startValue.incrementSize);
-
-    if (initialize){
-        muWidget->setValue(muData.defaultValue);
-        sigmaWidget->setValue(sigmaData.defaultValue);
-        startValueWidget->setValue(startValue.defaultValue);
-    }
+    m_startValueWidget->setRange(startValue.allowedValues.first, startValue.allowedValues.second);
+    m_startValueWidget->setValue(startValue.defaultValue);
+    m_startValueWidget->setSingleStep(startValue.incrementSize);
 }
 
 void DefinitionManager::addDefinitionWidgets(){
@@ -43,19 +41,14 @@ void DefinitionManager::addDefinitionWidgets(){
         ProcessType::GBM,
         ProcessType::OU,
     };
-    auto* processes = new QComboBox(this);
 
     for (size_t i = 0; i < processTypes.size(); ++i) {
-        processes->insertItem(static_cast<int>(i), QString::fromStdString(std::string( getField(FieldTags::acronym{}, processTypes[i]) )));
-        processes->setItemData(static_cast<int>(i), QString::fromStdString(std::string( getField(FieldTags::name{}, processTypes[i]) )), Qt::ToolTipRole);
+        m_process->insertItem(static_cast<int>(i), QString::fromStdString(std::string( getField(FieldTags::acronym{}, processTypes[i]) )));
+        m_process->setItemData(static_cast<int>(i), QString::fromStdString(std::string( getField(FieldTags::name{}, processTypes[i]) )), Qt::ToolTipRole);
     }
 
-    processes->setCurrentIndex(0);
-    m_widgets[DefinitionWidget::PROCESS] = processes;
-    m_widgets[DefinitionWidget::MU] = new QDoubleSpinBox(this);
-    m_widgets[DefinitionWidget::SIGMA] = new QDoubleSpinBox(this);
-    m_widgets[DefinitionWidget::STARTVALUE] = new QDoubleSpinBox(this);
-    updateWidgetProperties(DefaultConstants::process, true);
+    m_process->setCurrentIndex(0);
+    updateWidgetProperties(DefaultConstants::process);
     auto definitionModifiedCb = [this](DefinitionWidget param) {
         return [this, param](double newValue) {
             Parent()->onProcessDefinitionModified(param, newValue);
@@ -63,7 +56,7 @@ void DefinitionManager::addDefinitionWidgets(){
         };
 
     connect(
-        qobject_cast<QComboBox*>(m_widgets[DefinitionWidget::PROCESS]),
+        m_process,
         QOverload<int>::of(&QComboBox::currentIndexChanged),
         this,
         [this, processTypes](int newIndex) {
@@ -72,32 +65,31 @@ void DefinitionManager::addDefinitionWidgets(){
         }
     );
     connect(
-        qobject_cast<QDoubleSpinBox*>(m_widgets[DefinitionWidget::MU]),
+        m_muWidget,
         QOverload<double>::of(&QDoubleSpinBox::valueChanged),
         this,
         definitionModifiedCb(DefinitionWidget::MU)
     );
     connect(
-        qobject_cast<QDoubleSpinBox*>(m_widgets[DefinitionWidget::SIGMA]),
+        m_sigmaWidget,
         QOverload<double>::of(&QDoubleSpinBox::valueChanged),
         this,
         definitionModifiedCb(DefinitionWidget::SIGMA)
     );
     connect(
-        qobject_cast<QDoubleSpinBox*>(m_widgets[DefinitionWidget::STARTVALUE]),
+        m_startValueWidget,
         QOverload<double>::of(&QDoubleSpinBox::valueChanged),
         this,
         definitionModifiedCb(DefinitionWidget::STARTVALUE)
     );
-
 }
 
 void DefinitionManager::initializeDesign(){
     setTitle("Definition");
     setStyleSheet(GUI::groupBoxDescription() + GUI::comboBoxDescription() + GUI::spinBoxDescription());
     auto* definitionLayout = new QFormLayout(this);
-    definitionLayout->addRow(new QLabel("Process:", this), m_widgets[DefinitionWidget::PROCESS]);
-    definitionLayout->addRow(new QLabel("Drift (μ):", this), m_widgets[DefinitionWidget::MU]);
-    definitionLayout->addRow(new QLabel("Diffusion (σ):", this), m_widgets[DefinitionWidget::SIGMA]);
-    definitionLayout->addRow(new QLabel("Start (X<sub>0</sub>):", this), m_widgets[DefinitionWidget::STARTVALUE]);
+    definitionLayout->addRow(new QLabel("Process:", this), m_process);
+    definitionLayout->addRow(new QLabel("Drift (μ):", this), m_muWidget);
+    definitionLayout->addRow(new QLabel("Diffusion (σ):", this), m_sigmaWidget);
+    definitionLayout->addRow(new QLabel("Start (X<sub>0</sub>):", this), m_startValueWidget);
 }

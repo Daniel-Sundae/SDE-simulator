@@ -39,6 +39,10 @@ public:
       m_inputHandler->onSettingsParameterModified(std::forward<Args>(args)...);
     }
 
+    ActionManager* getActionManager() const {
+        return m_actionManager;
+    }
+
 private:
     ActionManager* m_actionManager;
     DefinitionManager* m_definitionManager;

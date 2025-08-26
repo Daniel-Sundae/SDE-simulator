@@ -21,12 +21,12 @@ void OutputHandler::onPathsReceived(const Paths& paths){
     signalReadyIfNeeded();
 }
 
-void OutputHandler::onDistributionReceived(const Distribution& distribution, const Range support){
+void OutputHandler::onDistributionReceived(const Distribution& distribution, State min, State max){
     Utils::assertTrue(!m_currentPDF.data.has_value(), "Data has incorrectly already been generated");
     Utils::assertTrue(m_currentPDF.pdf != nullptr, "PDF has not been created");
-    auto GUIsupport = std::pair{support.first - m_currentPDF.stddev, support.second + m_currentPDF.stddev};
-    m_currentPDF.generatePDFData(GUIsupport);
-    m_outputDispatcher->setDistributionChartSupport(GUIsupport);
+    auto support = m_currentPDF.support(distribution.size(), min, max);
+    m_currentPDF.generatePDFData(support);
+    m_outputDispatcher->setDistributionChartSupport(support);
     m_outputDispatcher->updateDistributionChartPDF(m_currentPDF.data.value());
     m_outputDispatcher->updateDistributionChartEV(m_currentPDF.EV);
     m_outputDispatcher->plotDistribution(distribution);

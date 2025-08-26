@@ -44,13 +44,14 @@ MainPresenter::MainPresenter()
                 "Expected distribution to be ready");
             if (job->transactionNr != s_currentTransaction.load()) {
                 m_outputHandler->setError(ErrorType::STALE_QUERY);
+                return;
             }
 
             Distribution distribution = job->distribution.get();
             switch (job->type) {
             case Job::Type::Stochastic:
                 m_outputHandler->onDistributionReceived(std::move(distribution),
-                    std::pair{job->atomicData->minPathEndVal.load(), job->atomicData->maxPathEndVal.load()});
+                    job->atomicData->minPathEndVal.load(), job->atomicData->maxPathEndVal.load());
                 break;
             default:
                 break;

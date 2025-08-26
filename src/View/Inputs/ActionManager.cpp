@@ -4,39 +4,52 @@
 
 ActionManager::ActionManager(InputDispatcher *parent)
     : InputDispatcherGroupBox(parent)
+    , m_goButton(new QPushButton("GO", this))
+    , m_clearButton(new QPushButton("CLEAR", this))
+    , m_cancelButton(new QPushButton("CANCEL", this))
 {
     addActionWidgets();
 }
 
 
 void ActionManager::addActionWidgets(){
-    auto* goButton = new QPushButton("GO", this);
-    goButton->setToolTip("Generate sample.");
-    goButton->setStyleSheet("QPushButton { background-color: green; }");
-    auto* clearButton = new QPushButton("CLEAR", this);
-    clearButton->setToolTip("Remove all samples.");
-    clearButton->setStyleSheet("QPushButton { background-color: red; padding: 2px;}");
-    auto* cancelButton = new QPushButton("CANCEL", this);
-    cancelButton->setToolTip("Cancel current sampling.");
-    cancelButton->setStyleSheet("QPushButton { background-color: red; padding: 2px;}");
+    m_goButton->setToolTip("Generate sample.");
+    m_goButton->setStyleSheet("QPushButton { background-color: green; }");
+    m_clearButton->setToolTip("Remove all samples.");
+    m_clearButton->setStyleSheet("QPushButton { background-color: red; padding: 2px;}");
+    m_cancelButton->setToolTip("Cancel current sampling.");
+    m_cancelButton->setStyleSheet("QPushButton { background-color: red; padding: 2px;}");
     connect(
-        goButton,
+        m_goButton,
         &QPushButton::clicked,
         this,
-        [this]() { Parent()->onGoButtonClicked(); });
+        [this]() {
+            m_goButton->setEnabled(false);
+            m_clearButton->setEnabled(false);
+            m_cancelButton->setEnabled(true);
+            Parent()->onGoButtonClicked();
+        });
     connect(
-        clearButton,
+        m_clearButton,
         &QPushButton::clicked,
         this,
-        [this]() { Parent()->onClearButtonClicked(); });
+        [this]() {
+            Parent()->onClearButtonClicked();
+        });
     connect(
-        cancelButton,
+        m_cancelButton,
         &QPushButton::clicked,
         this,
         [this]() { Parent()->onCancelButtonClicked(); });
     auto layout = new QHBoxLayout(this);
-    layout->addWidget(goButton);
-    layout->addWidget(clearButton);
-    layout->addWidget(cancelButton);
+    layout->addWidget(m_goButton);
+    layout->addWidget(m_clearButton);
+    layout->addWidget(m_cancelButton);
     setStyleSheet(GUI::groupBoxDescription());
+}
+
+void ActionManager::setReady(){
+    m_goButton->setEnabled(true);
+    m_clearButton->setEnabled(true);
+    m_cancelButton->setEnabled(false);
 }

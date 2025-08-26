@@ -4,6 +4,7 @@
 #include <atomic>
 #include <stop_token>
 #include <memory>
+#include <numeric>
 #include "Types.hpp"
 
 struct Job {
@@ -26,6 +27,9 @@ struct Job {
     std::future<Distribution> distribution{};
     size_t transactionNr{};
     std::shared_ptr<Job::Atomics> atomicData =
-        std::make_shared<Job::Atomics>(0, 0, 0);
+        std::make_shared<Job::Atomics>(
+            0,
+            std::numeric_limits<State>::max(),
+            std::numeric_limits<State>::min());
     std::stop_source stop{};
 };

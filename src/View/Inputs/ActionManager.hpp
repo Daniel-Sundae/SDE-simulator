@@ -1,18 +1,21 @@
 #pragma once
 
-#include "Types.hpp"
 #include "InputHandler.hpp"
 #include "InputDispatcher.hpp"
-#include <unordered_map>
+
+class QPushButton;
 
 class ActionManager : public InputDispatcherGroupBox
 {
     Q_OBJECT
 public:
     explicit ActionManager(InputDispatcher* parent);
+    void setReady();
 private:
     void addActionWidgets();
 private:
-    std::unordered_map<ActionWidget, QWidget*> m_widgets;
+    QPushButton* m_goButton;
+    QPushButton* m_clearButton;
+    QPushButton* m_cancelButton;
 };
 

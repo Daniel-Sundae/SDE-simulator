@@ -2,8 +2,9 @@
 
 #include "Types.hpp"
 #include "InputDispatcher.hpp"
-#include <unordered_map>
-#include <QtWidgets/QGroupBox>
+
+class QComboBox;
+class QDoubleSpinBox;
 
 class DefinitionManager : public InputDispatcherGroupBox
 {
@@ -11,9 +12,12 @@ class DefinitionManager : public InputDispatcherGroupBox
 public:
     explicit DefinitionManager(InputDispatcher* parent);
 private:
-    void updateWidgetProperties(ProcessType process, bool initialize = false);
+    void updateWidgetProperties(ProcessType process);
     void addDefinitionWidgets();
     void initializeDesign();
 private:
-    std::unordered_map<DefinitionWidget, QWidget*> m_widgets;
+    QComboBox* m_process;
+    QDoubleSpinBox* m_muWidget;
+    QDoubleSpinBox* m_sigmaWidget;
+    QDoubleSpinBox* m_startValueWidget;
 };

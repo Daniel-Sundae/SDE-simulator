@@ -1,6 +1,7 @@
 #include "MainWindow.hpp"
 #include "InputDispatcher.hpp"
 #include "OutputDispatcher.hpp"
+#include "ActionManager.hpp"
 
 MainWindow::MainWindow()
     : QMainWindow()
@@ -14,6 +15,9 @@ MainWindow::MainWindow()
     resize(1500, 700);
     addWidgets();
     show();
+    QObject::connect(
+        m_outputDispatcher->getStatusManager(), &StatusManager::signalReady,
+        m_inputDispatcher->getActionManager(), &ActionManager::setReady);
 }
 
 void MainWindow::addWidgets(){
