@@ -4,7 +4,6 @@
 #include <chrono>
 #include <memory>
 
-
 JobHandler::~JobHandler() {
     m_doCancel.store(true);
     if (m_deterministicJobThread.joinable()) m_deterministicJobThread.join();

@@ -25,7 +25,6 @@ struct Job {
     Type type{};
     std::future<Paths> fullPaths{};
     std::future<Distribution> distribution{};
-    size_t transactionNr{};
     std::shared_ptr<Job::Atomics> atomicData =
         std::make_shared<Job::Atomics>(
             0,

@@ -1,6 +1,6 @@
 FUNCTIONALITY TODO:
 - looks like rendering takes time. Limit points in the path drawn (noone cares about 0.0001 dt, do 0.001 as smallest for rendering)
-- implement signal from outputhandler and connect to lambda in inputviewer for enabled logic.
+- write som sampling info: exp val, max endval, min endval, min/max path val seen (which path, store seed?)
 - super laggy to resize window when chart is populated with a lot of dense paths
 - auto detect squishiness (e.g. exp beh gbm)
 - introduce meta data for jobs. Would allow for clean distribution and path plot.

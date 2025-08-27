@@ -31,7 +31,7 @@ MainPresenter::MainPresenter()
                 m_outputHandler->onDriftDataReceived(paths.front());
                 break;
             case Job::Type::Stochastic:
-                m_outputHandler->onPathsReceived(paths);
+                m_outputHandler->onPathsReceived(std::move(paths));
                 break;
             default:
                 Utils::fatalError("Unknown job type received in MainPresenter");
@@ -42,10 +42,6 @@ MainPresenter::MainPresenter()
         this, [this](std::shared_ptr<Job> job){
             Utils::assertTrue(job->distribution.wait_for(std::chrono::seconds(0)) == std::future_status::ready,
                 "Expected distribution to be ready");
-            if (job->transactionNr != s_currentTransaction.load()) {
-                m_outputHandler->setError(ErrorType::STALE_QUERY);
-                return;
-            }
 
             Distribution distribution = job->distribution.get();
             switch (job->type) {
@@ -62,18 +58,12 @@ MainPresenter::MainPresenter()
 MainPresenter::~MainPresenter() = default;
 
 void MainPresenter::onTransactionReceived(const Transaction& transaction){
-    if (m_jobHandler->jobRunning()) {
-        m_outputHandler->setError(ErrorType::BUSY_ENGINE);
-        return;
-    }
+    Utils::assertTrue(!m_jobHandler->jobRunning(), "Expected no job to be running");
     m_outputHandler->onStartTransaction(transaction.pathQuery);
     Job deterministicJob = m_engine->processPathQuery(transaction.deterministicQuery);
     deterministicJob.type = Job::Type::Deterministic;
     Job stochasticJob = m_engine->processPathQuery(transaction.pathQuery);
     stochasticJob.type = Job::Type::Stochastic;
-    const size_t transactionNr = ++s_currentTransaction;
-    deterministicJob.transactionNr = transactionNr;
-    stochasticJob.transactionNr = transactionNr;
     m_jobHandler->postJobs(std::move(deterministicJob), std::move(stochasticJob));
 }
 

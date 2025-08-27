@@ -14,7 +14,6 @@ public:
     void onStartTransaction(const PathQuery& query);
     void onDriftDataReceived(const Path& driftCurve);
     void jobProgress(size_t pathsCompleted);
-    void setError(ErrorType error);
     void setOutputDispatcher(OutputDispatcher* outputDispatcher){ m_outputDispatcher = outputDispatcher; };
     void clearGUI() const;
     void cancelGUI() const;

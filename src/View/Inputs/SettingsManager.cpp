@@ -32,7 +32,7 @@ void SettingsManager::addSeedWidget(){
     seedCheckBox->setChecked(false);
     auto* seedSpinBox = new QSpinBox(m_seedWidget);
     seedSpinBox->setValue(1);
-    seedSpinBox->setMinimum(1);
+    seedSpinBox->setMinimum(0);
     seedSpinBox->setMaximum(10000);
     seedSpinBox->setSingleStep(1);
     seedSpinBox->setEnabled(false);

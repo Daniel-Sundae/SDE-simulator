@@ -27,11 +27,6 @@ public:
     void prepareStatusInfo(const size_t totalPaths) const{
         m_statusManager->prepareStatusInfo(totalPaths);
     }
-    void setError(const ErrorType error) const{
-        // m_statusManager->setError(error);
-        int TODO = 1;
-        (void)TODO;
-    }
     void setReady() const{
         m_statusManager->setReady();
     }

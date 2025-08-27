@@ -11,12 +11,26 @@ class StatusManager : public QWidget
 {
     Q_OBJECT
 private:
+    struct QueryInfo : public QGroupBox {
+        explicit QueryInfo(QWidget* parent);
+        QLabel* infoLabel;
+    };
+
+    struct ResultInfo : public QGroupBox {
+        explicit ResultInfo(QWidget* parent);
+        QLabel* minEndValue;
+        QLabel* maxEndValue;
+        QLabel* minPathValue;
+        QLabel* maxPathValue;
+    };
+
     struct StatusInfo : public QGroupBox {
         explicit StatusInfo(QWidget* parent);
         QLabel* currentStatus;
         QLabel* errorStatus;
         QProgressBar* progressBar;
     };
+    
 public:
     explicit StatusManager(QWidget* parent);
     void setProgress(const size_t completed);
@@ -29,6 +43,7 @@ signals:
     void signalReady();
 
 private:
-    QGroupBox* m_queryInfo;
+    QueryInfo* m_queryInfo;
+    ResultInfo* m_resultInfo;
     StatusInfo* m_statusInfo;
 };

@@ -62,9 +62,3 @@ enum class StatusSignal{
     SAMPLING,
     RENDERING
 };
-
-enum class ErrorType{
-    NONE = 0,
-    BUSY_ENGINE,
-    STALE_QUERY
-};
