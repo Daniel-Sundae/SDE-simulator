@@ -16,10 +16,11 @@ MainPresenter::MainPresenter()
     , m_engine(std::make_unique<PathEngine>())
     , m_jobHandler(std::make_unique<JobHandler>())
 {
-    QObject::connect(m_jobHandler.get(), &JobHandler::jobProgress,
-        this, [this](size_t pathsFinished){
-            m_outputHandler->jobProgress(pathsFinished);
+    QObject::connect(m_jobHandler.get(), &JobHandler::jobMetaData,
+        this, [this](size_t pathsCompleted, State minXT, State maxXT, State minXt, State maxXt){
+            m_outputHandler->jobMetaData(pathsCompleted, minXT, maxXT, minXt, maxXt);
         }, Qt::QueuedConnection);
+
     QObject::connect(m_jobHandler.get(), &JobHandler::fullPathsDone,
         this, [this](std::shared_ptr<Job> job){
             Paths paths = job->fullPaths.get();
@@ -37,6 +38,7 @@ MainPresenter::MainPresenter()
                 break;
             }
         }, Qt::QueuedConnection);
+
     QObject::connect(m_jobHandler.get(), &JobHandler::distributionDone,
         this, [this](std::shared_ptr<Job> job){
             Utils::assertTrue(job->distribution.wait_for(std::chrono::seconds(0)) == std::future_status::ready,
@@ -46,7 +48,7 @@ MainPresenter::MainPresenter()
             switch (job->type) {
             case Job::Type::Stochastic:
                 m_outputHandler->onDistributionReceived(std::move(distribution),
-                    job->atomicData->minPathEndVal.load(), job->atomicData->maxPathEndVal.load());
+                    job->metaData->minXT.load(), job->metaData->maxXT.load());
                 break;
             default:
                 break;
@@ -71,7 +73,7 @@ void MainPresenter::clear() const{
 }
 
 void MainPresenter::cancel() const {
-    if (!m_jobHandler->jobRunning()) return;
+    Utils::assertTrue(m_jobHandler->jobRunning(), "Expected a job to be running");
     m_outputHandler->cancelGUI();
     m_jobHandler->cancel();
 }

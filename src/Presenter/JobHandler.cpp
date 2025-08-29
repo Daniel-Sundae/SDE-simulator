@@ -41,16 +41,27 @@ void JobHandler::handleDeterministicJob(Job dJob) {
 }
 
 void JobHandler::handleStochasticJob(Job sJob) {
-    while(sJob.distribution.wait_for(std::chrono::milliseconds(DefaultConstants::guiUpdateRate)) != std::future_status::ready
-            || sJob.fullPaths.wait_for(std::chrono::milliseconds(DefaultConstants::guiUpdateRate)) != std::future_status::ready) {
-        if (m_doCancel.load()){
-            sJob.stop.request_stop();
-        }
-        emit jobProgress(sJob.atomicData->pathsCompleted.load());
-    }
-    emit jobProgress(sJob.atomicData->pathsCompleted.load());
     auto job = std::make_shared<Job>(std::move(sJob));
-    emit fullPathsDone(job);
-    emit distributionDone(job);
+    bool distributionEmitted = false;
+    bool fullPathsEmitted = false;
+    while(true) {
+        if (m_doCancel.load()) job->stop.request_stop();
+        if(!fullPathsEmitted && job->fullPaths.wait_for(std::chrono::milliseconds(DefaultConstants::guiUpdateRate)) == std::future_status::ready){
+            emit fullPathsDone(job);
+            fullPathsEmitted = true;
+        }
+        if(!distributionEmitted && job->distribution.wait_for(std::chrono::milliseconds(DefaultConstants::guiUpdateRate)) == std::future_status::ready) {
+            emit distributionDone(job);
+            distributionEmitted = true;
+        }
+        emit jobMetaData(
+            job->metaData->pathsCompleted.load(),
+            job->metaData->minXT.load(),
+            job->metaData->maxXT.load(),
+            job->metaData->minXt.load(),
+            job->metaData->maxXt.load()
+        );
+        if (fullPathsEmitted && distributionEmitted) break;
+    }
     m_stochasticJobRunning.store(false);
 }

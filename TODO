@@ -1,7 +1,7 @@
 FUNCTIONALITY TODO:
 - set pathmax and pathmin resizing of pathplot
 - ensure paths are sent as soon as finished
-- in result tab, show which seed 
+- fixed seed multiple samples should show same results. Where is small diff from? 
 - write som sampling info: exp val, max endval, min endval, min/max path val seen (which path, store seed?)
 - super laggy to resize window when chart is populated with a lot of dense paths
 - auto detect squishiness (e.g. exp beh gbm)

@@ -18,10 +18,10 @@ private:
 
     struct ResultInfo : public QGroupBox {
         explicit ResultInfo(QWidget* parent);
-        QLabel* minEndValue;
-        QLabel* maxEndValue;
-        QLabel* minPathValue;
-        QLabel* maxPathValue;
+        QLabel* minXT;
+        QLabel* maxXT;
+        QLabel* minXt;
+        QLabel* maxXt;
         QLabel* expectedValue;
         QLabel* stdDevValue;
     };
@@ -35,6 +35,7 @@ private:
 public:
     explicit StatusManager(QWidget* parent);
     void setProgress(const size_t completed);
+    void setResults(State minXT, State maxXT, State minXt, State maxXt);
     void setReady();
     void prepareStatusInfo(const size_t totalPaths);
     void setQueryInfo(const PathQuery& query);

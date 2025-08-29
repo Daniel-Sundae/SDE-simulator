@@ -42,8 +42,9 @@ void OutputHandler::onDriftDataReceived(const Path& driftCurve){
     m_outputDispatcher->plotPathChartDriftData(driftCurve);
 }
 
-void OutputHandler::jobProgress(size_t pathsCompleted){
+void OutputHandler::jobMetaData(size_t pathsCompleted, State minXT, State maxXT, State minXt, State maxXt){
     m_outputDispatcher->setProgress(pathsCompleted);
+    m_outputDispatcher->setResults(minXT, maxXT, minXt, maxXt);
 }
 
 void OutputHandler::onStartTransaction(const PathQuery& query){

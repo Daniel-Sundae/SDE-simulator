@@ -24,6 +24,9 @@ public:
     void setProgress(size_t pathsCompleted) const{
         m_statusManager->setProgress(pathsCompleted);
     }
+    void setResults(State minXT, State maxXT, State minXt, State maxXt) const {
+        m_statusManager->setResults(minXT, maxXT, minXt, maxXt);
+    }
     void prepareStatusInfo(const size_t totalPaths) const{
         m_statusManager->prepareStatusInfo(totalPaths);
     }

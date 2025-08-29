@@ -12,10 +12,12 @@ struct Job {
         Deterministic,
         Stochastic,
     };
-    struct Atomics {
+    struct MetaData {
         std::atomic<size_t> pathsCompleted;
-        std::atomic<State> minPathEndVal;
-        std::atomic<State> maxPathEndVal;
+        std::atomic<State> minXT;
+        std::atomic<State> maxXT;
+        std::atomic<State> minXt;
+        std::atomic<State> maxXt;
     };
     explicit Job(size_t _totalPaths)
     : totalPaths(_totalPaths)
@@ -25,10 +27,13 @@ struct Job {
     Type type{};
     std::future<Paths> fullPaths{};
     std::future<Distribution> distribution{};
-    std::shared_ptr<Job::Atomics> atomicData =
-        std::make_shared<Job::Atomics>(
+    std::shared_ptr<Job::MetaData> metaData =
+        std::make_shared<Job::MetaData>(
             0,
             std::numeric_limits<State>::max(),
-            std::numeric_limits<State>::min());
+            std::numeric_limits<State>::min(),
+            std::numeric_limits<State>::max(),
+            std::numeric_limits<State>::min()
+        );
     std::stop_source stop{};
 };

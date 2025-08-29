@@ -28,7 +28,7 @@ private:
     void handleDeterministicJob(Job dJob);
     void handleStochasticJob(Job sJob);
 signals:
-    void jobProgress(size_t pathsFinished);
+    void jobMetaData(size_t pathsFinished, State minXT, State maxXT, State minXt, State maxXt);
     void fullPathsDone(std::shared_ptr<Job> job);
     void distributionDone(std::shared_ptr<Job> job);
 private:
