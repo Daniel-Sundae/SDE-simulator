@@ -22,15 +22,16 @@ private:
         QLabel* maxEndValue;
         QLabel* minPathValue;
         QLabel* maxPathValue;
+        QLabel* expectedValue;
+        QLabel* stdDevValue;
     };
 
     struct StatusInfo : public QGroupBox {
         explicit StatusInfo(QWidget* parent);
         QLabel* currentStatus;
-        QLabel* errorStatus;
         QProgressBar* progressBar;
     };
-    
+
 public:
     explicit StatusManager(QWidget* parent);
     void setProgress(const size_t completed);

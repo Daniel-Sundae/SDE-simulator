@@ -64,7 +64,6 @@ void OutputHandler::prepareGUI(const PathQuery& query){
     m_outputDispatcher->clearDistributionChart();
     m_outputDispatcher->prepareStatusInfo(query.simulationParameters.samples);
     m_outputDispatcher->setQueryInfo(query);
-    m_outputDispatcher->clearPathChart(false);
     m_outputDispatcher->setPathChartMaxTime(query.simulationParameters.time);
     m_outputDispatcher->updateDistributionChartTitle(query.processDefinition.type);
     m_outputDispatcher->updatePathChartTitle(DefaultConstants::maxPathsToDraw >= query.simulationParameters.samples);

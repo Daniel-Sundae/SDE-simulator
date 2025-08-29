@@ -13,14 +13,12 @@ public:
     explicit PathChart();
     void updateTitle(bool allPathsPlotted);
     void plotPath(const Path& sampleData);
-    void clearPathChart(bool clearDrift = true);
+    void clearPathChart();
     void plotDriftCurve(const Path& driftLine);
     void setMaxTime(const Time time);
 private:
-    void updateZeroLine();
-    void updateYAxisIfNeeded(State min_Y, State max_Y);
     void initializeAxis();
-    void initializeProcessChart();
+    void initializePathChart();
 private:
     QValueAxis* m_xAxisTime;
     QValueAxis* m_yAxis;

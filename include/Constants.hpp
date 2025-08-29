@@ -11,7 +11,7 @@ namespace DefaultConstants{
     constexpr double OUthetaData = 1.0; // Mean-reversion coefficient for OU process (Hard coded for now...)
     namespace Simulation {
         constexpr SolverType solver = SolverType::EULER_MARUYAMA;
-        constexpr Time time = 10;
+        constexpr Time time = 5;
         constexpr Time dt = 0.01;
         constexpr size_t samples = 1;
     }

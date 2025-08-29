@@ -1,5 +1,7 @@
 FUNCTIONALITY TODO:
-- looks like rendering takes time. Limit points in the path drawn (noone cares about 0.0001 dt, do 0.001 as smallest for rendering)
+- set pathmax and pathmin resizing of pathplot
+- ensure paths are sent as soon as finished
+- in result tab, show which seed 
 - write som sampling info: exp val, max endval, min endval, min/max path val seen (which path, store seed?)
 - super laggy to resize window when chart is populated with a lot of dense paths
 - auto detect squishiness (e.g. exp beh gbm)

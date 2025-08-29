@@ -55,7 +55,7 @@ void SimulationManager::addSpinBoxes(){
     auto* dtWidget = new QDoubleSpinBox(this);
     dtWidget->setValue(DefaultConstants::Simulation::dt);
     dtWidget->setDecimals(3);
-    dtWidget->setRange(0.0, 0.5); 
+    dtWidget->setRange(0.001, 0.5); 
     dtWidget->setSingleStep(0.001);
     m_widgets[SimulationWidget::dt] = dtWidget;
     auto* samplesWidget = new QSpinBox(this);

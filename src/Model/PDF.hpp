@@ -33,9 +33,9 @@ struct PDF {
     }
     Range support(size_t sampledEndVals, const State minObserved, const State maxObserved) const {
         Utils::assertTrue(sampledEndVals > 0, "Invalid number of points");
-        State lower = minObserved;
-        State upper = maxObserved;
-        State padding = 0* std::max((maxObserved-minObserved)*0.1, 0.0001);
+        State padding = std::max((maxObserved-minObserved)*0.1, 0.001);
+        State lower = minObserved - padding;
+        State upper = maxObserved + padding;
         State threshold = 1e-3;
         State start = EV - 5 * stddev - padding;
         State end = EV + 5 * stddev + padding;
@@ -54,7 +54,7 @@ struct PDF {
                 break;
             }
         }
-        if (lower > upper){
+        if (lower >= upper){
             Utils::fatalError("Failed to generate PDF support: (lower, upper) is ({}, {})",
                 lower, upper);
         }

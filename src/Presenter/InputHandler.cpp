@@ -21,19 +21,7 @@ void InputHandler::cancel() const{
     m_mainPresenter.cancel();
 }
 
-bool InputHandler::canSample() const{
-    if (m_processDefinition->type == ProcessType::NONE)
-        return false;
-    if (m_inputMu == 0 && m_inputSigma == 0)
-        return false;
-    if (m_simulationParameters->dt <= 0 || m_simulationParameters->time <= 0)
-        return false;
-    return true;
-}
-
 void InputHandler::samplePaths(){
-    if (!canSample())
-        return;
     m_processDefinition = std::make_unique<ProcessDefinition>(
         m_processDefinition->type,
         getField(FieldTags::drift{}, m_processDefinition->type, m_inputMu),

@@ -14,7 +14,7 @@ PathChart::PathChart()
     , m_driftCurve(new QLineSeries(this))
 {
     initializeAxis();
-    initializeProcessChart();
+    initializePathChart();
 }
 
 void PathChart::updateTitle(bool allPathsPlotted){
@@ -22,16 +22,14 @@ void PathChart::updateTitle(bool allPathsPlotted){
     setTitle(title);
 }
 
-void PathChart::clearPathChart(bool clearDrift){
+void PathChart::clearPathChart(){
     for (QAbstractSeries* s : series()) {
         if (s != m_zeroLine && s != m_driftCurve) {
             removeSeries(s);
             delete s;
         }
     }
-    if (clearDrift) {
-        m_driftCurve->clear();
-    }
+    m_driftCurve->clear();
 }
 
 void PathChart::plotDriftCurve(const Path& driftCurve){
@@ -46,11 +44,12 @@ void PathChart::plotDriftCurve(const Path& driftCurve){
         points.append(QPointF(static_cast<double>(i)*intervalWidth, driftCurve[i]));
     }
     m_driftCurve->replace(points);
-    updateYAxisIfNeeded(min_y, max_y);
+    State padding = std::max(0.1*(max_y - min_y), 0.1);
+    m_yAxis->setRange(min_y - padding, max_y + padding);
 }
 
 // This function is written by chatGPT.
-// Removes points from plot to reduce clutter and increase rendering speed
+// Removes excessive points from plot to reduce clutter and increase rendering speed
 static QVector<QPointF> lttbDownsampleUniform(const Path& y, int maxPoints, double xMin, double xMax) {
     const size_t n = y.size();
     QVector<QPointF> out;
@@ -134,76 +133,38 @@ void PathChart::plotPath(const Path& path){
     GUI::setPathStyle(series);
 }
 
-
 void PathChart::setMaxTime(const Time time){
     m_xAxisTime->setRange(0, time);
-    updateZeroLine();
-}
-
-void PathChart::updateZeroLine(){
     m_zeroLine->clear();
     m_zeroLine->append(m_xAxisTime->min(), 0);
     m_zeroLine->append(m_xAxisTime->max(), 0);
 }
 
-void PathChart::updateYAxisIfNeeded(State min_Y, State max_Y){
-    constexpr qreal yPaddingFactor = 0.3;
-    qreal dataYMin = static_cast<qreal>(min_Y);
-    qreal dataYMax = static_cast<qreal>(max_Y);
-    qreal dataYRange = dataYMax - dataYMin;
-
-    qreal paddingY = std::max(0.3, dataYRange * yPaddingFactor);
-    qreal desiredYMin = dataYMin - paddingY;
-    qreal desiredYMax = dataYMax + paddingY;
-
-    qreal currentYMin = m_yAxis->min();
-    qreal currentYMax = m_yAxis->max();
-    qreal currentYRange = currentYMax - currentYMin;
-    bool adjustY = false;
-    qreal hysteresis = std::max(0.5, currentYRange * 0.05);  // 5% hysteresis
-    if (desiredYMin < currentYMin - hysteresis || desiredYMax > currentYMax + hysteresis) {
-        adjustY = true;
-    } else if (currentYRange > 5.0 * dataYRange && dataYRange > 0) {
-        adjustY = true;
-    }
-    if (adjustY) {
-        qreal roundTo = std::max(1.0, std::pow(10, std::floor(std::log10(dataYRange / 5))));
-        qreal newYMin = std::floor(desiredYMin / roundTo) * roundTo;
-        qreal newYMax = std::ceil(desiredYMax / roundTo) * roundTo;
-        if (newYMin > 0 && newYMin < dataYRange * 0.5) newYMin = 0;
-        if (newYMax < 0 && newYMax > -dataYRange * 0.5) newYMax = 0;
-        if (newYMax - newYMin < 1.0) {
-            qreal midPoint = (newYMax + newYMin) / 2.0;
-            newYMin = midPoint - 0.5;
-            newYMax = midPoint + 0.5;
-        }
-        m_yAxis->setRange(newYMin, newYMax);
-        int tickCount = std::min(11, std::max(5, static_cast<int>((newYMax - newYMin) / roundTo) + 1));
-        m_yAxis->setTickCount(tickCount);
-        m_yAxis->applyNiceNumbers();
-    }
-}
-
 void PathChart::initializeAxis(){
     addAxis(m_xAxisTime, Qt::AlignBottom);
-    addAxis(m_yAxis, Qt::AlignLeft);
-    m_xAxisTime->setTitleText("Time (s)");
-    m_yAxis->setTitleText("X<sub>t</sub>");
+    m_xAxisTime->setTitleText("t");
     m_xAxisTime->setGridLineVisible(false);
+    m_xAxisTime->setRange(0, DefaultConstants::Simulation::time);
+    addAxis(m_yAxis, Qt::AlignLeft);
+    m_yAxis->setTitleText("X<sub>t</sub>");
     m_yAxis->setGridLineVisible(false);
-    m_xAxisTime->setRange(0, 10);
     m_yAxis->setRange(-10, 10);
+    m_yAxis->setTickType(QValueAxis::TicksFixed);
+    m_yAxis->setTickCount(7);
+    m_yAxis->setTickAnchor(0.0);
 }
 
-void PathChart::initializeProcessChart(){
+void PathChart::initializePathChart(){
     GUI::setChartStyle(this);
     legend()->setVisible(false);
+
     m_zeroLine->setPen(QPen(Qt::gray, 1.0));
     addSeries(m_zeroLine);
     m_zeroLine->attachAxis(m_xAxisTime);
     m_zeroLine->attachAxis(m_yAxis);
     m_zeroLine->append(0, 0);
-    m_zeroLine->append(10, 0); // Match initial m_xAxisTime range
+    m_zeroLine->append(DefaultConstants::Simulation::time, 0); // Match initial m_xAxisTime range
+
     m_driftCurve->setPen(QPen(Qt::gray, 1.0));
     addSeries(m_driftCurve);
     m_driftCurve->attachAxis(m_xAxisTime);

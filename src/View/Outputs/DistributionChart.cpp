@@ -92,6 +92,7 @@ void DistributionChart::plotExpValLine(const State EV){
     const auto y0 = m_yAxisDensity->min();
     const auto y1 = m_yAxisDensity->max();
     m_expValLine->replace({ QPointF(EV, y0), QPointF(EV, y1) });
+    m_xAxis->setTickAnchor(EV);
 }
 
 void DistributionChart::setDistributionChartSupport(const Range range){

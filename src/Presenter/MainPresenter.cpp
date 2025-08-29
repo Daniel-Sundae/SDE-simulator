@@ -16,7 +16,6 @@ MainPresenter::MainPresenter()
     , m_engine(std::make_unique<PathEngine>())
     , m_jobHandler(std::make_unique<JobHandler>())
 {
-    // Pass ready engine results to output handler
     QObject::connect(m_jobHandler.get(), &JobHandler::jobProgress,
         this, [this](size_t pathsFinished){
             m_outputHandler->jobProgress(pathsFinished);
@@ -28,7 +27,7 @@ MainPresenter::MainPresenter()
             case Job::Type::Deterministic:
                 Utils::assertTrue(paths.size() == 1,
                     "Expected deterministic job to return exactly one path, got: {}", paths.size());
-                m_outputHandler->onDriftDataReceived(paths.front());
+                m_outputHandler->onDriftDataReceived(std::move(paths.front()));
                 break;
             case Job::Type::Stochastic:
                 m_outputHandler->onPathsReceived(std::move(paths));

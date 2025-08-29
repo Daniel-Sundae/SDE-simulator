@@ -50,8 +50,8 @@ public:
     void plotPathChartDriftData(const Path &driftLine) const{
         getPathChart()->plotDriftCurve(driftLine);
     }
-    void clearPathChart(bool clearDrift = true){
-        getPathChart()->clearPathChart(clearDrift);
+    void clearPathChart(){
+        getPathChart()->clearPathChart();
     }
     void setPathChartMaxTime(const Time time){
         getPathChart()->setMaxTime(time);

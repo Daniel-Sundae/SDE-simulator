@@ -11,12 +11,20 @@ static const std::unordered_map<SolverType, QString> solverToString = {
     std::pair{SolverType::MILSTEIN, QString("Milstein")}
 };
 
+static void initGridLayout(QGridLayout* grid) {
+    grid->setContentsMargins(6, 4, 6, 6);
+    grid->setHorizontalSpacing(8);
+    grid->setVerticalSpacing(2);
+}
+
 StatusManager::QueryInfo::QueryInfo(QWidget* parent)
     : QGroupBox("Query", parent)
     , infoLabel(new QLabel(this))
 {
-    auto* form = new QFormLayout(this);
-    form->addRow(infoLabel);
+    auto* grid = new QGridLayout(this);
+    initGridLayout(grid);
+    setLayout(grid);
+    grid->addWidget(infoLabel);
 }
 
 StatusManager::ResultInfo::ResultInfo(QWidget* parent = nullptr)
@@ -25,25 +33,40 @@ StatusManager::ResultInfo::ResultInfo(QWidget* parent = nullptr)
     , maxEndValue(new QLabel(this))
     , minPathValue(new QLabel(this))
     , maxPathValue(new QLabel(this))
+    , expectedValue(new QLabel(this))
+    , stdDevValue(new QLabel(this))
 {
-    auto* form = new QFormLayout(this);
-    form->addRow("Min end:", minEndValue);
-    form->addRow("Max end:", maxEndValue);
-    form->addRow("Min path:", minPathValue);
-    form->addRow("Max path:", maxPathValue);
+    auto* grid = new QGridLayout(this);
+    initGridLayout(grid);
+    setLayout(grid);
+
+    grid->addWidget(new QLabel("Min X(T):"),  0,0);
+    grid->addWidget(minEndValue,              0,1);
+    grid->addWidget(new QLabel("Max X(T):"),  0,2);
+    grid->addWidget(maxEndValue,              0,3);
+
+    grid->addWidget(new QLabel("Min X(t):"),  1,0);
+    grid->addWidget(minPathValue,             1,1);
+    grid->addWidget(new QLabel("Max X(t):"),  1,2);
+    grid->addWidget(maxPathValue,             1,3);
+
+    grid->addWidget(new QLabel("E[X(T)]:"),   2,0);
+    grid->addWidget(expectedValue,            2,1);
+    grid->addWidget(new QLabel("σ(X(T)):"),   2,2);
+    grid->addWidget(stdDevValue,              2,3);
 }
 
 StatusManager::StatusInfo::StatusInfo(QWidget* parent)
     : QGroupBox("Status", parent)
     , currentStatus(new QLabel(this))
-    , errorStatus(new QLabel(this))
     , progressBar(new QProgressBar(this))
 {
+    auto* grid = new QGridLayout(this);
+    initGridLayout(grid);
+    setLayout(grid);
     progressBar->setFormat("%v/%m");
-    auto* form = new QFormLayout(this);
-    form->addRow("Current status:", currentStatus);
-    form->addRow("Error status:", errorStatus);
-    form->addRow("Progress:", progressBar);
+    grid->addWidget(currentStatus, 0, 0);
+    grid->addWidget(progressBar, 1, 0);
 }
 
 StatusManager::StatusManager(QWidget* parent)
