@@ -124,7 +124,7 @@ struct Fields<ProcessType::GBM> : RequiredFields<Fields<ProcessType::GBM>> {
     static constexpr std::string_view description = "Geometric brownian motion.";
     static constexpr std::string_view definition = "dX = μXdt + σXdB";
     static constexpr Constants muData{ {-0.5, 0.5}, 0.2, 0.1 };
-    static constexpr Constants sigmaData{ {0, 0.4}, 0.2, 0.05 };
+    static constexpr Constants sigmaData{ {0.1, 0.5}, 0.2, 0.05 };
     static constexpr Constants startValue{ {0.1, 2}, 1, 0.1 };
     static auto drift(const double _mu) -> Drift {
         return Drift(

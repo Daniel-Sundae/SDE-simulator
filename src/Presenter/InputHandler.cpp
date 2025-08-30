@@ -28,12 +28,14 @@ void InputHandler::samplePaths(){
         getField(FieldTags::diffusion{}, m_processDefinition->type, m_inputSigma),
         m_processDefinition->startValue);
 
-    const PathQuery stochasticQuery{ *m_processDefinition, *m_simulationParameters, *m_settingsParameters};
-    const PathQuery deterministicQuery = createDriftQuery(stochasticQuery);
-    m_mainPresenter.onTransactionReceived(Transaction{std::move(stochasticQuery), std::move(deterministicQuery)});
+    const StochasticQuery stochasticQuery{ *m_processDefinition, *m_simulationParameters, *m_settingsParameters};
+    const DeterministicQuery deterministicQuery = createDriftQuery(stochasticQuery);
+    const StochasticFullPathsQuery stochasticFullPathQuery = createStochasticFullPathQuery(stochasticQuery);
+    m_mainPresenter.onTransactionReceived(
+        Transaction{std::move(deterministicQuery), std::move(stochasticQuery), std::move(stochasticFullPathQuery)});
 }
 
-PathQuery InputHandler::createDriftQuery(const PathQuery& stochasticQuery) const{
+DeterministicQuery InputHandler::createDriftQuery(const StochasticQuery& stochasticQuery) const{
     auto definition = ProcessDefinition(
         stochasticQuery.processDefinition.type,
         stochasticQuery.processDefinition.drift,
@@ -45,7 +47,16 @@ PathQuery InputHandler::createDriftQuery(const PathQuery& stochasticQuery) const
         stochasticQuery.simulationParameters.time,
         stochasticQuery.simulationParameters.dt,
         1);
-    return PathQuery( definition, simulationParams, stochasticQuery.settingsParameters);
+    return DeterministicQuery( definition, simulationParams, stochasticQuery.settingsParameters);
+}
+
+StochasticFullPathsQuery InputHandler::createStochasticFullPathQuery(const StochasticQuery& stochasticQuery) const{
+    auto simulationParams = SimulationParameters(
+        stochasticQuery.simulationParameters.solver,
+        stochasticQuery.simulationParameters.time,
+        stochasticQuery.simulationParameters.dt,
+        std::min(stochasticQuery.simulationParameters.samples, DefaultConstants::maxPathsToDraw)); // Only drawn paths are kept in full
+    return StochasticFullPathsQuery( stochasticQuery.processDefinition, simulationParams, stochasticQuery.settingsParameters);
 }
 
 void InputHandler::onSolverTypeModified(SolverType newType){

@@ -8,6 +8,7 @@ JobHandler::~JobHandler() {
     m_doCancel.store(true);
     if (m_deterministicJobThread.joinable()) m_deterministicJobThread.join();
     if (m_stochasticJobThread.joinable()) m_stochasticJobThread.join();
+    if (m_stochasticFullPathsJobThread.joinable()) m_stochasticFullPathsJobThread.join();
 }
 
 void JobHandler::cancel() {
@@ -15,53 +16,51 @@ void JobHandler::cancel() {
 }
 
 bool JobHandler::jobRunning() const {
-    return m_deterministicJobRunning.load() || m_stochasticJobRunning.load();
+    return m_deterministicJobRunning.load() || m_stochasticJobRunning.load() || m_stochasticFullPathsJobRunning.load();
 }
 
-void JobHandler::postJobs(Job&& deterministicJob, Job&& stochasticJob) {
+void JobHandler::postJobs(
+        DeterministicJob&& deterministicJob,
+        StochasticJob&& stochasticJob,
+        StochasticFullPathsJob&& stochasticFullPathJob
+    ) {
     Utils::assertTrue(!jobRunning(), "Cannot post jobs while another job is running");
     m_deterministicJobRunning.store(true);
     m_stochasticJobRunning.store(true);
+    m_stochasticFullPathsJobRunning.store(true);
     m_doCancel.store(false);
     // Non blocking join due to check no job is running
     if (m_deterministicJobThread.joinable()) m_deterministicJobThread.join();
     if (m_stochasticJobThread.joinable()) m_stochasticJobThread.join();
+    if (m_stochasticFullPathsJobThread.joinable()) m_stochasticFullPathsJobThread.join();
     m_deterministicJobThread = std::thread(&JobHandler::handleDeterministicJob, this, std::move(deterministicJob));
     m_stochasticJobThread = std::thread(&JobHandler::handleStochasticJob, this, std::move(stochasticJob));
+    m_stochasticFullPathsJobThread = std::thread(&JobHandler::handleStochasticFullPathsJob, this, std::move(stochasticFullPathJob));
 }
 
-void JobHandler::handleDeterministicJob(Job dJob) {
-    while(dJob.distribution.wait_for(std::chrono::milliseconds(DefaultConstants::guiUpdateRate)) != std::future_status::ready) {
-        if (m_doCancel.load()){
-            dJob.stop.request_stop();
-        }
+void JobHandler::handleDeterministicJob(DeterministicJob dJob) {
+    while(dJob.drift.wait_for(std::chrono::milliseconds(DefaultConstants::guiUpdateRate)) != std::future_status::ready) {
+        if (m_doCancel.load()) dJob.stop.request_stop();
     }
     emit fullPathsDone(std::make_shared<Job>(std::move(dJob)));
     m_deterministicJobRunning.store(false);
 }
 
-void JobHandler::handleStochasticJob(Job sJob) {
-    auto job = std::make_shared<Job>(std::move(sJob));
-    bool distributionEmitted = false;
-    bool fullPathsEmitted = false;
-    while(true) {
-        if (m_doCancel.load()) job->stop.request_stop();
-        if(!fullPathsEmitted && job->fullPaths.wait_for(std::chrono::milliseconds(DefaultConstants::guiUpdateRate)) == std::future_status::ready){
-            emit fullPathsDone(job);
-            fullPathsEmitted = true;
-        }
-        if(!distributionEmitted && job->distribution.wait_for(std::chrono::milliseconds(DefaultConstants::guiUpdateRate)) == std::future_status::ready) {
-            emit distributionDone(job);
-            distributionEmitted = true;
-        }
+void JobHandler::handleStochasticJob(StochasticJob sJob) {
+    const auto emitMetaData = [this, &sJob] {
         emit jobMetaData(
-            job->metaData->pathsCompleted.load(),
-            job->metaData->minXT.load(),
-            job->metaData->maxXT.load(),
-            job->metaData->minXt.load(),
-            job->metaData->maxXt.load()
+            sJob.metaData->pathsCompleted.load(),
+            sJob.metaData->minXT.load(),
+            sJob.metaData->maxXT.load(),
+            sJob.metaData->minXt.load(),
+            sJob.metaData->maxXt.load()
         );
-        if (fullPathsEmitted && distributionEmitted) break;
+    };
+    while(sJob.distribution.wait_for(std::chrono::milliseconds(DefaultConstants::guiUpdateRate)) != std::future_status::ready) {
+        if (m_doCancel.load()) sJob.stop.request_stop();
+        emitMetaData();
     }
+    emitMetaData();
+    emit distributionDone(std::make_unique<StochasticJob>(std::move(sJob)));
     m_stochasticJobRunning.store(false);
 }

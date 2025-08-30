@@ -1,5 +1,6 @@
 #include "OutputDispatcher.hpp"
 #include <QtWidgets/QGraphicsLayout>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 
 OutputDispatcher::OutputDispatcher(QWidget *parent)
     : QWidget(parent)
@@ -14,6 +15,8 @@ OutputDispatcher::OutputDispatcher(QWidget *parent)
     groupBoxWrapperLayout->addWidget(m_statusManager);
     layout->addLayout(groupBoxWrapperLayout);
 
+    m_pathChartView->setViewport(new QOpenGLWidget());
+    m_pathChartView->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     auto* pathChart = new PathChart();
     m_pathChartView->setChart(pathChart);
     layout->addWidget(m_pathChartView);

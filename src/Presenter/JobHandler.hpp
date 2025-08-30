@@ -22,19 +22,27 @@ public:
     ~JobHandler();
     bool jobRunning() const;
     void cancel();
-    void postJobs(Job&& deterministicJob, Job&& stochasticJob);
+    void postJobs(
+        DeterministicJob&& dJob,
+        StochasticJob&& sJob,
+        StochasticFullPathsJob&& fpJob
+    );
 
 private:
-    void handleDeterministicJob(Job dJob);
-    void handleStochasticJob(Job sJob);
+    void handleDeterministicJob(DeterministicJob dJob);
+    void handleStochasticJob(StochasticJob sJob);
+    void handleStochasticFullPathsJob(StochasticFullPathsJob fpJob);
 signals:
     void jobMetaData(size_t pathsFinished, State minXT, State maxXT, State minXt, State maxXt);
+    void driftDone(Path path);
     void fullPathsDone(std::shared_ptr<Job> job);
     void distributionDone(std::shared_ptr<Job> job);
 private:
     std::thread m_deterministicJobThread;
     std::thread m_stochasticJobThread;
+    std::thread m_stochasticFullPathsJobThread;
     std::atomic<bool> m_deterministicJobRunning = false;
     std::atomic<bool> m_stochasticJobRunning = false;
+    std::atomic<bool> m_stochasticFullPathsJobRunning = false;
     std::atomic<bool> m_doCancel = false;
 };

@@ -3,6 +3,8 @@
 #include "Constants.hpp"
 #include "Utils.hpp"
 #include <optional>
+#include <variant>
+
 struct SimulationParameters {
     explicit SimulationParameters() = default;
     explicit SimulationParameters(SolverType _solver, Time _time, Time _dt, size_t _samples)
@@ -58,3 +60,15 @@ struct PathQuery {
     {
     }
 };
+
+struct DeterministicQuery : PathQuery {
+    using PathQuery::PathQuery;
+};
+struct StochasticQuery : PathQuery {
+    using PathQuery::PathQuery;
+};
+struct StochasticFullPathsQuery : PathQuery {
+    using PathQuery::PathQuery;
+};
+using AnyQuery = std::variant<DeterministicQuery, StochasticQuery, StochasticFullPathsQuery>;
+

@@ -21,7 +21,8 @@ public:
     void cancel() const;
 private:
     bool canSample() const;
-    PathQuery createDriftQuery(const PathQuery& stochasticQuery) const;
+    DeterministicQuery createDriftQuery(const StochasticQuery& stochasticQuery) const;
+    StochasticFullPathsQuery createStochasticFullPathQuery(const StochasticQuery& stochasticQuery) const;
 private:
     MainPresenter& m_mainPresenter;
     std::unique_ptr<ProcessDefinition> m_processDefinition;

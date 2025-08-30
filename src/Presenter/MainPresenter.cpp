@@ -21,23 +21,17 @@ MainPresenter::MainPresenter()
             m_outputHandler->jobMetaData(pathsCompleted, minXT, maxXT, minXt, maxXt);
         }, Qt::QueuedConnection);
 
-    QObject::connect(m_jobHandler.get(), &JobHandler::fullPathsDone,
-        this, [this](std::shared_ptr<Job> job){
-            Paths paths = job->fullPaths.get();
-            switch (job->type) {
-            case Job::Type::Deterministic:
-                Utils::assertTrue(paths.size() == 1,
-                    "Expected deterministic job to return exactly one path, got: {}", paths.size());
-                m_outputHandler->onDriftDataReceived(std::move(paths.front()));
-                break;
-            case Job::Type::Stochastic:
-                m_outputHandler->onPathsReceived(std::move(paths));
-                break;
-            default:
-                Utils::fatalError("Unknown job type received in MainPresenter");
-                break;
-            }
+    QObject::connect(m_jobHandler.get(), &JobHandler::driftDone,
+        this, [this](Path path){
+            m_outputHandler->onDriftDataReceived(std::move(path));
         }, Qt::QueuedConnection);
+    
+    QObject::connect(m_jobHandler.get(), &JobHandler::fullPathsDone,
+        this, [this](std::shared_ptr<StochasticFullPathsJob> job){
+            m_outputHandler->onPathsReceived(job->fullPaths.get(),
+                job->metaData->minXt.load(), job->metaData->maxXt.load());
+        }, Qt::QueuedConnection);
+    });
 
     QObject::connect(m_jobHandler.get(), &JobHandler::distributionDone,
         this, [this](std::shared_ptr<Job> job){
@@ -60,12 +54,11 @@ MainPresenter::~MainPresenter() = default;
 
 void MainPresenter::onTransactionReceived(const Transaction& transaction){
     Utils::assertTrue(!m_jobHandler->jobRunning(), "Expected no job to be running");
-    m_outputHandler->onStartTransaction(transaction.pathQuery);
-    Job deterministicJob = m_engine->processPathQuery(transaction.deterministicQuery);
-    deterministicJob.type = Job::Type::Deterministic;
-    Job stochasticJob = m_engine->processPathQuery(transaction.pathQuery);
-    stochasticJob.type = Job::Type::Stochastic;
-    m_jobHandler->postJobs(std::move(deterministicJob), std::move(stochasticJob));
+    m_outputHandler->onStartTransaction(transaction.stochasticQuery);
+    DeterministicJob deterministicJob = std::get<DeterministicJob>(m_engine->processQuery(transaction.deterministicQuery));
+    StochasticJob stochasticJob = std::get<StochasticJob>(m_engine->processQuery(transaction.stochasticQuery));
+    StochasticFullPathsJob stochasticFullPathJob = std::get<StochasticFullPathsJob>(m_engine->processQuery(transaction.stochasticFullPathQuery));
+    m_jobHandler->postJobs(std::move(deterministicJob), std::move(stochasticJob), std::move(stochasticFullPathJob));
 }
 
 void MainPresenter::clear() const{

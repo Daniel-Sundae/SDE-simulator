@@ -12,10 +12,13 @@ class PathChart : public QChart{
 public:
     explicit PathChart();
     void updateTitle(bool allPathsPlotted);
-    void plotPath(const Path& sampleData);
+    void plotPaths(Paths&& _paths);
+    void preparePlotPath(Path&& path, int maxPoints, double xMin, double xMax);
+    void plotPath(QVector<QPointF> points);
     void clearPathChart();
     void plotDriftCurve(const Path& driftLine);
     void setMaxTime(const Time time);
+    void setYAxisRange(const State min, const State max);
 private:
     void initializeAxis();
     void initializePathChart();

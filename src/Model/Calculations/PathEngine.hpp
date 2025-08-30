@@ -12,7 +12,7 @@ struct Transaction;
 class PathEngine{
 public:
     explicit PathEngine() = default;
-    [[nodiscard]] Job processPathQuery(const PathQuery &pathQuery);
+    [[nodiscard]] AnyJob processQuery(const AnyQuery &query);
     bool isBusy();
 
 private:

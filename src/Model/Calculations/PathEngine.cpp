@@ -4,7 +4,7 @@
 #include "Transaction.hpp"
 #include <thread>
 
-static void updateXT(
+static void updateJobData(
         std::shared_ptr<Job::MetaData> jobData,
         const State XT,
         const State minXt,
@@ -36,19 +36,21 @@ static Path samplePath(
     const State startValue = query.processDefinition.startValue;
     auto dXt = dXtFunction(query.simulationParameters.solver);
     std::mt19937 generator(seq);
+    std::normal_distribution<double> noise(0.0, 1.0);
     Path path = {};
     Utils::assertTrue(points != 0, "Expected points to be non-zero");
     path.reserve(points);
     path.push_back(startValue);
     for (size_t i = 1; i < points; ++i) {
         if (stopToken.stop_requested()) [[unlikely]] return {};
-        path.push_back(path.back() + dXt(drift, diffusion, static_cast<Time>(i) * dt, path.back(), dt, generator));
+        double dB = noise(generator) * std::sqrt(dt);
+        path.push_back(path.back() + dXt(drift, diffusion, static_cast<Time>(i) * dt, path.back(), dt, dB));
     }
     return path;
 }
 
 static Paths samplePaths(
-        const PathQuery& query,
+        const StochasticFullPathsQuery& query,
         EngineThreadPool& threadpool,
         std::stop_token stopToken){
     const size_t nrPathsToDraw = query.simulationParameters.nrPathsToDraw();
@@ -93,14 +95,17 @@ static std::optional<State> samplePathXT(
     State maxXt = XT;
     auto dXt = dXtFunction(query.simulationParameters.solver);
     std::mt19937 generator(seq);
+    std::normal_distribution<double> noise(0.0, 1.0);
     Utils::assertTrue(points != 0, "Expected points to be non-zero");
     for (size_t i = 1; i < points; ++i) {
         if (stopToken.stop_requested()) [[unlikely]] return std::nullopt;
-        XT += dXt(drift, diffusion, static_cast<Time>(i) * dt, XT, dt, generator);
+        State dB = noise(generator) * std::sqrt(dt);
+        Time t = static_cast<Time>(i) * dt;
+        XT += dXt(drift, diffusion, t, XT, dt, dB);
         minXt = std::min(minXt, XT);
         maxXt = std::max(maxXt, XT);
     }
-    updateXT(jobData, XT, minXt, maxXt);
+    updateJobData(jobData, XT, minXt, maxXt);
     return std::make_optional(XT);
 }
 
@@ -139,13 +144,28 @@ static Distribution sampleDistribution(
     return distribution;
 }
 
-[[nodiscard]] Job PathEngine::processPathQuery(const PathQuery& pathQuery) {
-    Job job{pathQuery.simulationParameters.samples};
-    job.fullPaths = std::move(std::async(std::launch::async, samplePaths,
-        pathQuery, std::ref(*m_tp), job.stop.get_token()));
-    job.distribution = std::move(std::async(std::launch::async, sampleDistribution,
-        pathQuery, std::ref(*m_tp), job.metaData, job.stop.get_token()));
-    return job;
+[[nodiscard]] AnyJob PathEngine::processQuery(const AnyQuery& aQuery) {
+    return std::visit([this](auto const& query) -> AnyJob {
+        using QueryType = std::decay_t<decltype(query)>;
+        if constexpr (std::is_same_v<QueryType, DeterministicQuery>){
+            DeterministicJob dJob(query.simulationParameters.samples);
+            dJob.drift = std::move(std::async(std::launch::async,
+                [query, st = dJob.stop.get_token()]() mutable {
+                return samplePath(query, std::seed_seq{0}, st);
+            }));
+            return dJob;
+        } else if constexpr (std::is_same_v<QueryType, StochasticQuery>) {
+            StochasticJob sJob(query.simulationParameters.samples);
+            sJob.distribution = std::move(std::async(std::launch::async, sampleDistribution,
+                query, std::ref(*m_tp), sJob.metaData, sJob.stop.get_token()));
+            return sJob;
+        } else if constexpr (std::is_same_v<QueryType, StochasticFullPathsQuery>) {
+            StochasticFullPathsJob fpJob(query.simulationParameters.samples);
+            fpJob.fullPaths = std::move(std::async(std::launch::async, samplePaths,
+                query, std::ref(*m_tp), fpJob.stop.get_token()));
+            return fpJob;
+        }
+    }, aQuery);
 }
 
 bool PathEngine::isBusy(){

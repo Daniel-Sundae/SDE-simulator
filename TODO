@@ -33,6 +33,7 @@ WRITE TESTS:
 - solvers roughly same val
 - processes
 - exp val
+- sample one query many times and assert results are the same each time. (no caching across jobs of the RNG objects)
 
 PRESENTATION:
 - Show bigger increment step -> bigger error.

@@ -41,14 +41,14 @@ StatusManager::ResultInfo::ResultInfo(QWidget* parent = nullptr)
     setLayout(grid);
 
     grid->addWidget(new QLabel("Min X(T):"),  0,0);
-    grid->addWidget(minXT,              0,1);
+    grid->addWidget(minXT,                    0,1);
     grid->addWidget(new QLabel("Max X(T):"),  0,2);
-    grid->addWidget(maxXT,              0,3);
+    grid->addWidget(maxXT,                    0,3);
 
     grid->addWidget(new QLabel("Min X(t):"),  1,0);
-    grid->addWidget(minXt,             1,1);
+    grid->addWidget(minXt,                    1,1);
     grid->addWidget(new QLabel("Max X(t):"),  1,2);
-    grid->addWidget(maxXt,             1,3);
+    grid->addWidget(maxXt,                    1,3);
 
     grid->addWidget(new QLabel("E[X(T)]:"),   2,0);
     grid->addWidget(expectedValue,            2,1);
@@ -94,10 +94,10 @@ void StatusManager::setProgress(const size_t pathsCompleted){
 }
 
 void StatusManager::setResults(State minXT, State maxXT, State minXt, State maxXt) {
-    m_resultInfo->minXT->setText(QString::number(minXT));
-    m_resultInfo->maxXT->setText(QString::number(maxXT));
-    m_resultInfo->minXt->setText(QString::number(minXt));
-    m_resultInfo->maxXt->setText(QString::number(maxXt));
+    m_resultInfo->minXT->setText(QString::number(minXT, 'f', 3));
+    m_resultInfo->maxXT->setText(QString::number(maxXT, 'f', 3));
+    m_resultInfo->minXt->setText(QString::number(minXt, 'f', 3));
+    m_resultInfo->maxXt->setText(QString::number(maxXt, 'f', 3));
     m_resultInfo->minXT->repaint();
     m_resultInfo->maxXT->repaint();
     m_resultInfo->minXt->repaint();

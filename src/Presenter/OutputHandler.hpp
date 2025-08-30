@@ -9,7 +9,7 @@ struct PDF;
 class OutputHandler{
 public:
     OutputHandler() = default;
-    void onPathsReceived(const Paths& paths);
+    void onPathsReceived(Paths&& paths, State minXt, State maxXt);
     void onDistributionReceived(const Distribution& distribution, State min, State max);
     void onStartTransaction(const PathQuery& query);
     void onDriftDataReceived(const Path& driftCurve);

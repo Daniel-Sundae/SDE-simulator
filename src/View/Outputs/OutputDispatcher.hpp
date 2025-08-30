@@ -44,8 +44,8 @@ public:
     }
 
     // PathChart
-    void plotPath(const Path& path) const{
-        getPathChart()->plotPath(path);
+    void plotPaths(Paths&& paths) const{
+        getPathChart()->plotPaths(std::move(paths));
     }
     void updatePathChartTitle(bool allPathsPlotted) const{
         getPathChart()->updateTitle(allPathsPlotted);
@@ -58,6 +58,9 @@ public:
     }
     void setPathChartMaxTime(const Time time){
         getPathChart()->setMaxTime(time);
+    }
+    void setPathChartYAxisRange(const State min, const State max) const {
+        getPathChart()->setYAxisRange(min, max);
     }
 
     // DistributionChart

@@ -4,36 +4,57 @@
 #include <atomic>
 #include <stop_token>
 #include <memory>
-#include <numeric>
+#include <limits>
+#include <variant>
 #include "Types.hpp"
 
 struct Job {
     enum class Type {
         Deterministic,
         Stochastic,
+        StochasticFullPath,
     };
     struct MetaData {
-        std::atomic<size_t> pathsCompleted;
-        std::atomic<State> minXT;
-        std::atomic<State> maxXT;
-        std::atomic<State> minXt;
-        std::atomic<State> maxXt;
+        std::atomic<size_t> pathsCompleted{0};
+        std::atomic<State> minXT{std::numeric_limits<State>::max()};
+        std::atomic<State> maxXT{std::numeric_limits<State>::lowest()};
+        std::atomic<State> minXt{std::numeric_limits<State>::max()};
+        std::atomic<State> maxXt{std::numeric_limits<State>::lowest()};
     };
-    explicit Job(size_t _totalPaths)
-    : totalPaths(_totalPaths)
-    {
-    }
+protected:
+    explicit Job(size_t _totalPaths, Type _type)
+        : totalPaths(_totalPaths), type(_type)
+    {}
+    ~Job() = default;
+public:
     const size_t totalPaths{};
-    Type type{};
-    std::future<Paths> fullPaths{};
-    std::future<Distribution> distribution{};
-    std::shared_ptr<Job::MetaData> metaData =
-        std::make_shared<Job::MetaData>(
-            0,
-            std::numeric_limits<State>::max(),
-            std::numeric_limits<State>::min(),
-            std::numeric_limits<State>::max(),
-            std::numeric_limits<State>::min()
-        );
+    const Type type{};
     std::stop_source stop{};
+    const std::shared_ptr<MetaData> metaData{ std::make_shared<MetaData>() };
 };
+
+struct DeterministicJob : public Job{
+    explicit DeterministicJob(size_t _totalPaths)
+        : Job(_totalPaths, Type::Deterministic)
+    {}
+    std::future<Path> drift{};
+};
+
+struct StochasticJob : public Job {
+    explicit StochasticJob(size_t _totalPaths)
+        : Job(_totalPaths, Type::Stochastic)
+    {}
+    std::future<Distribution> distribution{};
+};
+
+struct StochasticFullPathsJob : public Job {
+    explicit StochasticFullPathsJob(size_t _totalPaths)
+        : Job(_totalPaths, Type::StochasticFullPath)
+    {}
+    std::future<Paths> fullPaths{};
+};
+
+using AnyJob = std::variant<
+    DeterministicJob,
+    StochasticJob,
+    StochasticFullPathsJob>;

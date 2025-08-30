@@ -11,14 +11,13 @@ void OutputHandler::signalReadyIfNeeded() const {
     }
 }
 
-void OutputHandler::onPathsReceived(const Paths& paths){
+void OutputHandler::onPathsReceived(Paths&& paths, State minXt, State maxXt){
     Utils::assertTrue(paths.size() <= DefaultConstants::maxPathsToDraw,
         "Expected paths to be at most {} but got {}", DefaultConstants::maxPathsToDraw, paths.size());
     Utils::assertTrue(!m_pathsReceived, "Paths have already been received");
-    for (const auto& path : paths) {
-        m_outputDispatcher->plotPath(path);
-    }
-    m_pathsReceived = true; 
+    m_outputDispatcher->plotPaths(std::move(paths));
+    m_outputDispatcher->setPathChartYAxisRange(minXt, maxXt);
+    m_pathsReceived = true;
     signalReadyIfNeeded();
 }
 
