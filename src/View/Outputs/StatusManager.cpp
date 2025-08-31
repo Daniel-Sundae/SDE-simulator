@@ -87,10 +87,6 @@ StatusManager::StatusManager(QWidget* parent)
 
 void StatusManager::setProgress(const size_t pathsCompleted){
     m_statusInfo->progressBar->setValue(static_cast<int>(pathsCompleted));
-    if (pathsCompleted == m_statusInfo->progressBar->maximum()){
-        m_statusInfo->currentStatus->setText("Rendering...");
-        m_statusInfo->currentStatus->repaint();
-    }
 }
 
 void StatusManager::setResults(State minXT, State maxXT, State minXt, State maxXt) {
@@ -137,6 +133,14 @@ void StatusManager::setQueryInfo(const PathQuery& query){
 
 void StatusManager::clear(){
     m_queryInfo->infoLabel->setText("");
+
+    m_resultInfo->minXT->setText("");
+    m_resultInfo->maxXT->setText("");
+    m_resultInfo->minXt->setText("");
+    m_resultInfo->maxXt->setText("");
+    m_resultInfo->expectedValue->setText("");
+    m_resultInfo->stdDevValue->setText("");
+
     m_statusInfo->progressBar->setRange(0, 1);
     m_statusInfo->progressBar->setValue(0);
     setReady();

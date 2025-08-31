@@ -95,7 +95,7 @@ struct Fields<ProcessType::BM> : RequiredFields<Fields<ProcessType::BM>> {
     static constexpr std::string_view description = "Standard brownian motion.";
     static constexpr std::string_view definition = "dX = μdt + σdB";
     static constexpr Constants muData{ {-0.5, 0.5}, 0, 0.1 };
-    static constexpr Constants sigmaData{ {0, 1.2}, 0.2, 0.1 };
+    static constexpr Constants sigmaData{ {0, 3}, 0.2, 0.1 };
     static constexpr Constants startValue{ {-100, 100}, 0, 1 };
     static auto drift(const double _mu) -> Drift {
         return Drift(_mu, [_mu](Time, State) { return _mu; });
@@ -124,7 +124,7 @@ struct Fields<ProcessType::GBM> : RequiredFields<Fields<ProcessType::GBM>> {
     static constexpr std::string_view description = "Geometric brownian motion.";
     static constexpr std::string_view definition = "dX = μXdt + σXdB";
     static constexpr Constants muData{ {-0.5, 0.5}, 0.2, 0.1 };
-    static constexpr Constants sigmaData{ {0.1, 0.5}, 0.2, 0.05 };
+    static constexpr Constants sigmaData{ {0.1, 2.0}, 0.2, 0.05 };
     static constexpr Constants startValue{ {0.1, 2}, 1, 0.1 };
     static auto drift(const double _mu) -> Drift {
         return Drift(

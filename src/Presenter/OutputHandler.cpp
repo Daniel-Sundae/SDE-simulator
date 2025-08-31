@@ -37,11 +37,11 @@ void OutputHandler::onDistributionReceived(const Distribution& distribution, Sta
     signalReadyIfNeeded();
 }
 
-void OutputHandler::onDriftDataReceived(const Path& driftCurve){
-    m_outputDispatcher->plotPathChartDriftData(driftCurve);
+void OutputHandler::onDriftDataReceived(const Path& drift, State minXt, State maxXt){
+    m_outputDispatcher->plotPathChartDriftData(drift, minXt, maxXt);
 }
 
-void OutputHandler::jobMetaData(size_t pathsCompleted, State minXT, State maxXT, State minXt, State maxXt){
+void OutputHandler::distributionJobData(size_t pathsCompleted, State minXT, State maxXT, State minXt, State maxXt){
     m_outputDispatcher->setProgress(pathsCompleted);
     m_outputDispatcher->setResults(minXT, maxXT, minXt, maxXt);
 }

@@ -7,6 +7,10 @@
 #include <QtCharts/QValueAxis>
 #include <QtConcurrent/QtConcurrent>
 
+static constexpr double defaultYAxisMin = -0.1;
+static constexpr double defaultYAxisMax = 0.1;
+static constexpr int maxPointsPerPath = 2000;
+
 PathChart::PathChart()
     : QChart()
     , m_xAxisTime(new QValueAxis(this))
@@ -31,105 +35,100 @@ void PathChart::clearPathChart(){
         }
     }
     m_driftCurve->clear();
+    m_zeroLine->clear();
+    m_zeroLine->append(0, 0);
+    m_zeroLine->append(DefaultConstants::Simulation::time, 0);
+    m_yAxis->setRange(defaultYAxisMin, defaultYAxisMax);
+    m_xAxisTime->setRange(0, DefaultConstants::Simulation::time);
 }
 
-void PathChart::plotDriftCurve(const Path& driftCurve){
+void PathChart::plotDriftCurve(const Path& drift, State minXt, State maxXt){
     QVector<QPointF> points;
-    points.reserve(static_cast<qsizetype>(driftCurve.size()));
-    const double intervalWidth = (m_xAxisTime->max() - m_xAxisTime->min())/static_cast<qreal>(driftCurve.size());
-    State min_y = 0;
-    State max_y = 0;
-    for (size_t i = 0; i < driftCurve.size(); ++i) {
-        min_y = std::min(min_y, driftCurve[i]);
-        max_y = std::max(max_y, driftCurve[i]);
-        points.append(QPointF(static_cast<double>(i)*intervalWidth, driftCurve[i]));
+    expandYAxisRange(minXt, maxXt);
+    points.reserve(static_cast<qsizetype>(drift.size()));
+    const double intervalWidth = (m_xAxisTime->max() - m_xAxisTime->min())/static_cast<qreal>(drift.size());
+    for (size_t i = 0; i < drift.size(); ++i) {
+        points.append(QPointF(double(i)*intervalWidth, drift[i]));
     }
     m_driftCurve->replace(points);
-    setYAxisRange(min_y, max_y);
 }
 
-// This function is written by chatGPT.
-// Removes excessive points from plot to reduce clutter and increase rendering speed
-void PathChart::preparePlotPath(Path&& path, int maxPoints, double xMin, double xMax) {
-
+static QVector<QPointF> pathToQVector(const Path& path, double xMin, double xMax){
     const size_t n = path.size();
     QVector<QPointF> points;
-    if (n == 0) return;
+    if (n == 0) return points;
+    if (n <= static_cast<size_t>(maxPointsPerPath)) {
+        points.resize(static_cast<int>(n));
+        const double dx = (n > 1) ? (xMax - xMin) / double(n - 1) : 0.0;
+        for (size_t i = 0; i < n; ++i)
+            points[i] = QPointF(xMin + i*dx, path[i]);
+    }
+    // Algorithm for downsampling to not choke the GUI thread when rendering
+    else {
+        points.reserve(maxPointsPerPath);
+        const double dx = (xMax - xMin) / double(n - 1);
+        points.append(QPointF(xMin, path[0]));
+        const double bucketSize = double(n - 2) / double(maxPointsPerPath - 2);
+        size_t a = 0;
 
-    points.resize(static_cast<int>(n));
-    const double dx = (n > 1) ? (xMax - xMin) / double(n - 1) : 0.0; // note: n-1
-    for (size_t i = 0; i < n; ++i)
-        points[static_cast<int>(i)] = QPointF(xMin + i*dx, path[i]);
+        for (int i = 0; i < maxPointsPerPath - 2; ++i) {
+            // current bucket [start, end)
+            const size_t start = 1 + size_t(std::floor(i * bucketSize));
+            size_t end = 1 + size_t(std::floor((i + 1) * bucketSize));
+            if (end >= n - 1) end = n - 1;
+            const size_t left = (start < end ? start : end); // guard degeneracy
+            const size_t right = (start < end ? end : start + 1); // ensure at least one
 
-    // Do rendering on GUI thread
-    QMetaObject::invokeMethod(this, [this, points = std::move(points)]() mutable {
-        plotPath(std::move(points));
-    });
-    (void)maxPoints;
-    // if (n <= static_cast<size_t>(maxPoints)) {
-    //     points.resize(static_cast<int>(n));
-    //     const double dx = (n > 1) ? (xMax - xMin) / double(n - 1) : 0.0; // note: n-1
-    //     for (size_t i = 0; i < n; ++i)
-    //         points[static_cast<int>(i)] = QPointF(xMin + i*dx, path[i]);
-    //     return points;
-    // }
-
-    // points.reserve(maxPoints);
-
-    // const double dx = (xMax - xMin) / double(n - 1);
-    // points.append(QPointF(xMin, path[0]));
-
-    // const double bucketSize = double(n - 2) / double(maxPoints - 2);
-    // size_t a = 0;
-
-    // for (int i = 0; i < maxPoints - 2; ++i) {
-    //     // current bucket [start, end)
-    //     const size_t start = 1 + size_t(std::floor(i * bucketSize));
-    //     size_t end = 1 + size_t(std::floor((i + 1) * bucketSize));
-    //     if (end >= n - 1) end = n - 1;
-    //     const size_t left = (start < end ? start : end); // guard degeneracy
-    //     const size_t right = (start < end ? end : start + 1); // ensure at least one
-
-    //     // mean of next bucket (for triangle anchor)
-    //     size_t nextStart = 1 + size_t(std::floor((i + 1) * bucketSize));
-    //     size_t nextEnd   = 1 + size_t(std::floor((i + 2) * bucketSize));
-    //     if (nextEnd > n) nextEnd = n;
-    //     double avgX = 0.0, avgY = 0.0;
-    //     size_t cnt = (nextEnd > nextStart) ? (nextEnd - nextStart) : 1;
-    //     if (cnt == 1) { avgX = xMin + (n - 1) * dx; avgY = path[n - 1]; }
-    //     else {
-    //         for (size_t j = nextStart; j < nextEnd; ++j) {
-    //             avgX += xMin + j*dx;
-    //             avgY += path[j];
-    //         }
-    //         avgX /= double(cnt);
-    //         avgY /= double(cnt);
-    //     }
-    //     const double ax = xMin + a*dx;
-    //     const double ay = path[a];
-    //     double bestArea = -1.0;
-    //     size_t bestIdx = left;
-    //     for (size_t j = left; j < right; ++j) {
-    //         const double bx = xMin + j*dx;
-    //         const double by = path[j];
-    //         // area of triangle A-B-avg (scaled by 2, we only compare)
-    //         const double area = std::abs((ax - avgX)*(by - ay) - (ax - bx)*(avgY - ay));
-    //         if (area > bestArea) { bestArea = area; bestIdx = j; }
-    //     }
-    //     points.append(QPointF(xMin + bestIdx*dx, path[bestIdx]));
-    //     a = bestIdx;
-    // }
-    // points.append(QPointF(xMin + (n - 1)*dx, path[n - 1]));
-    // return points;
+            // mean of next bucket (for triangle anchor)
+            size_t nextStart = 1 + size_t(std::floor((i + 1) * bucketSize));
+            size_t nextEnd   = 1 + size_t(std::floor((i + 2) * bucketSize));
+            if (nextEnd > n) nextEnd = n;
+            double avgX = 0.0, avgY = 0.0;
+            size_t cnt = (nextEnd > nextStart) ? (nextEnd - nextStart) : 1;
+            if (cnt == 1) { avgX = xMin + (n - 1) * dx; avgY = path[n - 1]; }
+            else {
+                for (size_t j = nextStart; j < nextEnd; ++j) {
+                    avgX += xMin + j*dx;
+                    avgY += path[j];
+                }
+                avgX /= double(cnt);
+                avgY /= double(cnt);
+            }
+            const double ax = xMin + a*dx;
+            const double ay = path[a];
+            double bestArea = -1.0;
+            size_t bestIdx = left;
+            for (size_t j = left; j < right; ++j) {
+                const double bx = xMin + j*dx;
+                const double by = path[j];
+                // area of triangle A-B-avg (scaled by 2, we only compare)
+                const double area = std::abs((ax - avgX)*(by - ay) - (ax - bx)*(avgY - ay));
+                if (area > bestArea) { bestArea = area; bestIdx = j; }
+            }
+            points.append(QPointF(xMin + bestIdx*dx, path[bestIdx]));
+            a = bestIdx;
+        }
+        points.append(QPointF(xMin + (n - 1)*dx, path[n - 1]));
+    }
+    return points;
 }
 
 void PathChart::plotPaths(Paths&& paths){
     if (paths.empty()) return;
-    const double xMin = m_xAxisTime->min();
-    const double xMax = m_xAxisTime->max();
-    for(auto& path : paths){
-        QtConcurrent::run([this, p = std::move(path), xMin, xMax] mutable -> void{
-            preparePlotPath(std::move(p), 500, xMin, xMax);
+    // Threadpool captures pointer copy instead of data. Lifetime safety.
+    auto pathsKeepAlive = std::make_shared<Paths>(std::move(paths));
+    Time xMin = m_xAxisTime->min();
+    Time xMax = m_xAxisTime->max();
+    for (size_t i = 0; i < pathsKeepAlive->size(); ++i) {
+        // Computational pre-processing off GUI thread
+        QFuture<QVector<QPointF>> pointsFut = QtConcurrent::task([pathsKeepAlive](const Path& p, Time xMin, Time xMax) {
+                return pathToQVector(p, xMin, xMax);
+            })
+            .withArguments(std::cref((*pathsKeepAlive)[i]), xMin, xMax)
+            .spawn();
+        // Rendering on GUI thread
+        pointsFut.then(this, [this](QVector<QPointF> points) {
+            plotPath(std::move(points));
         });
     }
 }
@@ -137,7 +136,7 @@ void PathChart::plotPaths(Paths&& paths){
 void PathChart::plotPath(QVector<QPointF> points){
     if (points.empty()) return;
     auto* series = new QLineSeries(this);
-    series->setUseOpenGL(true);
+    // series->setUseOpenGL(true);
     addSeries(series);
     series->replace(points);
     series->attachAxis(m_xAxisTime);
@@ -152,9 +151,11 @@ void PathChart::setMaxTime(const Time time){
     m_zeroLine->append(m_xAxisTime->max(), 0);
 }
 
-void PathChart::setYAxisRange(const State min, const State max){
-    State padding = std::max(0.1*(max - min), 0.1);
-    m_yAxis->setRange(min - padding, max + padding);
+void PathChart::expandYAxisRange(const State min, const State max){
+    State padding = 0 * std::max(0.1*(max - min), 0.1);
+    State newYmin = min - padding;
+    State newYmax = max + padding;
+    m_yAxis->setRange(std::min(newYmin, m_yAxis->min()), std::max(newYmax, m_yAxis->max()));
 }
 
 void PathChart::initializeAxis(){
@@ -165,7 +166,7 @@ void PathChart::initializeAxis(){
     addAxis(m_yAxis, Qt::AlignLeft);
     m_yAxis->setTitleText("X<sub>t</sub>");
     m_yAxis->setGridLineVisible(false);
-    m_yAxis->setRange(-10, 10);
+    m_yAxis->setRange(defaultYAxisMin, defaultYAxisMax);
     m_yAxis->setTickType(QValueAxis::TicksFixed);
     m_yAxis->setTickCount(7);
     m_yAxis->setTickAnchor(0.0);

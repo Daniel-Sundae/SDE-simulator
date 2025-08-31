@@ -16,37 +16,24 @@ MainPresenter::MainPresenter()
     , m_engine(std::make_unique<PathEngine>())
     , m_jobHandler(std::make_unique<JobHandler>())
 {
-    QObject::connect(m_jobHandler.get(), &JobHandler::jobMetaData,
+    QObject::connect(m_jobHandler.get(), &JobHandler::distributionJobData,
         this, [this](size_t pathsCompleted, State minXT, State maxXT, State minXt, State maxXt){
-            m_outputHandler->jobMetaData(pathsCompleted, minXT, maxXT, minXt, maxXt);
+            m_outputHandler->distributionJobData(pathsCompleted, minXT, maxXT, minXt, maxXt);
         }, Qt::QueuedConnection);
 
     QObject::connect(m_jobHandler.get(), &JobHandler::driftDone,
-        this, [this](Path path){
-            m_outputHandler->onDriftDataReceived(std::move(path));
+        this, [this](Path drift, State minXt, State maxXt){
+            m_outputHandler->onDriftDataReceived(std::move(drift), minXt, maxXt);
         }, Qt::QueuedConnection);
     
     QObject::connect(m_jobHandler.get(), &JobHandler::fullPathsDone,
-        this, [this](std::shared_ptr<StochasticFullPathsJob> job){
-            m_outputHandler->onPathsReceived(job->fullPaths.get(),
-                job->metaData->minXt.load(), job->metaData->maxXt.load());
+        this, [this](Paths paths, State minXt, State maxXt){
+            m_outputHandler->onPathsReceived(std::move(paths), minXt, maxXt);
         }, Qt::QueuedConnection);
-    });
 
     QObject::connect(m_jobHandler.get(), &JobHandler::distributionDone,
-        this, [this](std::shared_ptr<Job> job){
-            Utils::assertTrue(job->distribution.wait_for(std::chrono::seconds(0)) == std::future_status::ready,
-                "Expected distribution to be ready");
-
-            Distribution distribution = job->distribution.get();
-            switch (job->type) {
-            case Job::Type::Stochastic:
-                m_outputHandler->onDistributionReceived(std::move(distribution),
-                    job->metaData->minXT.load(), job->metaData->maxXT.load());
-                break;
-            default:
-                break;
-            }
+        this, [this](Distribution distribution, State minXT, State maxXT){
+            m_outputHandler->onDistributionReceived(std::move(distribution), minXT, maxXT);
         }, Qt::QueuedConnection);
 }
 

@@ -27,16 +27,15 @@ public:
         StochasticJob&& sJob,
         StochasticFullPathsJob&& fpJob
     );
-
 private:
     void handleDeterministicJob(DeterministicJob dJob);
     void handleStochasticJob(StochasticJob sJob);
     void handleStochasticFullPathsJob(StochasticFullPathsJob fpJob);
 signals:
-    void jobMetaData(size_t pathsFinished, State minXT, State maxXT, State minXt, State maxXt);
-    void driftDone(Path path);
-    void fullPathsDone(std::shared_ptr<Job> job);
-    void distributionDone(std::shared_ptr<Job> job);
+    void distributionJobData(size_t pathsFinished, State minXT, State maxXT, State minXt, State maxXt);
+    void driftDone(Path drift, State minXt, State maxXt);
+    void fullPathsDone(Paths paths, State minXt, State maxXt);
+    void distributionDone(Distribution distribution, State minXT, State maxXT);
 private:
     std::thread m_deterministicJobThread;
     std::thread m_stochasticJobThread;

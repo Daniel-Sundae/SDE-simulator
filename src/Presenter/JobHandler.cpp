@@ -16,7 +16,9 @@ void JobHandler::cancel() {
 }
 
 bool JobHandler::jobRunning() const {
-    return m_deterministicJobRunning.load() || m_stochasticJobRunning.load() || m_stochasticFullPathsJobRunning.load();
+    return m_deterministicJobRunning.load()
+        || m_stochasticJobRunning.load()
+        || m_stochasticFullPathsJobRunning.load();
 }
 
 void JobHandler::postJobs(
@@ -42,13 +44,14 @@ void JobHandler::handleDeterministicJob(DeterministicJob dJob) {
     while(dJob.drift.wait_for(std::chrono::milliseconds(DefaultConstants::guiUpdateRate)) != std::future_status::ready) {
         if (m_doCancel.load()) dJob.stop.request_stop();
     }
-    emit fullPathsDone(std::make_shared<Job>(std::move(dJob)));
+    emit driftDone(std::move(dJob.drift.get()),
+        dJob.metaData->minXt.load(), dJob.metaData->maxXt.load());
     m_deterministicJobRunning.store(false);
 }
 
 void JobHandler::handleStochasticJob(StochasticJob sJob) {
-    const auto emitMetaData = [this, &sJob] {
-        emit jobMetaData(
+    const auto emitData = [this, &sJob] {
+        emit distributionJobData(
             sJob.metaData->pathsCompleted.load(),
             sJob.metaData->minXT.load(),
             sJob.metaData->maxXT.load(),
@@ -58,9 +61,18 @@ void JobHandler::handleStochasticJob(StochasticJob sJob) {
     };
     while(sJob.distribution.wait_for(std::chrono::milliseconds(DefaultConstants::guiUpdateRate)) != std::future_status::ready) {
         if (m_doCancel.load()) sJob.stop.request_stop();
-        emitMetaData();
+        emitData();
     }
-    emitMetaData();
-    emit distributionDone(std::make_unique<StochasticJob>(std::move(sJob)));
+    emitData();
+    emit distributionDone(std::move(sJob.distribution.get()),
+        sJob.metaData->minXT.load(), sJob.metaData->maxXT.load());
     m_stochasticJobRunning.store(false);
+}
+
+void JobHandler::handleStochasticFullPathsJob(StochasticFullPathsJob fpJob) {
+    while(fpJob.fullPaths.wait_for(std::chrono::milliseconds(DefaultConstants::guiUpdateRate)) != std::future_status::ready) {
+        if (m_doCancel.load()) fpJob.stop.request_stop();
+    }
+    emit fullPathsDone(std::move(fpJob.fullPaths.get()), fpJob.metaData->minXt.load(), fpJob.metaData->maxXt.load());
+    m_stochasticFullPathsJobRunning.store(false);
 }

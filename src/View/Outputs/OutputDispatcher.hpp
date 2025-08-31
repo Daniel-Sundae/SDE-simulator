@@ -50,8 +50,8 @@ public:
     void updatePathChartTitle(bool allPathsPlotted) const{
         getPathChart()->updateTitle(allPathsPlotted);
     }
-    void plotPathChartDriftData(const Path &driftLine) const{
-        getPathChart()->plotDriftCurve(driftLine);
+    void plotPathChartDriftData(const Path &drift, State minXt, State maxXt) const{
+        getPathChart()->plotDriftCurve(drift, minXt, maxXt);
     }
     void clearPathChart(){
         getPathChart()->clearPathChart();
@@ -60,7 +60,7 @@ public:
         getPathChart()->setMaxTime(time);
     }
     void setPathChartYAxisRange(const State min, const State max) const {
-        getPathChart()->setYAxisRange(min, max);
+        getPathChart()->expandYAxisRange(min, max);
     }
 
     // DistributionChart

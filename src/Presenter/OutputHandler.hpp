@@ -12,8 +12,8 @@ public:
     void onPathsReceived(Paths&& paths, State minXt, State maxXt);
     void onDistributionReceived(const Distribution& distribution, State min, State max);
     void onStartTransaction(const PathQuery& query);
-    void onDriftDataReceived(const Path& driftCurve);
-    void jobMetaData(size_t pathsCompleted, State minXT, State maxXT, State minXt, State maxXt);
+    void onDriftDataReceived(const Path& drift, State minXt, State maxXt);
+    void distributionJobData(size_t pathsCompleted, State minXT, State maxXT, State minXt, State maxXt);
     void setOutputDispatcher(OutputDispatcher* outputDispatcher){ m_outputDispatcher = outputDispatcher; };
     void clearGUI() const;
     void cancelGUI() const;
