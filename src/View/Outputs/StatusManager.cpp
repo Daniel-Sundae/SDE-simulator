@@ -106,6 +106,11 @@ void StatusManager::setReady(){
     emit signalReady();
 }
 
+void StatusManager::setEVSTDInfo(State mu, State sigma){
+    m_resultInfo->expectedValue->setText(QString::number(mu, 'f', 3));
+    m_resultInfo->stdDevValue->setText(QString::number(sigma, 'f', 3));
+}
+
 void StatusManager::prepareStatusInfo(const size_t totalPaths){
     m_statusInfo->progressBar->setRange(0, static_cast<int>(totalPaths));
     m_statusInfo->progressBar->setValue(0);
@@ -133,14 +138,12 @@ void StatusManager::setQueryInfo(const PathQuery& query){
 
 void StatusManager::clear(){
     m_queryInfo->infoLabel->setText("");
-
     m_resultInfo->minXT->setText("");
     m_resultInfo->maxXT->setText("");
     m_resultInfo->minXt->setText("");
     m_resultInfo->maxXt->setText("");
     m_resultInfo->expectedValue->setText("");
     m_resultInfo->stdDevValue->setText("");
-
     m_statusInfo->progressBar->setRange(0, 1);
     m_statusInfo->progressBar->setValue(0);
     setReady();

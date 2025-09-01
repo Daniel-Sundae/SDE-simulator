@@ -4,7 +4,7 @@
 namespace DefaultConstants{
     constexpr ProcessType process = ProcessType::BM;
     constexpr double PI = std::numbers::pi_v<double>;
-    constexpr size_t pdfPoints = static_cast<size_t>(1e3);
+    constexpr size_t pdfPoints = static_cast<size_t>(2e3);
     constexpr size_t maxPathsToDraw = 20;
     constexpr size_t guiUpdateRate = 20; // milliseconds
     constexpr double OUthetaData = 0.5; // Mean-reversion coefficient for OU process (Hard coded for now...)

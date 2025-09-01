@@ -108,8 +108,8 @@ struct Fields<ProcessType::BM> : RequiredFields<Fields<ProcessType::BM>> {
         const double stddev = _sigma * std::sqrt(time);
         const double denominator = std::sqrt(2.0 * DefaultConstants::PI * time) * _sigma;
         const double expDenominator = 2.0 * _sigma * _sigma * time;
-        const auto _pdf = [=](const State endValue) -> Density {
-            const double expNumerator = - std::pow(endValue - (_startValue + _mu * time), 2);
+        const auto _pdf = [=](const State XT) -> Density {
+            const double expNumerator = - std::pow(XT - (_startValue + _mu * time), 2);
             const double exponent = expNumerator / expDenominator;
             return (1 / denominator) * std::exp(exponent);
             };
@@ -124,7 +124,7 @@ struct Fields<ProcessType::GBM> : RequiredFields<Fields<ProcessType::GBM>> {
     static constexpr std::string_view description = "Geometric brownian motion.";
     static constexpr std::string_view definition = "dX = μXdt + σXdB";
     static constexpr Constants muData{ {-0.5, 0.5}, 0.2, 0.1 };
-    static constexpr Constants sigmaData{ {0.1, 2.0}, 0.2, 0.05 };
+    static constexpr Constants sigmaData{ {0.01, 1.2}, 0.2, 0.05 };
     static constexpr Constants startValue{ {0.1, 2}, 1, 0.1 };
     static auto drift(const double _mu) -> Drift {
         return Drift(
@@ -144,12 +144,12 @@ struct Fields<ProcessType::GBM> : RequiredFields<Fields<ProcessType::GBM>> {
         const double EV = _startValue * std::exp(_mu * time);
         const double stddev = EV * sqrt(exp(_sigma * _sigma * time) - 1);
         const double expDenominator = 2.0 * _sigma * _sigma * time;      
-        const auto _pdf = [=](const State endValue) -> Density {
-            if (endValue <= 0.0) {
+        const auto _pdf = [=](const State XT) -> Density {
+            if (XT <= 0.0) {
                 return 0;
             }
-            const double expNumerator = - std::pow(std::log(endValue / _startValue) - (_mu - 0.5 * _sigma * _sigma) * time, 2);
-            const double denominator = std::sqrt(2 * DefaultConstants::PI * time) * endValue * _sigma;
+            const double expNumerator = - std::pow(std::log(XT / _startValue) - (_mu - 0.5 * _sigma * _sigma) * time, 2);
+            const double denominator = std::sqrt(2 * DefaultConstants::PI * time) * XT * _sigma;
             return (1 / denominator) * std::exp(expNumerator / expDenominator);
         };
         return PDF(EV, stddev, _pdf);
@@ -183,8 +183,8 @@ struct Fields<ProcessType::OU> : RequiredFields<Fields<ProcessType::OU>> {
         const double _privateRepeatedVal = (_sigma * _sigma) / (2.0 * DefaultConstants::OUthetaData) * (1.0 - std::exp(-2.0 * DefaultConstants::OUthetaData * time));
         const double stddev = std::sqrt(_privateRepeatedVal);
         const double expDenominator = 2.0 * _privateRepeatedVal;
-        const auto _pdf = [=](const State endValue) -> Density {
-            const double expNumerator = -std::pow(endValue - EV, 2);
+        const auto _pdf = [=](const State XT) -> Density {
+            const double expNumerator = -std::pow(XT - EV, 2);
             const double denominator = std::sqrt(2.0 * DefaultConstants::PI * _privateRepeatedVal);
             return (1.0 / denominator) * std::exp(expNumerator / expDenominator);
         };

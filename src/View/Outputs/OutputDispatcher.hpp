@@ -27,6 +27,9 @@ public:
     void setResults(State minXT, State maxXT, State minXt, State maxXt) const {
         m_statusManager->setResults(minXT, maxXT, minXt, maxXt);
     }
+    void setEVSTDInfo(State mu, State sigma) const{
+        m_statusManager->setEVSTDInfo(mu, sigma);
+    }
     void prepareStatusInfo(const size_t totalPaths) const{
         m_statusManager->prepareStatusInfo(totalPaths);
     }
@@ -59,7 +62,7 @@ public:
     void setPathChartMaxTime(const Time time){
         getPathChart()->setMaxTime(time);
     }
-    void setPathChartYAxisRange(const State min, const State max) const {
+    void expandYAxisRange(const State min, const State max) const {
         getPathChart()->expandYAxisRange(min, max);
     }
 

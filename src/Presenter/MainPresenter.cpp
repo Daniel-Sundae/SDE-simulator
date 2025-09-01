@@ -53,7 +53,11 @@ void MainPresenter::clear() const{
 }
 
 void MainPresenter::cancel() const {
-    Utils::assertTrue(m_jobHandler->jobRunning(), "Expected a job to be running");
+    if(!m_jobHandler->jobRunning()) {
+        // This can happen if user cancels just as the job is finishing.
+        // The queued cancel signal will be stale.
+        return;
+    }
     m_outputHandler->cancelGUI();
     m_jobHandler->cancel();
 }

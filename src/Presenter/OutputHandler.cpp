@@ -16,7 +16,7 @@ void OutputHandler::onPathsReceived(Paths&& paths, State minXt, State maxXt){
         "Expected paths to be at most {} but got {}", DefaultConstants::maxPathsToDraw, paths.size());
     Utils::assertTrue(!m_pathsReceived, "Paths have already been received");
     m_outputDispatcher->plotPaths(std::move(paths));
-    m_outputDispatcher->setPathChartYAxisRange(minXt, maxXt);
+    m_outputDispatcher->expandYAxisRange(minXt, maxXt);
     m_pathsReceived = true;
     signalReadyIfNeeded();
 }
@@ -27,11 +27,10 @@ void OutputHandler::onDistributionReceived(const Distribution& distribution, Sta
     Utils::assertTrue(!distribution.empty(), "Received empty distribution");
     Utils::assertTrue(min <= max, "Invalid distribution support");
     Utils::assertTrue(!m_distributionReceived, "Distribution has already been received");
-    auto support = m_currentPDF.support(distribution.size(), min, max);
+    auto support = m_currentPDF.support(std::make_optional(min), std::make_optional(max));
     m_currentPDF.generatePDFData(support);
     m_outputDispatcher->setDistributionChartSupport(support);
     m_outputDispatcher->updateDistributionChartPDF(m_currentPDF.data.value());
-    m_outputDispatcher->updateDistributionChartEV(m_currentPDF.EV);
     m_outputDispatcher->plotDistribution(distribution);
     m_distributionReceived = true;
     signalReadyIfNeeded();
@@ -47,7 +46,6 @@ void OutputHandler::distributionJobData(size_t pathsCompleted, State minXT, Stat
 }
 
 void OutputHandler::onStartTransaction(const PathQuery& query){
-    prepareGUI(query);
     m_currentPDF = getField(FieldTags::pdf{},
         query.processDefinition.type,
         query.processDefinition.startValue,
@@ -55,6 +53,7 @@ void OutputHandler::onStartTransaction(const PathQuery& query){
         query.processDefinition.drift.mu(),
         query.processDefinition.diffusion.sigma()
     );
+    prepareGUI(query);
     m_pathsReceived = false;
     m_distributionReceived = false;
 }
@@ -62,11 +61,20 @@ void OutputHandler::onStartTransaction(const PathQuery& query){
 void OutputHandler::prepareGUI(const PathQuery& query){
     m_outputDispatcher->clearPathChart();
     m_outputDispatcher->clearDistributionChart();
-    m_outputDispatcher->prepareStatusInfo(query.simulationParameters.samples);
+
+    // StatusManager
     m_outputDispatcher->setQueryInfo(query);
+    m_outputDispatcher->setEVSTDInfo(m_currentPDF.EV, m_currentPDF.stddev);
+    m_outputDispatcher->prepareStatusInfo(query.simulationParameters.samples);
+    
+    // PathChart
     m_outputDispatcher->setPathChartMaxTime(query.simulationParameters.time);
-    m_outputDispatcher->updateDistributionChartTitle(query.processDefinition.type);
     m_outputDispatcher->updatePathChartTitle(DefaultConstants::maxPathsToDraw >= query.simulationParameters.samples);
+    
+    // DistributionChart
+    m_outputDispatcher->updateDistributionChartTitle(query.processDefinition.type);
+    m_outputDispatcher->setDistributionChartSupport(m_currentPDF.support(std::nullopt, std::nullopt));
+    m_outputDispatcher->updateDistributionChartEV(m_currentPDF.EV);
 }
 
 void OutputHandler::clearGUI() const{

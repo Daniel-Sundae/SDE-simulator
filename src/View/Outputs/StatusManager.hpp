@@ -37,6 +37,7 @@ public:
     void setProgress(const size_t completed);
     void setResults(State minXT, State maxXT, State minXt, State maxXt);
     void setReady();
+    void setEVSTDInfo(State mu, State sigma);
     void prepareStatusInfo(const size_t totalPaths);
     void setQueryInfo(const PathQuery& query);
     void clear();

@@ -18,6 +18,7 @@ struct PDF {
         , pdf(_pdf)
     {
     }
+
     Density operator()(State s) const{ return pdf(s); }
     explicit operator bool() const{ return pdf ? true : false; }
     void generatePDFData(const Range support){
@@ -31,26 +32,36 @@ struct PDF {
             data->push_back(pdf(state));
         }
     }
-    Range support(size_t sampledEndVals, const State minObserved, const State maxObserved) const {
-        Utils::assertTrue(sampledEndVals > 0, "Invalid number of points");
-        State padding = std::max((maxObserved-minObserved)*0.1, 0.001);
-        State lower = minObserved - padding;
-        State upper = maxObserved + padding;
-        State threshold = 1e-3;
-        State start = EV - 5 * stddev - padding;
-        State end = EV + 5 * stddev + padding;
+    Range support(
+            const std::optional<State> minPointToInclude,
+            const std::optional<State> maxPointToInclude) const {
+        // Denote Riemann rectangle at Xt is pdf(Xt) * width.
+        // Assuming every rectangle is area of this rectangle, threshold states how large fraction
+        // of the whole area, 1, that is needed for Xt to be considered a point with support.
+        State threshold = 0.001;
+        State padding = 0.001; // In case stddev = 0
+        State start = EV - 3 * stddev - padding;
+        if (minPointToInclude) start = std::min(start, *minPointToInclude);
+        State end = EV + 3 * stddev + padding;
+        if (maxPointToInclude) end = std::max(end, *maxPointToInclude);
+        State lower = start;
+        State upper = end;
         const double increment = (end - start) / static_cast<double>(pdfPoints);
         // Find lower bound
         for (State state = start; state < end; state += increment) {
-            if (pdf(state) > threshold) {
-                lower = std::min(state, minObserved) - padding;
+            if (pdf(state) * increment * pdfPoints > threshold) {
+                lower = state;
+                if (minPointToInclude.has_value())
+                    lower = std::min(lower, minPointToInclude.value());
                 break;
             }
         }
         // Find upper bound
         for (State state = end; lower < state; state -= increment) {
-            if (pdf(state) > threshold) {
-                upper = std::max(state, maxObserved) + padding;
+            if (pdf(state) * increment * pdfPoints > threshold) {
+                upper = state;
+                if (maxPointToInclude.has_value())
+                    upper = std::max(upper, maxPointToInclude.value());
                 break;
             }
         }

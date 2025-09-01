@@ -136,7 +136,6 @@ void PathChart::plotPaths(Paths&& paths){
 void PathChart::plotPath(QVector<QPointF> points){
     if (points.empty()) return;
     auto* series = new QLineSeries(this);
-    // series->setUseOpenGL(true);
     addSeries(series);
     series->replace(points);
     series->attachAxis(m_xAxisTime);
@@ -152,10 +151,7 @@ void PathChart::setMaxTime(const Time time){
 }
 
 void PathChart::expandYAxisRange(const State min, const State max){
-    State padding = 0 * std::max(0.1*(max - min), 0.1);
-    State newYmin = min - padding;
-    State newYmax = max + padding;
-    m_yAxis->setRange(std::min(newYmin, m_yAxis->min()), std::max(newYmax, m_yAxis->max()));
+    m_yAxis->setRange(std::min(min, m_yAxis->min()), std::max(max, m_yAxis->max()));
 }
 
 void PathChart::initializeAxis(){

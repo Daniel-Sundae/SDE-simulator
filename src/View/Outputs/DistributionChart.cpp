@@ -61,13 +61,14 @@ void DistributionChart::plotDistribution(const Distribution& results){
         m_distributionSet->append(binRelativeCountInPercent);
         maxBinRelativeCountInPercent = std::max(maxBinRelativeCountInPercent, binRelativeCountInPercent);
     }
-    m_yAxisRelativeCount->setRange(0, maxBinRelativeCountInPercent * 1.1);
+    m_yAxisRelativeCount->setRange(0, maxBinRelativeCountInPercent);
 }
 
 void DistributionChart::clearDistributionChart(){
     m_pdf->clear();
     m_expValLine->clear();
     m_distributionSet->remove(0, m_distributionSet->count());
+    m_yAxisDensity->setRange(0, 1);
 }
 
 void DistributionChart::updateDistributionChartPDF(const PDFData& pdfData){
@@ -85,7 +86,7 @@ void DistributionChart::updateDistributionChartPDF(const PDFData& pdfData){
         maxDensity = std::max(maxDensity, pdfData[i]);
     }
     m_pdf->replace(points);
-    m_yAxisDensity->setRange(0, maxDensity * 1.1);
+    m_yAxisDensity->setRange(0, maxDensity);
 }
 
 void DistributionChart::plotExpValLine(const State EV){
@@ -104,15 +105,17 @@ void DistributionChart::initializeAxis(){
     addAxis(m_yAxisRelativeCount, Qt::AlignLeft);
     addAxis(m_yAxisDensity, Qt::AlignRight);
     addAxis(m_categoryAxis, Qt::AlignBottom);
-    m_yAxisDensity->setVisible(false);
     m_xAxis->setTitleText("X<sub>T</sub>");
-    m_yAxisRelativeCount->setTitleText("Count (%)");
+    m_xAxis->setTickCount(7);
     m_xAxis->setGridLineVisible(false);
-    m_yAxisRelativeCount->setGridLineVisible(false);
-    m_yAxisDensity->setGridLineVisible(false);
     m_xAxis->setRange(-10, 10);
+    m_yAxisRelativeCount->setTitleText("Count (%)");
+    m_yAxisRelativeCount->setGridLineVisible(false);
     m_yAxisRelativeCount->setRange(0, 1);
+    m_yAxisDensity->setVisible(false);
+    m_yAxisDensity->setGridLineVisible(false);
     m_yAxisDensity->setRange(0, 1);
+
     for (size_t i = 0; i < s_nrBins; ++i) {
         m_categoryAxis->append(QString::number(i));
     }
