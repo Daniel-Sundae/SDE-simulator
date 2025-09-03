@@ -21,5 +21,4 @@ OutputDispatcher::OutputDispatcher(QWidget *parent)
     auto* distributionChart = new DistributionChart();
     m_distributionChartView->setChart(distributionChart);
     layout->addWidget(m_distributionChartView);
-    setLayout(layout);
 }

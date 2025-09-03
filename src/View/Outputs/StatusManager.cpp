@@ -23,7 +23,6 @@ StatusManager::QueryInfo::QueryInfo(QWidget* parent)
 {
     auto* grid = new QGridLayout(this);
     initGridLayout(grid);
-    setLayout(grid);
     grid->addWidget(infoLabel);
 }
 
@@ -38,7 +37,6 @@ StatusManager::ResultInfo::ResultInfo(QWidget* parent = nullptr)
 {
     auto* grid = new QGridLayout(this);
     initGridLayout(grid);
-    setLayout(grid);
 
     grid->addWidget(new QLabel("Min X(T):"),  0,0);
     grid->addWidget(minXT,                    0,1);
@@ -63,7 +61,6 @@ StatusManager::StatusInfo::StatusInfo(QWidget* parent)
 {
     auto* grid = new QGridLayout(this);
     initGridLayout(grid);
-    setLayout(grid);
     progressBar->setFormat("%v/%m");
     grid->addWidget(currentStatus, 0, 0);
     grid->addWidget(progressBar, 1, 0);
@@ -76,8 +73,6 @@ StatusManager::StatusManager(QWidget* parent)
     , m_statusInfo(new StatusInfo(this))
 {
     auto layout = new QHBoxLayout(this);
-    auto queryInfoLayout = new QVBoxLayout(m_queryInfo);
-    queryInfoLayout->addWidget(new QLabel("", this));
     layout->addWidget(m_queryInfo, 3);
     layout->addWidget(m_resultInfo, 2);
     layout->addWidget(m_statusInfo, 1);
