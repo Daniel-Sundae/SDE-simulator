@@ -1,51 +1,61 @@
-// #include <gtest/gtest.h>
-// #include "TestUtil.hpp"
-// #include "EngineThreadPool.hpp"
-// #include <chrono>
-// #include <mutex>
-// #include <latch>
-// #include <algorithm>
+#include <gtest/gtest.h>
+#include "TestUtil.hpp"
+#include "EngineThreadPool.hpp"
+#include <chrono>
+#include <mutex>
+#include <latch>
+#include <algorithm>
 
-// class EngineThreadPoolTest : public ::testing::Test {
-// protected:
-//     std::unique_ptr<EngineThreadPool> m_tp;
-//     Paths m_results;
-//     std::unique_ptr<std::latch> m_nrTasksLeft;
+class EngineThreadPoolTest : public ::testing::Test {
+protected:
+    void busySpin(size_t ms) {
+        const auto until = std::chrono::steady_clock::now() + std::chrono::milliseconds(ms);
+        while (std::chrono::steady_clock::now() < until) { /* spin */ }
+    }
+};
 
-//     void RuntimeSetUp(size_t nrThreads, size_t nrTasks) {
-//         TearDown();
-//         m_results.resize(nrTasks);
-//         m_nrTasksLeft = std::make_unique<std::latch>(nrTasks);
-//         m_tp = std::make_unique<EngineThreadPool>(nrThreads);
-//     }
+TEST_F(EngineThreadPoolTest, SlowTaskDoesNotBlockOthers) {
+    size_t workers = 2;
+    EngineThreadPool tp(workers);
+    size_t nrTasks = 100;
+    std::latch start(1);
+    std::mutex m;
+    std::vector<size_t> completionOrder;
+    completionOrder.reserve(nrTasks);
+    auto makeTask = [&](size_t taskTime, size_t id) {
+        return [&, taskTime, id]() -> Path {
+            start.wait();
+            busySpin(taskTime);
+            {
+                std::scoped_lock lock(m);
+                completionOrder.push_back(id);
+            }
+            return {}; // Not used
+        };
+    };
 
-//     void TearDown() {
-//         m_nrTasksLeft.reset();
-//         m_tp.reset();
-//         m_results.clear();
-//     }
+    std::vector<std::future<Path>> futures;
+    futures.reserve(nrTasks);
+    for (size_t i = 0; i < nrTasks; ++i) {
+        size_t time = 0;
+        // First and last tasks are slow
+        if(i == 0) time = 100;
+        if(i == nrTasks - 1) time = 120;
+        futures.push_back(tp.enqueue(makeTask(time, i)));
+    }
 
-//     std::function<void()> generateTaskFunction(const size_t taskTimeMs, const State resultState, const size_t slot){
-//         return [this, taskTimeMs, resultState, slot]() -> void {
-//             std::this_thread::sleep_for(std::chrono::milliseconds(taskTimeMs));
-//             m_results[slot] = { resultState };
-//             m_nrTasksLeft->count_down();
-//         };
-//     }
-// };
+    start.count_down();
+    for (auto& fut : futures) {
+        fut.get();
+    }
 
-// TEST_F(EngineThreadPoolTest, TestTpSimpleTasks) {
-//     size_t nrTasks = 4;
-//     RuntimeSetUp(1, nrTasks);
-
-//     for(size_t slot = 0; slot < nrTasks; ++slot){
-//         m_tp->enqueue(generateTaskFunction(GetRandomInt(1, 300), 0.1 + slot, slot));
-//     }
-//     m_nrTasksLeft->wait();
-
-//     std::vector<Path> expected = { {0.1}, {1.1}, {2.1}, {3.1} };
-//     ASSERT_EQ(expected, m_results);
-// }
+    ASSERT_EQ(completionOrder.size(), nrTasks);
+    for (size_t i = 0; i < nrTasks-2; ++i) {
+        ASSERT_EQ(completionOrder[i], i+1);
+    }
+    ASSERT_EQ(completionOrder[nrTasks - 2], 0); // First task should be second to last
+    ASSERT_EQ(completionOrder[nrTasks - 1], nrTasks - 1); // Last task should be last
+}
 
 // TEST_F(EngineThreadPoolTest, TestTpMultiThreadIsFaster) {
 //     size_t maxThreads = 4; // Increase or decrease depending on machine. Higher nr means more flaky test.
