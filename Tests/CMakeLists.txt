@@ -1,5 +1,6 @@
 add_executable(StochasticSimTests
     test_EngineThreadPool.cpp
+    test_PathEngine.cpp
 )
 
 include(GoogleTest)
