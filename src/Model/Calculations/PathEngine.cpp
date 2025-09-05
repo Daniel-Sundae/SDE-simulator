@@ -30,7 +30,7 @@ static Path samplePath(
         std::shared_ptr<Job::MetaData> jobData,
         std::stop_token stopToken) {
     if (stopToken.stop_requested()) return {};
-    const auto points = query.simulationParameters.points();
+    const auto points = query.simulationParameters.steps() + 1;
     const auto& drift = query.processDefinition.drift;
     const auto& diffusion = query.processDefinition.diffusion;
     const Time dt = query.simulationParameters.dt;
@@ -41,7 +41,7 @@ static Path samplePath(
     std::mt19937 generator(seq);
     std::normal_distribution<double> noise(0.0, 1.0);
     Path path = {};
-    Utils::assertTrue(points != 0, "Expected points to be non-zero");
+    Utils::assertTrue(points >= 1, "Expected points to be at least 1");
     path.reserve(points);
     path.push_back(XT);
     for (size_t i = 1; i < points; ++i) {
@@ -95,7 +95,7 @@ static std::optional<State> samplePathXT(
         std::stop_token stopToken) {
     // Worker threads should always start by checking for user cancellation
     if (stopToken.stop_requested()) return std::nullopt;
-    const auto points = query.simulationParameters.points();
+    const auto points = query.simulationParameters.steps() + 1;
     const auto& drift = query.processDefinition.drift;
     const auto& diffusion = query.processDefinition.diffusion;
     const Time dt = query.simulationParameters.dt;
@@ -105,7 +105,7 @@ static std::optional<State> samplePathXT(
     auto dXt = dXtFunction(query.simulationParameters.solver);
     std::mt19937 generator(seq);
     std::normal_distribution<double> noise(0.0, 1.0);
-    Utils::assertTrue(points != 0, "Expected points to be non-zero");
+    Utils::assertTrue(points >= 1, "Expected points to be at least 1");
     for (size_t i = 1; i < points; ++i) {
         if (stopToken.stop_requested()) [[unlikely]] return std::nullopt;
         State dB = noise(generator) * std::sqrt(dt);

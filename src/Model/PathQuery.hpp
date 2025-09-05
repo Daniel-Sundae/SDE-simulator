@@ -15,7 +15,7 @@ struct SimulationParameters {
     {
         Utils::assertTrue(dt > 0 && time > 0, "Time and points must be greater than 0");
     }
-    size_t points() const{
+    size_t steps() const{
         return static_cast<size_t>(std::ceil(time / dt));
     }
     size_t nrPathsToDraw() const {
