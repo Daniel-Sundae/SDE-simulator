@@ -5,13 +5,13 @@ class FunctionWrapper {
 protected:
     
     // mu or sigma
-    const double parameter;
+    double parameter;
 
     // a(t, Xt) or b(t, Xt) in dXt = adt + bdB
-    const std::function<double(Time, State)> f;
+    std::function<double(Time, State)> f;
 
     // da/dX or db/dX
-    const std::function<double(Time, State)> fPrime;
+    std::function<double(Time, State)> fPrime;
 
 public:
     FunctionWrapper(double _parameter, std::function<double(Time, State)> _f, std::function<double(Time, State)> _fPrime = [](Time, State){return 0;})

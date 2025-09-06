@@ -24,15 +24,15 @@ public:
     void onProcessTypeModified(const ProcessType newType) const{
         m_inputHandler->onProcessTypeModified(newType);
     }
-    void onProcessDefinitionModified(const DefinitionWidget param, double userValue) const{
-        m_inputHandler->onProcessDefinitionModified(param, userValue);
+    void onDefinitionParametersModified(const DefinitionWidget param, double userValue) const{
+        m_inputHandler->onDefinitionParametersModified(param, userValue);
     }
     void onSolverTypeModified(const SolverType newType) const{
         m_inputHandler->onSolverTypeModified(newType);
     }
     template <typename... Args>
-    void onSimulationParameterModified(Args&&... args) const {
-      m_inputHandler->onSimulationParameterModified(std::forward<Args>(args)...);
+    void onSimulationParametersModified(Args&&... args) const {
+      m_inputHandler->onSimulationParametersModified(std::forward<Args>(args)...);
     }
     template <typename... Args>
     void onSettingsParameterModified(Args&&... args) const {

@@ -68,7 +68,7 @@ void DistributionChart::clearDistributionChart(){
     m_pdf->clear();
     m_expValLine->clear();
     m_distributionSet->remove(0, m_distributionSet->count());
-    m_yAxisDensity->setRange(0, 1);
+    m_yAxisDensity->setRange(0, 100);
 }
 
 void DistributionChart::updateDistributionChartPDF(const PDFData& pdfData){
@@ -114,7 +114,7 @@ void DistributionChart::initializeAxis(){
     m_yAxisRelativeCount->setRange(0, 1);
     m_yAxisDensity->setVisible(false);
     m_yAxisDensity->setGridLineVisible(false);
-    m_yAxisDensity->setRange(0, 1);
+    m_yAxisDensity->setRange(0, 100);
 
     for (size_t i = 0; i < s_nrBins; ++i) {
         m_categoryAxis->append(QString::number(i));

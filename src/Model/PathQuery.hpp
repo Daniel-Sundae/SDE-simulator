@@ -27,19 +27,23 @@ struct SimulationParameters {
     size_t samples = DefaultConstants::Simulation::samples;
 };
 
-struct ProcessDefinition {
-    ProcessType type = DefaultConstants::process;
-    Drift drift = getField(FieldTags::drift{}, DefaultConstants::process, 0.0);
-    Diffusion diffusion = getField(FieldTags::diffusion{}, DefaultConstants::process, 0.0);
-    State startValue = getField(FieldTags::startValue{}, DefaultConstants::process).defaultValue;
+struct DefinitionParameters {
+    ProcessType type;
+    Drift drift;
+    Diffusion diffusion;
+    State X0;
 
-    explicit ProcessDefinition() = default;
-
-    explicit ProcessDefinition(ProcessType t, Drift d, Diffusion diff, State start)
+    explicit DefinitionParameters(ProcessType pt = DefaultConstants::process)
+        : type(pt)
+        , drift(getField(FieldTags::drift{}, pt, getField(FieldTags::muData{}, pt).defaultValue))
+        , diffusion(getField(FieldTags::diffusion{}, pt, getField(FieldTags::sigmaData{}, pt).defaultValue))
+        , X0(getField(FieldTags::X0{}, pt).defaultValue)
+    {}
+    explicit DefinitionParameters(ProcessType t, Drift d, Diffusion diff, State start)
         : type(t)
         , drift(d)
         , diffusion(diff)
-        , startValue(start)
+        , X0(start)
     {
     }
 };
@@ -50,25 +54,72 @@ struct SettingsParameters{
 };
 
 struct PathQuery {
-    const ProcessDefinition processDefinition;
-    const SimulationParameters simulationParameters;
-    const SettingsParameters settingsParameters;
-    PathQuery(const ProcessDefinition& def, const SimulationParameters& simParam, const SettingsParameters& settParam)
-        : processDefinition(def)
-        , simulationParameters(simParam)
-        , settingsParameters(settParam)
-    {
-    }
+    DefinitionParameters definitionParameters;
+    SimulationParameters simulationParameters;
+    SettingsParameters settingsParameters;
+    PathQuery(ProcessType pt = DefaultConstants::process)
+        : definitionParameters(DefinitionParameters(pt)),
+          simulationParameters(SimulationParameters()),
+          settingsParameters(SettingsParameters())
+    {}
+    PathQuery(DefinitionParameters def, SimulationParameters simParam, SettingsParameters settParam)
+        : definitionParameters(std::move(def))
+        , simulationParameters(std::move(simParam))
+        , settingsParameters(std::move(settParam))
+    {}
 };
 
-struct DeterministicQuery : PathQuery {
-    using PathQuery::PathQuery;
-};
 struct StochasticQuery : PathQuery {
     using PathQuery::PathQuery;
 };
+struct DeterministicQuery : PathQuery {
+    using PathQuery::PathQuery;
+    explicit DeterministicQuery(ProcessType pt = DefaultConstants::process)
+        : PathQuery(deterministicDefinitionParameters(DefinitionParameters(pt)),
+                    deterministicSimulationParameters(SimulationParameters()),
+                    SettingsParameters()) {}
+    explicit DeterministicQuery(const StochasticQuery& sQuery)
+        : PathQuery(deterministicDefinitionParameters(sQuery.definitionParameters),
+                    deterministicSimulationParameters(sQuery.simulationParameters),
+                    sQuery.settingsParameters) {}
+
+    DefinitionParameters deterministicDefinitionParameters(const DefinitionParameters& sQuery) const{
+        return DefinitionParameters(
+            sQuery.type,
+            sQuery.drift,
+            // Diffusion function is not needed by deterministic query
+            {0, [](Time, State){return 0;}},
+            sQuery.X0);
+    }
+
+    SimulationParameters deterministicSimulationParameters(const SimulationParameters& sQuery) const{
+        return SimulationParameters(
+            sQuery.solver,
+            sQuery.time,
+            sQuery.dt,
+            // Only need one sample since deterministic
+            1);
+    }
+};
 struct StochasticFullPathsQuery : PathQuery {
     using PathQuery::PathQuery;
+    explicit StochasticFullPathsQuery()
+        : PathQuery(DefinitionParameters(),
+                    stochasticFullPathsSimulationParameters(SimulationParameters()),
+                    SettingsParameters()) {}
+    explicit StochasticFullPathsQuery(const StochasticQuery& sQuery)
+        : PathQuery(sQuery.definitionParameters,
+                    stochasticFullPathsSimulationParameters(sQuery.simulationParameters),
+                    sQuery.settingsParameters) {}
+
+    SimulationParameters stochasticFullPathsSimulationParameters(const SimulationParameters& sQuery) const{
+        return SimulationParameters(
+            sQuery.solver,
+            sQuery.time,
+            sQuery.dt,
+            // Only drawn paths are kept as full paths
+            std::min(sQuery.samples, DefaultConstants::maxPathsToDraw));
+    }
 };
 using AnyQuery = std::variant<DeterministicQuery, StochasticQuery, StochasticFullPathsQuery>;
 

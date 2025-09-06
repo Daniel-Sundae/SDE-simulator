@@ -42,7 +42,7 @@ enum class DefinitionWidget {
     PROCESS = 0,
     MU,
     SIGMA,
-    STARTVALUE
+    X0
 };
 
 enum class SimulationWidget {

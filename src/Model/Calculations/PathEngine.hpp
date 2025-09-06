@@ -13,8 +13,6 @@ class PathEngine{
 public:
     explicit PathEngine() = default;
     [[nodiscard]] AnyJob processQuery(const AnyQuery &query);
-    bool isBusy();
-
 private:
     std::unique_ptr<EngineThreadPool> m_tp =
         std::make_unique<EngineThreadPool>();

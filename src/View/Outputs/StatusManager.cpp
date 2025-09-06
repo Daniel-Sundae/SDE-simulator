@@ -85,10 +85,10 @@ void StatusManager::setProgress(const size_t pathsCompleted){
 }
 
 void StatusManager::setResults(State minXT, State maxXT, State minXt, State maxXt) {
-    m_resultInfo->minXT->setText(QString::number(minXT, 'f', 3));
-    m_resultInfo->maxXT->setText(QString::number(maxXT, 'f', 3));
-    m_resultInfo->minXt->setText(QString::number(minXt, 'f', 3));
-    m_resultInfo->maxXt->setText(QString::number(maxXt, 'f', 3));
+    m_resultInfo->minXT->setText(QString::number(minXT, 'f', 4));
+    m_resultInfo->maxXT->setText(QString::number(maxXT, 'f', 4));
+    m_resultInfo->minXt->setText(QString::number(minXt, 'f', 4));
+    m_resultInfo->maxXt->setText(QString::number(maxXt, 'f', 4));
     m_resultInfo->minXT->repaint();
     m_resultInfo->maxXT->repaint();
     m_resultInfo->minXt->repaint();
@@ -102,8 +102,8 @@ void StatusManager::setReady(){
 }
 
 void StatusManager::setEVSTDInfo(State mu, State sigma){
-    m_resultInfo->expectedValue->setText(QString::number(mu, 'f', 3));
-    m_resultInfo->stdDevValue->setText(QString::number(sigma, 'f', 3));
+    m_resultInfo->expectedValue->setText(QString::number(mu, 'f', 4));
+    m_resultInfo->stdDevValue->setText(QString::number(sigma, 'f', 4));
 }
 
 void StatusManager::prepareStatusInfo(const size_t totalPaths){
@@ -116,11 +116,11 @@ void StatusManager::setQueryInfo(const PathQuery& query){
     QString queryInfo;
     QTextStream streamParams(&queryInfo);
     streamParams
-                << QString::fromUtf8( getField(FieldTags::name{}, query.processDefinition.type) ) << ": "
-                << QString::fromUtf8( getField(FieldTags::definition{}, query.processDefinition.type) ) << "\n"
-                << "μ = " << QString::number(query.processDefinition.drift.mu()) << ", "
-                << "σ = " << QString::number(query.processDefinition.diffusion.sigma()) << ", "
-                << "X" << QString::fromUtf8("\u2080") << " = " << QString::number(query.processDefinition.startValue) << "\n"
+                << QString::fromUtf8( getField(FieldTags::name{}, query.definitionParameters.type) ) << ": "
+                << QString::fromUtf8( getField(FieldTags::definition{}, query.definitionParameters.type) ) << "\n"
+                << "μ = " << QString::number(query.definitionParameters.drift.mu()) << ", "
+                << "σ = " << QString::number(query.definitionParameters.diffusion.sigma()) << ", "
+                << "X" << QString::fromUtf8("\u2080") << " = " << QString::number(query.definitionParameters.X0) << "\n"
                 << "Solver = " << solverToString.at(query.simulationParameters.solver) << ", "
                 << "T = " << QString::number(query.simulationParameters.time) << ", "
                 << "dt = " << QString::number(query.simulationParameters.dt) << ", "

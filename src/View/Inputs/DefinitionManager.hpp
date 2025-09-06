@@ -19,5 +19,5 @@ private:
     QComboBox* m_process;
     QDoubleSpinBox* m_muWidget;
     QDoubleSpinBox* m_sigmaWidget;
-    QDoubleSpinBox* m_startValueWidget;
+    QDoubleSpinBox* m_X0Widget;
 };

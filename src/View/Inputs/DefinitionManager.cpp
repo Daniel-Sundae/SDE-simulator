@@ -12,7 +12,7 @@ DefinitionManager::DefinitionManager(InputDispatcher *parent)
     , m_process(new QComboBox(this))
     , m_muWidget(new QDoubleSpinBox(this))
     , m_sigmaWidget(new QDoubleSpinBox(this))
-    , m_startValueWidget(new QDoubleSpinBox(this))
+    , m_X0Widget(new QDoubleSpinBox(this))
 {
     addDefinitionWidgets();
     initializeDesign();
@@ -29,10 +29,10 @@ void DefinitionManager::updateWidgetProperties(ProcessType process){
     m_sigmaWidget->setValue(sigmaData.defaultValue);
     m_sigmaWidget->setSingleStep(sigmaData.incrementSize);
 
-    Constants startValue = getField(FieldTags::startValue{}, process);
-    m_startValueWidget->setRange(startValue.allowedValues.first, startValue.allowedValues.second);
-    m_startValueWidget->setValue(startValue.defaultValue);
-    m_startValueWidget->setSingleStep(startValue.incrementSize);
+    Constants X0 = getField(FieldTags::X0{}, process);
+    m_X0Widget->setRange(X0.allowedValues.first, X0.allowedValues.second);
+    m_X0Widget->setValue(X0.defaultValue);
+    m_X0Widget->setSingleStep(X0.incrementSize);
 }
 
 void DefinitionManager::addDefinitionWidgets(){
@@ -51,7 +51,7 @@ void DefinitionManager::addDefinitionWidgets(){
     updateWidgetProperties(DefaultConstants::process);
     auto definitionModifiedCb = [this](DefinitionWidget param) {
         return [this, param](double newValue) {
-            Parent()->onProcessDefinitionModified(param, newValue);
+            Parent()->onDefinitionParametersModified(param, newValue);
             };
         };
 
@@ -77,10 +77,10 @@ void DefinitionManager::addDefinitionWidgets(){
         definitionModifiedCb(DefinitionWidget::SIGMA)
     );
     connect(
-        m_startValueWidget,
+        m_X0Widget,
         QOverload<double>::of(&QDoubleSpinBox::valueChanged),
         this,
-        definitionModifiedCb(DefinitionWidget::STARTVALUE)
+        definitionModifiedCb(DefinitionWidget::X0)
     );
 }
 
@@ -91,5 +91,5 @@ void DefinitionManager::initializeDesign(){
     definitionLayout->addRow(new QLabel("Process:", this), m_process);
     definitionLayout->addRow(new QLabel("Drift (μ):", this), m_muWidget);
     definitionLayout->addRow(new QLabel("Diffusion (σ):", this), m_sigmaWidget);
-    definitionLayout->addRow(new QLabel("Start (X<sub>0</sub>):", this), m_startValueWidget);
+    definitionLayout->addRow(new QLabel("Start (X<sub>0</sub>):", this), m_X0Widget);
 }

@@ -31,10 +31,10 @@ static Path samplePath(
         std::stop_token stopToken) {
     if (stopToken.stop_requested()) return {};
     const auto points = query.simulationParameters.steps() + 1;
-    const auto& drift = query.processDefinition.drift;
-    const auto& diffusion = query.processDefinition.diffusion;
+    const auto& drift = query.definitionParameters.drift;
+    const auto& diffusion = query.definitionParameters.diffusion;
     const Time dt = query.simulationParameters.dt;
-    State XT = query.processDefinition.startValue;
+    State XT = query.definitionParameters.X0;
     State minXt = XT;
     State maxXt = XT;
     auto dXt = dXtFunction(query.simulationParameters.solver);
@@ -96,10 +96,10 @@ static std::optional<State> samplePathXT(
     // Worker threads should always start by checking for user cancellation
     if (stopToken.stop_requested()) return std::nullopt;
     const auto points = query.simulationParameters.steps() + 1;
-    const auto& drift = query.processDefinition.drift;
-    const auto& diffusion = query.processDefinition.diffusion;
+    const auto& drift = query.definitionParameters.drift;
+    const auto& diffusion = query.definitionParameters.diffusion;
     const Time dt = query.simulationParameters.dt;
-    State XT = query.processDefinition.startValue;
+    State XT = query.definitionParameters.X0;
     State minXt = XT;
     State maxXt = XT;
     auto dXt = dXtFunction(query.simulationParameters.solver);
@@ -175,8 +175,4 @@ static Distribution sampleDistribution(
             return fpJob;
         }
     }, aQuery);
-}
-
-bool PathEngine::isBusy(){
-    return m_tp->nrBusyThreads() != 0;
 }

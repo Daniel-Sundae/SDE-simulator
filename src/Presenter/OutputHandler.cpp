@@ -47,11 +47,11 @@ void OutputHandler::distributionJobData(size_t pathsCompleted, State minXT, Stat
 
 void OutputHandler::onStartTransaction(const PathQuery& query){
     m_currentPDF = getField(FieldTags::pdf{},
-        query.processDefinition.type,
-        query.processDefinition.startValue,
+        query.definitionParameters.type,
+        query.definitionParameters.X0,
         query.simulationParameters.time,
-        query.processDefinition.drift.mu(),
-        query.processDefinition.diffusion.sigma()
+        query.definitionParameters.drift.mu(),
+        query.definitionParameters.diffusion.sigma()
     );
     prepareGUI(query);
     m_pathsReceived = false;
@@ -72,7 +72,7 @@ void OutputHandler::prepareGUI(const PathQuery& query){
     m_outputDispatcher->updatePathChartTitle(DefaultConstants::maxPathsToDraw >= query.simulationParameters.samples);
     
     // DistributionChart
-    m_outputDispatcher->updateDistributionChartTitle(query.processDefinition.type);
+    m_outputDispatcher->updateDistributionChartTitle(query.definitionParameters.type);
     m_outputDispatcher->setDistributionChartSupport(m_currentPDF.support(std::nullopt, std::nullopt));
     m_outputDispatcher->updateDistributionChartEV(m_currentPDF.EV);
 }

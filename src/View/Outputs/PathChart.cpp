@@ -43,10 +43,11 @@ void PathChart::clearPathChart(){
 }
 
 void PathChart::plotDriftCurve(const Path& drift, State minXt, State maxXt){
+    if(drift.size() < 2) return;
     QVector<QPointF> points;
     expandYAxisRange(minXt, maxXt);
     points.reserve(static_cast<qsizetype>(drift.size()));
-    const double intervalWidth = (m_xAxisTime->max() - m_xAxisTime->min())/static_cast<qreal>(drift.size());
+    const double intervalWidth = (m_xAxisTime->max() - m_xAxisTime->min())/static_cast<qreal>(drift.size()-1);
     for (size_t i = 0; i < drift.size(); ++i) {
         points.append(QPointF(double(i)*intervalWidth, drift[i]));
     }
