@@ -22,7 +22,6 @@ endif()
 
 add_compile_options(
   /W4 /permissive- /MP
-  #$<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:CXX>>:/fsanitize=address>
   $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:CXX>>:/Zi>
   $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:CXX>>:/sdl>
   $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:CXX>>:/analyze>

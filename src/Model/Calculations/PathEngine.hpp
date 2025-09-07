@@ -1,13 +1,8 @@
 #pragma once
-#include "Types.hpp"
 #include "EngineThreadPool.hpp"
+#include "PathQuery.hpp"
 #include "Job.hpp"
 #include <memory>
-#include <functional>
-#include <cmath>
-
-struct PathQuery;
-struct Transaction;
 
 class PathEngine{
 public:

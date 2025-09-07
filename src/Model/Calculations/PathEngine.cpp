@@ -1,7 +1,6 @@
 #include "PathEngine.hpp"
 #include "PathQuery.hpp"
 #include "SolverData.hpp"
-#include "Transaction.hpp"
 #include <thread>
 
 static void updateJobData(
@@ -15,9 +14,7 @@ static void updateJobData(
     State currentMaxXT = jobData->maxXT.load();
     State currentMinXt = jobData->minXt.load();
     State currentMaxXt = jobData->maxXt.load();
-    
     // If current value is stale, update it and if needed, try again
-
     while(XT < currentMinXT && !jobData->minXT.compare_exchange_strong(currentMinXT, XT, std::memory_order_relaxed, std::memory_order_relaxed));
     while(XT > currentMaxXT && !jobData->maxXT.compare_exchange_strong(currentMaxXT, XT, std::memory_order_relaxed, std::memory_order_relaxed));
     while(minXt < currentMinXt && !jobData->minXt.compare_exchange_strong(currentMinXt, minXt, std::memory_order_relaxed, std::memory_order_relaxed));

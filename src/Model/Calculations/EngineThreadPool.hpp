@@ -28,8 +28,6 @@ public:
         m_cv.notify_one();
         return fut;
     }
-
-    size_t nrBusyThreads() const;
 private:
     void doTasks();
 private:
@@ -37,6 +35,5 @@ private:
     std::queue<std::move_only_function<void()>> m_tasks{};
     std::condition_variable m_cv{};
     std::mutex m_taskMtx{};
-    std::atomic<uint32_t> m_nrBusyThreads{0};
     std::atomic<bool> m_shutdownInProgress{false};
 };

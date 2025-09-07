@@ -24,10 +24,6 @@ EngineThreadPool::~EngineThreadPool()
     }
 }
 
-size_t EngineThreadPool::nrBusyThreads() const{
-    return m_nrBusyThreads.load();
-}
-
 void EngineThreadPool::doTasks()
 {
     std::move_only_function<void()> task;
@@ -39,8 +35,6 @@ void EngineThreadPool::doTasks()
             task = std::move(m_tasks.front());
             m_tasks.pop();
         }
-        m_nrBusyThreads++;
         task(); // Sets value on promise
-        m_nrBusyThreads--;
     }
 }

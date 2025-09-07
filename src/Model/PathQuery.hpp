@@ -78,10 +78,10 @@ struct DeterministicQuery : PathQuery {
         : PathQuery(deterministicDefinitionParameters(DefinitionParameters(pt)),
                     deterministicSimulationParameters(SimulationParameters()),
                     SettingsParameters()) {}
-    explicit DeterministicQuery(const StochasticQuery& sQuery)
-        : PathQuery(deterministicDefinitionParameters(sQuery.definitionParameters),
-                    deterministicSimulationParameters(sQuery.simulationParameters),
-                    sQuery.settingsParameters) {}
+    explicit DeterministicQuery(const PathQuery& query)
+        : PathQuery(deterministicDefinitionParameters(query.definitionParameters),
+                    deterministicSimulationParameters(query.simulationParameters),
+                    query.settingsParameters) {}
 
     DefinitionParameters deterministicDefinitionParameters(const DefinitionParameters& sQuery) const{
         return DefinitionParameters(
