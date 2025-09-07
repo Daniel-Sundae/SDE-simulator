@@ -2,7 +2,6 @@
 #include "InputDispatcher.hpp"
 #include "ViewUtils.hpp"
 #include <QtWidgets/QCheckBox>
-#include <QtWidgets/QFormLayout>
 #include <QtWidgets/QLabel>
 
 
@@ -67,11 +66,17 @@ void SettingsManager::addSeedWidget(){
 void SettingsManager::initializeDesign(){
     setTitle("Settings");
     setStyleSheet(GUI::groupBoxDescription() + GUI::checkBoxDescription());
-    auto* simulationLayout = new QFormLayout(this);
-    auto* multiThreadingLabel = new QLabel("Multithreading:", this);
-    multiThreadingLabel->setToolTip("Toggle multithreading to compare performance.");
-    simulationLayout->addRow(multiThreadingLabel, m_multiThreadingCheckBox);
+
     auto* fixSeedLabel = new QLabel("Fix seed:", this);
     fixSeedLabel->setToolTip("Set source of randomness.");
-    simulationLayout->addRow(fixSeedLabel, m_seedWidget);
+
+    auto* grid = new QGridLayout(this);
+    GUI::initGridLayout(grid);
+
+    auto* multiThreadingLabel = new QLabel("Multithreading:", this);
+    multiThreadingLabel->setToolTip("Toggle multithreading to compare performance.");
+    grid->addWidget(multiThreadingLabel,      0, 0);
+    grid->addWidget(m_multiThreadingCheckBox, 0, 1);
+    grid->addWidget(fixSeedLabel,             1, 0);
+    grid->addWidget(m_seedWidget,             1, 1);
 }

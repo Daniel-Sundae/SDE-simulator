@@ -2,7 +2,6 @@
 #include "Constants.hpp"
 #include "ViewUtils.hpp"
 #include <QtWidgets/QComboBox>
-#include <QtWidgets/QFormLayout>
 #include <QtWidgets/QLabel>
 
 
@@ -89,12 +88,17 @@ void SimulationManager::addSpinBoxes(){
 void SimulationManager::initializeDesign(){
     setTitle("Simulation");
     setStyleSheet(GUI::groupBoxDescription() + GUI::comboBoxDescription() + GUI::spinBoxDescription());
-    auto* simulationLayout = new QFormLayout(this);
-    simulationLayout->addRow(new QLabel("Solver:", this), m_widgets[SimulationWidget::SOLVER]);
-    simulationLayout->addRow(new QLabel("Time (T):", this), m_widgets[SimulationWidget::TIME]);
-    simulationLayout->addRow(new QLabel("Time step (dt):", this), m_widgets[SimulationWidget::dt]);
+    
     auto* samplesLabel = new QLabel("Samples:", this);
     samplesLabel->setToolTip("Nr samples (paths) to generate.");
-    simulationLayout->addRow(samplesLabel, m_widgets[SimulationWidget::SAMPLES]);
-
+    auto* grid = new QGridLayout(this);
+    GUI::initGridLayout(grid);
+    grid->addWidget(new QLabel("Solver:", this),           0, 0);
+    grid->addWidget(m_widgets[SimulationWidget::SOLVER],   0, 1);
+    grid->addWidget(new QLabel("Time (T):", this),         1, 0);
+    grid->addWidget(m_widgets[SimulationWidget::TIME],     1, 1);
+    grid->addWidget(new QLabel("Time step (dt):", this),   2, 0);
+    grid->addWidget(m_widgets[SimulationWidget::dt],       2, 1);
+    grid->addWidget(samplesLabel,                          3, 0);
+    grid->addWidget(m_widgets[SimulationWidget::SAMPLES],  3, 1);
 }

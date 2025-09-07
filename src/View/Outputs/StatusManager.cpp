@@ -11,18 +11,12 @@ static const std::unordered_map<SolverType, QString> solverToString = {
     std::pair{SolverType::MILSTEIN, QString("Milstein")}
 };
 
-static void initGridLayout(QGridLayout* grid) {
-    grid->setContentsMargins(6, 4, 6, 6);
-    grid->setHorizontalSpacing(8);
-    grid->setVerticalSpacing(2);
-}
-
 StatusManager::QueryInfo::QueryInfo(QWidget* parent)
     : QGroupBox("Query", parent)
     , infoLabel(new QLabel(this))
 {
     auto* grid = new QGridLayout(this);
-    initGridLayout(grid);
+    GUI::initGridLayout(grid);
     grid->addWidget(infoLabel);
 }
 
@@ -36,7 +30,7 @@ StatusManager::ResultInfo::ResultInfo(QWidget* parent = nullptr)
     , stdDevValue(new QLabel(this))
 {
     auto* grid = new QGridLayout(this);
-    initGridLayout(grid);
+    GUI::initGridLayout(grid);
 
     grid->addWidget(new QLabel("Min X(T):"),  0,0);
     grid->addWidget(minXT,                    0,1);
@@ -60,7 +54,7 @@ StatusManager::StatusInfo::StatusInfo(QWidget* parent)
     , progressBar(new QProgressBar(this))
 {
     auto* grid = new QGridLayout(this);
-    initGridLayout(grid);
+    GUI::initGridLayout(grid);
     progressBar->setFormat("%v/%m");
     grid->addWidget(currentStatus, 0, 0);
     grid->addWidget(progressBar, 1, 0);

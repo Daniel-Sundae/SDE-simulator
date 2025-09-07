@@ -4,7 +4,6 @@
 #include "ViewUtils.hpp"
 #include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QComboBox>
-#include <QtWidgets/QFormLayout>
 #include <QtWidgets/QLabel>
 
 DefinitionManager::DefinitionManager(InputDispatcher *parent)
@@ -87,9 +86,18 @@ void DefinitionManager::addDefinitionWidgets(){
 void DefinitionManager::initializeDesign(){
     setTitle("Definition");
     setStyleSheet(GUI::groupBoxDescription() + GUI::comboBoxDescription() + GUI::spinBoxDescription());
-    auto* definitionLayout = new QFormLayout(this);
-    definitionLayout->addRow(new QLabel("Process:", this), m_process);
-    definitionLayout->addRow(new QLabel("Drift (μ):", this), m_muWidget);
-    definitionLayout->addRow(new QLabel("Diffusion (σ):", this), m_sigmaWidget);
-    definitionLayout->addRow(new QLabel("Start (X<sub>0</sub>):", this), m_X0Widget);
+    
+    auto* grid = new QGridLayout(this);
+    GUI::initGridLayout(grid);
+
+    grid->addWidget(new QLabel("Process:", this),      0, 0);
+    grid->addWidget(m_process,                         0, 1);
+    grid->addWidget(new QLabel("Drift (μ):", this),    1, 0);
+    grid->addWidget(m_muWidget,                        1, 1);
+
+    grid->addWidget(new QLabel("Diffusion (σ):", this), 2, 0);
+    grid->addWidget(m_sigmaWidget,                      2, 1);
+
+    grid->addWidget(new QLabel("Start (X<sub>0</sub>):", this), 3, 0);
+    grid->addWidget(m_X0Widget,                                 3, 1);
 }

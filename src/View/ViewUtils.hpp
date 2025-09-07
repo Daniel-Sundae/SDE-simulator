@@ -87,4 +87,10 @@ namespace GUI
             axis->setLinePen(QPen(Qt::white));
         }
     }
+
+    inline void initGridLayout(QGridLayout* grid) {
+        grid->setContentsMargins(6, 4, 6, 6);
+        grid->setHorizontalSpacing(8);
+        grid->setVerticalSpacing(2);
+    }
 }
